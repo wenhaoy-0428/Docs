@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="description" content="Description">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <link rel="stylesheet" href="//unpkg.com/docsify/themes/vue.css">
+  <link rel="stylesheet" href="https://unpkg.com/docsify-plugin-toc@1.3.1/dist/light.css">
+</head>
+<body>
+  <div id="app"></div>
+  <script>
+    window.$docsify = {
+      name: '',
+      repo: '',
+      loadSidebar: true,
+      subMaxLevel: 3,
+      // sidebarDisplayLvel: 1,
+      // plantuml theme
+      plantuml: {
+        skin: 'classic',
+      },
+      // path config
+      relativePath: true,
+      alias: {
+        '/html_path/(.*)': '/frontEnd/html/$1',
+        '/css_path/(.*)': '/frontEnd/css/$1',
+      },
+      toc: {
+        tocMaxLevel: 2,
+        target: 'h2'
+      },
+    }
+  </script>
+  <!-- Docsify v4 -->
+  <script src="//unpkg.com/docsify/lib/docsify.min.js"></script>
+  <!-- Language highlights -->
+  <script src="//unpkg.com/prismjs/components/prism-c.min.js"></script>
+  <script src="//unpkg.com/prismjs/components/prism-cpp.min.js"></script>
+  <script src="//unpkg.com/prismjs/components/prism-bash.min.js"></script>
+  <script src="//unpkg.com/prismjs@1.28.0/components/prism-php.min.js"></script>
+  <!-- plantuml -->
+  <script src="//unpkg.com/docsify-plantuml/dist/docsify-plantuml.min.js"></script>
+  
+  <script src="https://unpkg.com/docsify-plugin-toc@1.3.1/dist/docsify-plugin-toc.min.js"></script>
+
+
+
+</body>
+</html>

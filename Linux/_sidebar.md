@@ -1,0 +1,3 @@
+- [Home](../README.md)
+- [Linux](./linuxNotes.md)
+- [Server](./serverNotes.md)
