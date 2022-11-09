@@ -1,10 +1,10 @@
 # RoadMap
 
-> ## [FrontEnd](/frontEnd/README.md)
+> ## [FrontEnd](/FrontEnd/README.md)
 
-1. #### [HTML](/frontEnd/html/htmlNotes.md)
+1. #### [HTML](/FrontEnd/Html/htmlNotes.md)
 
-2. #### [CSS](/frontEnd/css/cssNotes.md)
+2. #### [CSS](/FrontEnd/Css/cssNotes.md)
     1. #### CSS float
     2. #### CSS flexBox
     3. #### CSS Grid

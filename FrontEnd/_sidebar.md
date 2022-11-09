@@ -1,4 +1,4 @@
 - [**Home**](../README.md)
-- [HTML](./html/htmlNotes.md)
-- [CSS](./css/cssNotes.md)
-- [Q&A](./QnA/questions.md)
+- [HTML](/FrontEnd/Html/htmlNotes.md)
+- [CSS](/FrontEnd/Css/cssNotes.md)
+- [Q&A](/FrontEnd/QnA/questions.md)

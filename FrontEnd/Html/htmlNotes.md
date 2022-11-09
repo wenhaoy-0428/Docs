@@ -156,7 +156,7 @@ The target attribute can have one of the following values:
     </tr>
     ...
     ```
-    <iframe src="/frontEnd/html/htmlSamples/colgroup.html"></iframe>
+    <iframe src="/FrontEnd/Html/HtmlSamples/colgroup.html"></iframe>
 
 3. Headers can be vertical/horizontal. They can also occupy multiple rows/cols by using `rowspan`/`colspan` respectively. [->Ref](https://www.w3schools.com/html/html_table_headers.asp)
 
@@ -172,7 +172,7 @@ The target attribute can have one of the following values:
     <dd>- white cold drink</dd>
     </dl>
     ```
-    <iframe src="/frontEnd/html/htmlSamples/dl.html" name="iframe_a" height="100px" width="100%"></iframe>
+    <iframe src="/FrontEnd/Html/HtmlSamples/dl.html" name="iframe_a" height="100px" width="100%"></iframe>
 
 
 ### Block/Inline
@@ -240,11 +240,11 @@ inline elements are the opposite to block-level ones.<br>
     - **When the screen size is smaller than the widest element**, viewport will shrink to a point where it's the smallest default value such as 900px, or it's tinny bit larger than the widest element if the width is larger than the default value, so that element is contained without scrollbar.
 
     The problem here is: When using a smaller device, the browser will render everything based on the viewport size which is larger than the device sceen size. The viewport will be squashed just like rule `#1` into the screen.
-    <img src='/frontEnd/html/assets/viewport1.png' style="display:block" height=200px></img>
+    <img src='/FrontEnd/Html/assets/viewport1.png' style="display:block" height=200px></img>
 
     Experiments can be done with this HTML and Chrome browser.
 
-    <iframe src="/frontEnd/html/htmlSamples/viewport.html" title="viewport experiment"></iframe>
+    <iframe src="/FrontEnd/Html/HtmlSamples/viewport.html" title="viewport experiment"></iframe>
 
     **In summary**, the browser will always try to fit the viewport in scale 1 into our screen, and if we change `image/div and etc.` to responsive like width 100%, then with `viewport=device-width`, viewport will always be set to the screen size, and therefore, everything looks good.
 
