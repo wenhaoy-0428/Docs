@@ -18,3 +18,9 @@
 - [LED1](https://ubuntu.com/tutorials/gpio-on-raspberry-pi#3-basic-gpio-example)
 - [LED2](https://www.youtube.com/watch?v=w_z0BUkzbIg)
 - [LEDStrip](https://dordnung.de/raspberrypi-ledstrip/)
+
+## [Nginx SetUp](https://www.plesk.com/blog/various/nginx-configuration-guide/)
+
+## [Nginx on LAN](https://stackoverflow.com/questions/45241243/accessing-nginx-virtual-host-in-local-network)
+
+## [Notes on default server](https://linuxhint.com/what-is-default-server-in-nginx/)

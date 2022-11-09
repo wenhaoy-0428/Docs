@@ -1,3 +1,3 @@
-- [Home](../README.md)
-- [Cpp](/BackEnd/cpp/cppNotes.md)
-- [gMock](/BackEnd/cpp/gMock.md)
+- [Home](/README.md)
+- [Cpp](/BackEnd/Cpp/cppNotes.md)
+- [gMock](/BackEnd/Cpp/gMock.md)
