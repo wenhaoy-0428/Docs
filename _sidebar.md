@@ -2,6 +2,7 @@
 * [FrontEnd](/FrontEnd/)
 * [BackEnd](/BackEnd/)
 * [CLI](/CLI/)
+* [English](/English/english.md)
 - Work
     * [Commands](/Work/commands.md)
     * [ErrCode](/Work/errCode.md)
