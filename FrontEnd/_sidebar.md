@@ -1,4 +1,5 @@
 - [**Home**](../README.md)
 - [HTML](/FrontEnd/Html/htmlNotes.md)
 - [CSS](/FrontEnd/Css/cssNotes.md)
+- [JS](/FrontEnd/Js/jsNotes.md)
 - [Q&A](/FrontEnd/QnA/questions.md)
