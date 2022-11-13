@@ -98,6 +98,33 @@ The `Ref` also notified that:
 ?>Then some developers started simply using HTTP as their app->server protocol. In effect, the app is also an HTTP server. The advantage of this is that you don't need to implement any new, possibly buggy, possibly not tested protocol and you can debug your app directly using a web browser (or also commonly, curl). And you don't need a modified web server to support your app, just any web server that can do reverse proxying or redirects.
 
 ---
+
+## Nginx
+
+Nginx is a **web server**<sup>1</sup> that can also be used as a [**reverse proxy**<sup>2</sup>](https://www.cloudflare.com/learning/cdn/glossary/reverse-proxy/), **load balancer**<sup>3</sup>, mail proxy and HTTP cache. 
+
+* Nginx is case sensitive.
+
+### [Nginx SetUp](https://www.plesk.com/blog/various/nginx-configuration-guide/)
+
+Nginx can hold many virtual servers meaning, many websites can be hold on the same machine as they are hosted on different ones. 
+
+* `/etc/nginx/sites-available/example.com` is a config file of Nginx. It includes server blocks that specifies the configurations of the virtual servers. 
+> It's valid to define multiple virtual servers to host different websites in the single config file. But it's less coupled to have each one in a separate config file.
+
+* `/etc/nginx/sites-enabled/*` contains symbolic links of config files to the ones in `/etc/nginx/sites-available/*`. Only config files included in `sites-enabled` folder can be accessed. 
+
+* `listen` specifies the port to listen and [default_server](https://linuxhint.com/what-is-default-server-in-nginx/) specifier indicates this server is served when HTTP Host header remains unmatched with any other server blocks.
+
+### [Nginx on LAN](https://stackoverflow.com/questions/45241243/accessing-nginx-virtual-host-in-local-network)
+
+Each device has a host file as it's own DNS service. Only domain name not found in the host file will be sent to external DNS servers to be resolved. 
+
+Therefore, add host entry in `IP DomainName` pair in `/etc/hosts` file on Mac can resolve local server name in a snap. 
+
+> It's a common practice to have a host software managing local hosts for you. [switchHost](https://swh.app)
+
+
 ## Notes
 
 ### Build FTP server [->Ref](https://help.aliyun.com/document_detail/60152.html)
