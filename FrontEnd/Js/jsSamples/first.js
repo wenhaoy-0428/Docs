@@ -1,6 +1,3 @@
-var x = 10;
-{
-	let x = 20;
-}
-
-console.log(x);
+console.info(typeof null)
+console.info(typeof undefined)
+console.info(null+2)
