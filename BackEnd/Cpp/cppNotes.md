@@ -20,15 +20,24 @@
 
 ## Notes:
 
-### operator precedence
-1. `++ () []`
-2. `a*b, a/b, a%b`
-3. `a+b, a-b`
-4. `a&b`
-5. `a^b`
-6. `a|b`
 
-### Basics
+
+## Basics
+
+### Chapter1
+
+`cout` is a predefined **object** (class), that knows how to handle different kinds of data. It's not a function.
+
+`endl` is a special notation, also dubbed *manipulator*.
+
+The following 2 lines behaves the same as starting a new line. However, `endl` guarantees that the output will be **flushed**, while `\n` on some system doesn't.
+```cpp
+cout << "\n";
+cout << endl;
+```
+
+
+
 
 1. constructors can not be virtual.
 2. `constexpr` is evaluated at compile time, and can be used on functions and constructors while `const` is evaluated at runtime.
@@ -47,6 +56,14 @@
      */
     void myfunc2(int **a)
     ```
+
+### operator precedence
+1. `++ () []`
+2. `a*b, a/b, a%b`
+3. `a+b, a-b`
+4. `a&b`
+5. `a^b`
+6. `a|b`
 
 4. `extern` to tell the compiler that the the variable or function may not be inside this file, but is certainly somewhere else.
 
@@ -207,7 +224,7 @@
     Foo(const Foo &other) = delete;
     ```
 
-#### static
+## static
 
 13. `static` keyword
     * specifies that the **member variable/function**  will be visible/accessible by everything in the current local file and only this local file. And it also makes the variable/function **unbounded** to any class. **Therefore, `this` which points to the current object(class) is not applicable to static memeber function.**  **A static member variable can only be initialized globally.**. Because it's `static`, the variable/function can be directly accessed without declaring a variable of that class first. `static` variable/function will also have a special segment of memory separated from the memory of the class.
@@ -448,7 +465,7 @@ int main() {
     }
     ```
 
-### Casting [->Ref](https://www.geeksforgeeks.org/static_cast-in-c-type-casting-operators/)
+## Casting [->Ref](https://www.geeksforgeeks.org/static_cast-in-c-type-casting-operators/)
 
 1. `static_cast`
     * force conversion that only checks at compile time, has no assurance for runtime safty.
@@ -488,7 +505,7 @@ int main() {
 
 4. `reinterpret_cast` dangerously change the type, wiouth any security checks.
 
-### Template
+## Template
 
 1. `Type Parameter`
     ```cpp
@@ -603,7 +620,7 @@ int main() {
 
   
 
-### RightValues[->Ref](http://thbecker.net/articles/rvalue_references/section_01.html)
+## RightValues[->Ref](http://thbecker.net/articles/rvalue_references/section_01.html)
 
 1. Move assignment operators typically "steal" the resources held by the argument (e.g. pointers to dynamically-allocated objects, file descriptors, TCP sockets, I/O streams, running threads, etc.), rather than make copies of them, and leave the argument in some valid but otherwise indeterminate state. **Therefore, a class with Move assignment operators defined can gain the benefits of rightvalues(move semantics)**.
 
@@ -669,7 +686,7 @@ int main() {
     * A&& & becomes A&
     * A&& && becomes A&&
 
-### Lambda
+## Lambda
 1. variables captured by copy by default are `const`,
     ```cpp
     int main() {
@@ -795,7 +812,7 @@ int main() {
     decltype((a)) x; // int &
     ```
 
-### Smart Pointer
+## Smart Pointer
 
 1. Common Operations
 

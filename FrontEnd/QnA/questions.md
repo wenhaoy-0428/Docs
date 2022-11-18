@@ -1,7 +1,11 @@
-## Questions
+
+FRAMEWORK: https://developer.mozilla.org/en-US/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks
 
 
-### HTML
+# Questions
+
+
+## HTML
 1. The difference between HTTP `GET` and `POST` [->Ref](#get-and-post)
 
 2. How to include Jquery in another JS file?
@@ -13,7 +17,7 @@
 
 ---
 
-### CSS
+## CSS
 1. All pseudo-classes and pseudo-elements [->Ref](https://www.w3schools.com/css/css_pseudo_elements.asp)
 
 2. [How to center elements?](/frontEnd/css/cssNotes.md#center)
@@ -40,11 +44,11 @@
 
 ---
 
-### JS
+## JS
 
 ---
 
-### AppDev
+## AppDev
 
 1. How to make an adaptive input filed that adjust height automatically?
    * `<input type="text">` is designed to accept input in a row, and will shift input accordingly when overflows.
