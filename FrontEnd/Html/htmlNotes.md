@@ -57,10 +57,19 @@ The target attribute can have one of the following values:
     * `_parent` - Opens the document in the parent frame
     * `_top` - Opens the document in the full body of the window
 
-2. Use mailto: inside the href attribute to create a link that opens the user's email program (to let them send a new email)
+2. Use `mailto:` inside the href attribute to create a link that opens the user's email program (to let them send a new email)
 
     ```html
     <a href="mailto:someone@example.com">Send email</a>
+    ```
+3. Use the `download` attribute to provide a default save filename
+
+    ```html
+    <a
+    href="https://download.mozilla.org/?product=firefox-latest-ssl&os=win64&lang=en-US"
+    download="firefox-latest-64bit-installer.exe">
+    Download Latest Firefox for Windows (64-bit) (English, US)
+    </a>
     ```
 
 3. Button to link
@@ -184,11 +193,18 @@ inline elements are the opposite to block-level ones.<br>
 
 ### Iframes
 
-1. Iframes can be used as above, it can also be the `target` of a link.
+`Iframes` is used to embed document into the website. For example, YouTube videos and etc. 
+
+`Iframes` can be used as above, it can also be the `target` of a link.
     ```html
     <iframe src="demo_iframe.htm" name="iframe_a" title="Iframe Example"></iframe>
     <p><a href="https://www.w3schools.com" target="iframe_a">W3Schools.com</a></p>
     ```
+
+However, `Iframes` can lead to clickjacking. To prevent this:
+1. Use HTTPS.
+2. Always specify [sandbox](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-sandbox) attribute. As it restricts the `Iframe` in various ways.
+3. Add [X-Frame-Options](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options) to disallow your website to be hosted as `Iframe` in other websites.
 
 ### Semantic Elements
 

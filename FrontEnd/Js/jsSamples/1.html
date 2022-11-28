@@ -1,19 +1,21 @@
 <!DOCTYPE html>
-<html>
-<body>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple DOM example</title>
+    <style>
+      .A + p {
+        background-color: aqua;
 
-<h2>JavaScript Strings</h2>
-
-<p>The escape sequence \\ inserts a backslash in a string.</p>
-
-<p id="demo"></p>
-
-<script>
-let text = \
-    "The character is called backslash.";
-document.getElementById("demo").innerHTML = text; 
-</script>
-
-</body>
+      }
+    </style>
+  </head>
+  <body>
+    <div class="A">
+      A
+    </div>
+    <p>B</p>
+    <p>C</p>
+  </body>
 </html>
-

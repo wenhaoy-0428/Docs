@@ -1,3 +1,7 @@
+## Questions
+
+1. [What is stack context](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Positioning/Understanding_z_index/The_stacking_context)
+
 ## Index
 1. There are four different techniques to create multi-column layouts.
     * [CSS framework: BootStrap](#TODO)
@@ -5,71 +9,62 @@
     * [CSS flexbox](#flexbox)
     * [CSS grid](#grid)
 
-## Basic
 
-### Cascading oder
+## Shorthands
 
-1. Inline style (inside an HTML element)
-2. External and internal style sheets (in the head section), **the value from the last read style sheet will be used.**
-3. Browser default
+Some properties like `font`, `background`, `padding`, `border`, and `margin` are called shorthand properties. This is because shorthand properties set several values in a single line.
 
-### Margin Collapse
+!> One less obvious aspect of using CSS shorthand is how omitted values reset. A value not specified in CSS shorthand reverts to **its initial value**. This means an omission in CSS shorthand can override previously set values.
 
-1. Top and bottom margins of elements are sometimes collapsed into a single margin that is equal to the largest of the two margins.[->Ref](https://stackoverflow.com/questions/9519841/why-does-this-css-margin-top-style-not-work)
-    <iframe src="/FrontEnd/Css/CssSamples/collapse.html"></iframe>
+### [How CSS Works](https://developer.mozilla.org/en-US/docs/Learn/CSS/First_steps/How_CSS_works#how_does_css_actually_work)
 
-### Box-Sizing
+![Process](./Assets/rendering.svg)
 
-1. First checkout the [Box Model](https://www.w3schools.com/css/css_boxmodel.asp) of HTML.
-2. !> `width` of element specifies the the width of the `content` only. Therefore, the total width of an element may be larger than expected.
-3. `box-sizing: border-box;` makes sure the total width is `300px`, and content size will be adjusted accordingly.
-    ```css
-    div.ex1 {
-    width: 300px;
-    background-color: yellow;
-    }
 
-    div.ex2 {
-    width: 300px;
-    padding: 25px;
-    background-color: lightblue;
-    /*box-sizing: border-box;*/
-    }
-    ```
-    <iframe src="/FrontEnd/Css/CssSamples/boxSizing.html"></iframe>
 
-### Text
 
-1. `text-overflow` allows us to specify the behavior when the container is not big enough to contain the texts.
-    ```css
-    p.test1 {
-    white-space: nowrap; /* specify text to be one line only */
-    width: 200px;
-    border: 1px solid #000000;
-    overflow: hidden;
-    text-overflow: clip;
-    }
+## Cascading oder
 
-    p.test2 {
-    white-space: nowrap;
-    width: 200px;
-    border: 1px solid #000000;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    }
-    ```
-2. `clip` will cut the text directly, and `ellipsis` will add `...` at the end.
-3. Both attributes requires `overflow` is set to `hidden`.
+Some properties are inherited from the parent nodes, such as `color`. There are several inheritance values allowing us to control how the property works.
+Refer to [Controlling inheritance](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Cascade_and_inheritance#controlling_inheritance) for better demonstration. 
 
-### Selector
+Property [all](https://developer.mozilla.org/en-US/docs/Web/CSS/all) can be used to set all inherited properties at once.
+
+
+The cascading order is calculated based on: 
+1. Source Order: 
+    1. Inline style (inside an HTML element)
+    2. External and internal style sheets (in the head section), **the value from the last read style sheet will be used.**
+    3. Browser default
+2. [Specificity](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Cascade_and_inheritance#specificity_2)
+    - [Selectors](#selector) can be classified into `ID, CLASS, ELEMENT` categories. They can be thought as a 3 digit number in which, `ID` plays as the hundreds place, and `CLASS` as the tens place, and `ELEMENT` as ones place. 
+    > No matter how many `ELEMENT` specificity adds up, it can be more specific than 1 single `CLASS` specificity, same for `CLASS` to `ID`.
+3. Importance: 
+```css
+p {
+    border: none !important;
+}
+```
+
+## Selector
 
 1. Simple Selector
 2. Combinator selectors
 3. Pseudo-class selectors
 4. Pseudo-elements selectors
 5. Attribute selectors
-6. Priority can be referred here[->Ref](https://www.w3schools.com/css/css_specificity.asp)
-7. `!important` specifier can override priority hierarchy.
+6. Priority can be referred to [Cascading Order](#cascading-oder)
+
+
+#### Selector List
+
+We can combine multiple selector into a single list separated by `,`. 
+```css
+h1, .special {
+  color: blue;
+}
+```
+> Doing so makes the stylesheet more succinct but when any one of selector in the selector list becomes invalid, the whole whole selector list is ignored.
 
 #### Simple Selector
 select elements based on name, id, class
@@ -185,7 +180,30 @@ combinations of elements (element `?` element)
     ```
 3. attributes with value starts with "a whole word" "a string"/ ends with ... [->Ref](https://www.w3schools.com/css/css_attribute_selectors.asp)
 
-### Center
+## Text
+
+1. `text-overflow` allows us to specify the behavior when the container is not big enough to contain the texts.
+    ```css
+    p.test1 {
+    white-space: nowrap; /* specify text to be one line only */
+    width: 200px;
+    border: 1px solid #000000;
+    overflow: hidden;
+    text-overflow: clip;
+    }
+
+    p.test2 {
+    white-space: nowrap;
+    width: 200px;
+    border: 1px solid #000000;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    }
+    ```
+2. `clip` will cut the text directly, and `ellipsis` will add `...` at the end.
+3. Both attributes requires `overflow` is set to `hidden`.
+
+## Center
 
 1. `text-align` : `left/right`, `center`, `justified` where `justified` makes sure each line is stretched so that every line has equal width just like a magazine square.
 
@@ -209,7 +227,80 @@ combinations of elements (element `?` element)
 
 4. more can be found here[->Ref](https://www.w3schools.com/css/css_align.asp)
 
-### Display
+
+## [CSS layer](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Cascade_and_inheritance#the_effect_of_css_location)
+//TODO
+
+
+## [Box Model](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/The_box_model)
+
+Box have `block boxes` and `inline boxes`, Boxes have an `inner` display type and an `outer` display type.
+
+**Outer display type**: Indicates how elements behave relative to other elements that are outside of the current element.
+For [display: block/inline;](#display) sets the outer display attributes.
+
+**Inner display type**:  Dictates how elements inside that box are laid out.
+For [display: flex;](#flexbox) sets the inner display type, while maintaining the `block` outer display type.
+
+Margins doesn't count into the Box size. Refer to [Box-sizing](#box-sizing) for details about how standard and alternate box model using `box-sizing: border-box`.
+
+
+
+
+
+#### Margin Collapse
+
+1. Top and bottom margins of elements are sometimes collapsed into a single margin that is equal to the largest of the two margins.
+Check out [Mastering margin collapsing](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Box_Model/Mastering_margin_collapsing) for more details.
+Check this classic [Example](https://stackoverflow.com/questions/9519841/why-does-this-css-margin-top-style-not-work)
+    <iframe src="/FrontEnd/Css/CssSamples/collapse.html"></iframe>
+
+#### Box-Sizing
+
+1. First checkout the [Box Model](#box-model) of HTML.
+2. !> `width` of element specifies the the width of the `content` only. Therefore, the total width of an element may be larger than expected.
+3. `box-sizing: border-box;` makes sure the total width is `300px`, and content size will be adjusted accordingly.
+    ```css
+    div.ex1 {
+    width: 300px;
+    background-color: yellow;
+    }
+
+    div.ex2 {
+    width: 300px;
+    padding: 25px;
+    background-color: lightblue;
+    /*box-sizing: border-box;*/
+    }
+    ```
+    <iframe src="/FrontEnd/Css/CssSamples/boxSizing.html"></iframe>
+
+## Units
+
+#### Percentage
+
+When working with `percentages` as the value of a property, percentages are normally calculated against the parent element's **corresponding property**. For example, `width: 50%` represents `50%` width of the parent element. 
+
+When [working with padding and margin](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Sizing_items_in_CSS#percentage_margins_and_padding), percentages are refer to [inline size](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Handling_different_text_directions#logical_properties_and_values) of the containing block — therefore the width when working in a horizontal language. Thus, they have equal padding all around.
+
+#### fr
+
+The `fr` unit distributes available space, not all space. Therefore, if one of your tracks has something large inside it, there will be less free space to share.
+
+## Replacement elements
+
+Images, forms, videos.. are replacement elements as CSS cannot affect the internal layout of these elements — only their position on the page amongst other elements.
+
+For `img`, we can use `width: 100%, height: 100%` to stretch the `img` to fill the area. Or use `object-fit: cover` to manipulate how `img` is displayed in its container. 
+
+#### [Replaced elements in layout](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Images_media_form_elements#replaced_elements_in_layout)
+
+However, in layout, like [grid](#grid) the img will not be stretched to fill the whole area like others do. 
+
+
+
+
+## Display
 
 1. `display: none`: The element will be hidden, and the page will be displayed as if the element is not there
 
@@ -217,7 +308,7 @@ combinations of elements (element `?` element)
 
 3. `display: inline-block`: The difference between `inline-block` and `inline` is that the former one allows to set a width and height on the element, and top and bottom margins/paddings are respected, while the latter one doesn't. The difference between `inline-block` and `block` is that the former one does't stretch as wide as possible and add a line break after itself. Demonstration can be found here [->Ref](https://www.w3schools.com/css/tryit.asp?filename=trycss_inline-block_span1)
 
-### Position
+## Position
 
 1. `position: static`
 2. `position: relative`: is positioned relative to its **normal** position. use in combination with `left/right/top/bottom`(Other content will not be adjusted to fit into any gap left by the element.)
@@ -228,21 +319,59 @@ combinations of elements (element `?` element)
     <iframe src="/FrontEnd/Css/CssSamples/absolute1.html"></iframe>
 
     * absolute elements can set `left` and `right` not only by px, but by percentage, and the percentage is relative to the width of it's parent (the one with relative position).
+
+> Refer to [containing block](https://developer.mozilla.org/en-US/docs/Web/CSS/Containing_block#identifying_the_containing_block) to find out the parent of a absolute element.
+
+
 4. `position: fixed`: fixed relative to the viewport.
 
-### float
+elements' positions are calculated as the offset from its `containing block`, refers to [ the rules of identifying the containing block](https://developer.mozilla.org/en-US/docs/Web/CSS/Containing_block#identifying_the_containing_block) for a more comprehensive understanding.
 
-1. `float: left/right/none/inherit`: specifies where the element should float inside its container **relative to its horizontal** location. (Text will be wrapped about the float element.)
+
+When more than one positioned elements and they start to overlap, and positioned elements later in the source order win over positioned elements earlier in the source order. Or the one with higher `z-index`
+## float
+
+1. `float: left/right/none/inherit`: The floated element is moved to the left or right and removed from normal flow, and the surrounding content floats around it.
     <iframe src="/FrontEnd/Css/CssSamples/float1.html"></iframe>
     <iframe src="/FrontEnd/Css/CssSamples/float2.html"></iframe>
 
 2. `float` property will disregard target element's display property as always generate `display: block`, and if no `width` specified, it will only occupy space as it needs as opposed to standard block element behavior of taking up 100% width automatically. [->Ref](https://stackoverflow.com/questions/9774282/css-display-property-when-a-float-is-applied)
 
+
+
+> While we can add a margin to the float to push the surrounding **text**(content away not element) away, we can't add a margin to the text to move it away from the float. This is because a floated element is taken out of normal flow and the boxes of the following items actually run behind the float. [->Ref](https://developer.mozilla.org/en-US/docs/Learn/CSS/CSS_layout/Floats#visualizing_the_float)
+
+Refer [Visualize formatting model](https://developer.mozilla.org/en-US/docs/Web/CSS/Visual_formatting_model#line_boxes) to better understand why only **text** are pushed away not element.
+
+
 3. `clear: none/left/right/both/both/inherit`: specifies an element is pushed below a floating element when it is on the floating element's left/right/both side. For example, `clear: left` means if it's left side has a floating element, then it will be pushed blow that element.
     <iframe src="/FrontEnd/Css/CssSamples/clear.html" style="height: 200px"></iframe>
 
-4. Fix floating element that is larger than its container.[->Ref](#fix-floating-element-that-is-larger-than-its-container)
+#### [Fix floating element that is larger than its container.](https://developer.mozilla.org/en-US/docs/Learn/CSS/CSS_layout/Floats#the_clearfix_hack)
 
+1. add `overflow: auto` property to its container, however, `overflow: auto` will add scroll bar when necessary.
+
+2. Use `clearfix hack`
+    ```css
+    .clearfix::after {
+        content: "";
+        clear: both;
+        display: block;
+    }
+    ```
+
+This works as `::after` will insert an element after the container. If we add `content: "afterElement` we'll see such:
+
+![clearfix1](/FrontEnd/Css/Assets/Screenshot%202022-11-28%20at%2022.18.15.png)
+
+If we make it `block` or `clear` it won't change anything, however, a `block` with `clear` will be put underneath the float. 
+
+3. Add new [BFC](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Flow_Layout/Intro_to_formatting_contexts)(Block Formatting Context) to the container.
+```css
+display: flow-root;
+```
+
+> Add new BFC is the best modern approach without any side-effects.
 
 #### float gotcha
 
@@ -252,7 +381,8 @@ combinations of elements (element `?` element)
     * This is a better demonstration.
     <iframe src="/FrontEnd/Css/CssSamples/float4.html"></iframe>
 
-### Math
+
+## Math
 
 1. `calc()` function performs a calculation to be used as the property value.
     ```css
@@ -267,7 +397,7 @@ combinations of elements (element `?` element)
     ```
 2. `min(), max()` are also available.
 
-### Counter
+## Counter
 
 1. CSS has counter `variable` that automatically increases when certain elements is inserted.
     ```css
@@ -284,7 +414,7 @@ combinations of elements (element `?` element)
 
     `::before` can be referred here.[->Ref](#pseudo-element-selectors)
 
-### 2D Transform
+## 2D Transform
 
 1. `translate()`: moves an element **from** its current position.
     ```css
@@ -322,7 +452,7 @@ transform: translate(-100%, 50%) rotate(45deg) translate(100%, -50%);
 
 <iframe src="/FrontEnd/Css/CssSamples/transformOrigin.html" style="height: 500px"></iframe>
 
-### Transition
+## Transition
 
 1. To create a transition effect, two factors are needed
     * The property to add effect on, that is when what property changes the effect will apply on.
@@ -345,7 +475,7 @@ transform: translate(-100%, 50%) rotate(45deg) translate(100%, -50%);
     ```
 
 
-### Animations
+## Animations
 
 1. To create an animation on an element.
     1. first use `@keyframes` to create animation **styles**  into which the element will change its style over time.
@@ -405,7 +535,7 @@ transform: translate(-100%, 50%) rotate(45deg) translate(100%, -50%);
 
 6. Example
     <iframe src="/FrontEnd/Css/CssSamples/animation.html" width=1px></iframe>
-### StyleImage
+## StyleImage
 
 1. `filter` can be applied on images. [->Ref](https://www.w3schools.com/cssref/css3_pr_filter.asp)
     ```css
@@ -421,7 +551,7 @@ transform: translate(-100%, 50%) rotate(45deg) translate(100%, -50%);
     .shadow {filter: drop-shadow(8px 8px 10px green);}
     ```
 
-### Variable
+## Variable
 
 1. CSS variables have access to the DOM, which means that you can create variables with local or global scope, change the variables with JavaScript, and change the variables based on media queries.
 
@@ -483,7 +613,7 @@ transform: translate(-100%, 50%) rotate(45deg) translate(100%, -50%);
 
 7. variables defined in parent elements will also be accessible by child elements.
 
-### Media-Query
+## Media-Query
 
 1. Background: 
     * The `@media` rule, introduced in CSS2, made it possible to define different style rules for different media types. 
@@ -516,25 +646,29 @@ transform: translate(-100%, 50%) rotate(45deg) translate(100%, -50%);
     }
     ```
 
-## FlexBox
+## [FlexBox](https://developer.mozilla.org/en-US/docs/Learn/CSS/CSS_layout/Flexbox#why_flexbox)
 
-1. The Flexible Box Layout Module, makes it easier to design flexible responsive layout structure without using float or positioning
+The Flexible Box Layout Module, makes it easier to design flexible responsive layout structure **in 1 dimension**, either  either as a row or as a column, without using float or positioning
 
     <iframe src="/FrontEnd/Css/CssSamples/flex.html" height="200px"></iframe>
 
     > Removing flex in the above example will cause top margin of the items to [collapse](#margin-collapse) with the container.
 
-2. The direct child elements of a flex container automatically becomes flexible (flex) items.
+The direct child elements of a flex container automatically becomes flexible (flex) items.
 
-3. [justify-content](https://www.w3schools.com/css/css3_flexbox_container.asp#justify-content) specifies the horizontal alignment of flex items.
+#### Property Methods
 
-4. [align-items](https://www.w3schools.com/css/css3_flexbox_container.asp#align-items) species the vertical alignment of flex items. `baseline` is an interesting attribute.
+[justify-content](https://www.w3schools.com/css/css3_flexbox_container.asp#justify-content) specifies the flex items along the main axis.
 
-5. [align-content](https://www.w3schools.com/css/css3_flexbox_container.asp#align-content) species vertically alignment of flex lines, which flex lines are each horizontal line when flex wraps.
+[align-items](https://developer.mozilla.org/en-US/docs/Learn/CSS/CSS_layout/Flexbox#horizontal_and_vertical_alignment) species the flex items on the cross axis. `baseline` is an interesting attribute.
+
+`align-self` can be used to override `align-items` for individual flex items.
+
+[align-content](https://www.w3schools.com/css/css3_flexbox_container.asp#align-content) species vertically alignment of flex lines, which flex lines are each horizontal line when flex wraps.
 
 5. //TODO: Perfect Center
 
-6. It's really powerful to use FlexBox in combination with [Media Queries](#media-query) to create a responsive web page.
+It's really powerful to use FlexBox in combination with [Media Queries](#media-query) to create a responsive web page.
     * One way of doing this is change row flex to colum flex when needed.
     ```css
     .flex-container {
@@ -571,54 +705,14 @@ transform: translate(-100%, 50%) rotate(45deg) translate(100%, -50%);
         }
     }
     ```
+
+
+
+
+
 ## Grid
 
-### GridView
-
-1. GridView is only a common of making responsive web page, but [Grid](#grid) is display layout.
-
-2. A responsive grid-view often has 12 columns, and has a total width of 100%, and will shrink and expand as you resize the browser window.
-    ![grid_12](./assets/grid.png)
-
-    <iframe src="/FrontEnd/Css/CssSamples/gridView.html" height="200px"></iframe>
-
-2. All these columns should be **floating** to the left. For refer to [Attribute Selectors](#attribute-selectors) for `[class*="col-"]`.
-    ```css
-    [class*="col-"] {
-        float: left;
-        padding: 15px;
-        border: 1px solid red;
-    }
-    ```
-
-3. Use [Media Query](#media-query) to support different devices
-
-    ```css
-    /* For desktop: */
-    .col-1 {width: 8.33%;}
-    .col-2 {width: 16.66%;}
-    .col-3 {width: 25%;}
-    .col-4 {width: 33.33%;}
-    .col-5 {width: 41.66%;}
-    .col-6 {width: 50%;}
-    .col-7 {width: 58.33%;}
-    .col-8 {width: 66.66%;}
-    .col-9 {width: 75%;}
-    .col-10 {width: 83.33%;}
-    .col-11 {width: 91.66%;}
-    .col-12 {width: 100%;}
-
-    @media only screen and (max-width: 768px) {
-        /* For mobile phones: */
-        [class*="col-"] {
-            width: 100%;
-        }
-    }
-    ```
-
-### Grid
-
-1. The CSS Grid Layout Module offers a grid-based layout system, with rows and columns, making it easier to design web pages without having to use floats and positioning.
+1. While [flexbox](#flexbox) is designed for one-dimensional layout, Grid Layout is designed for two dimensions — lining things up in rows and columns.The CSS Grid Layout Module offers a grid-based layout system, with rows and columns, making it easier to design web pages without having to use floats and positioning.
 
 2. An HTML element becomes a grid container when its display property is set to grid or inline-grid. All **direct** children of the grid container automatically become grid items.
 
@@ -626,13 +720,93 @@ transform: translate(-100%, 50%) rotate(45deg) translate(100%, -50%);
 
     <iframe src="/FrontEnd/Css/CssSamples/grid.html" height="200px"></iframe>
 
-4. Order of grid item by default is the order the item is defined, but it can also be reordered by `grid-area` to specifies exactly where an item is placed, The `grid-row property` is a shorthand property for the `grid-row-start` and the `grid-row-end` properties
+```css
+.container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); 
+  /* same as 1fr 1fr 1fr */
+  gap: 20px;
+}
+```
 
-5. ` grid-area: 2 / 1 / span 2 / span 3;` states: start on row-line 2 and column-line 1, and span 2 rows and 3 columns:
+> `repeat()` can be used to reduce the amount of code.
 
-6. The grid-area property can also be used to assign names to grid items. Where a period sign represents a grid item with no name. Each row is defined by apostrophes (' ')
+#### [Use gird-row to rearrange grid item](https://developer.mozilla.org/en-US/docs/Learn/CSS/CSS_layout/Grids#line-based_placement)
+Order of grid item by default is the order the item is defined, but it can also be reordered by `grip-row`, `grid-col`. The `grid-row property` is a shorthand property for the `grid-row-start` and the `grid-row-end` properties
+
+
+
+#### [Positioning with grid-template-areas](https://developer.mozilla.org/en-US/docs/Learn/CSS/CSS_layout/Grids#positioning_with_grid-template-areas)
+
+Another way to rearrange items is to use `grid-area` in the container and 
+
+```css
+.container {
+  display: grid;
+  grid-template-areas:
+    "header header"
+    "sidebar content"
+    "footer footer";
+  grid-template-columns: 1fr 3fr;
+  gap: 20px;
+}
+
+header {
+  grid-area: header;
+}
+```
+
+The cons of this is that:
+
+- You need to have every cell of the grid filled.
+- To span across two cells, repeat the name.
+- To leave a cell empty, use a . (period).
+- Areas must be rectangular — for example, you can't have an L-shaped area.
+- Areas can't be repeated in different locations.
+
+
+`grid-area` can also be used in grid item directly:
+
+`grid-area: 2 / 1 / span 2 / span 3;` states: start on row-line 2 and column-line 1, and span 2 rows and 3 columns:
+
+The grid-area property can also be used to assign names to grid items. Where a period sign represents a grid item with no name. Each row is defined by apostrophes (' ')
 
     <iframe src="/FrontEnd/Css/CssSamples/gridArea.html" height="200px"></iframe>
+
+#### Gap
+
+The `gap` properties (`column-gap`, `row-gap` and `gap`) used to be prefixed by `grid-`, but this has been changed in the spec in order to make them usable in multiple layout methods. The prefixed versions will be maintained as an alias, so they'll be safe to use for some time. To be on the safe side, you could double up and add both properties to make your code more bulletproof
+
+#### [The implicit and explicit grid](https://developer.mozilla.org/en-US/docs/Learn/CSS/CSS_layout/Grids#the_implicit_and_explicit_grid)
+
+`grid-template-columns` specifies the size of column tracks and is the `explicit` grid in this example. The rows are `implicit` grids as they expand automatically to accommodate their content. If you wish to give implicit grid tracks a size, you can use the `grid-auto-rows` and `grid-auto-columns` properties
+
+```css
+.container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: 100px;
+  /* grid-auto-rows: minmax(100px, auto); */
+  gap: 20px;
+}
+```
+
+> [minmax()](https://developer.mozilla.org/en-US/docs/Web/CSS/minmax) can be used to specify the min and max size for a grid. Thus, it can expand when necessary.
+
+#### [Fit most columns automatically](https://developer.mozilla.org/en-US/docs/Learn/CSS/CSS_layout/Grids#as_many_columns_as_will_fit)
+
+Use the `repeat()` and `minmax()` mentioned above, we can achieve to adjust the number of columns accordingly.
+
+```css
+.container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-auto-rows: minmax(100px, auto);
+  gap: 20px;
+}
+```
+
+#### [Grid frameworks in CSS Grid](https://developer.mozilla.org/en-US/docs/Learn/CSS/CSS_layout/Grids#grid_frameworks_in_css_grid)
 
 --- 
 
@@ -644,20 +818,6 @@ transform: translate(-100%, 50%) rotate(45deg) translate(100%, -50%);
 Add a container element (like `<div>`) with overflow-x:auto around the `<table>` element to make it responsive:
 
 <iframe src="/FrontEnd/Css/CssSamples/responsiveTable.html" width=1px></iframe>
-
-### Fix floating element that is larger than its container.
-
-1. add `overflow: auto` property to its container, however, `overflow: auto` will add scroll bar when necessary.
-
-2. add `::after` property to its container. [->Ref](TODO)
-
-    ```css
-    .clearfix::after {
-        content: "";
-        clear: both;
-        display: table;
-    }
-    ```
 
 ### Make floating elements not just side by side, but with equal hight  [->Ref](https://www.w3schools.com/css/tryit.asp?filename=trycss_float_boxes_flex)
 
