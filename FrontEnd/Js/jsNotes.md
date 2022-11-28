@@ -13,8 +13,11 @@
 13. [Why does console.log(this) in node return an empty object?](https://stackoverflow.com/questions/42631698/why-does-console-logthis-in-node-return-an-empty-object)
 14. [What are species in JS](#TODO)
 15. [https://stackoverflow.com/questions/650764/how-does-proto-differ-from-constructor-prototype](#prototype-with-constructor)
-
-//[TODO](https://stackoverflow.com/questions/597769/how-do-i-create-an-abstract-base-class-in-javascript)
+16. [How to make sure the order when including multiple external JS files?](#script-loading-strategies)
+17. [How to create an abstract base class](https://stackoverflow.com/questions/597769/how-do-i-create-an-abstract-base-class-in-javascript)
+18. [What is User Agent](https://developer.mozilla.org/en-US/docs/Glossary/User_agent)
+19. [How to edit js code in browser](https://stackoverflow.com/questions/16494237/chrome-dev-tools-modify-javascript-and-reload)
+20. [What is closure](#closure)
 
 
 ## [Pass by sharing](https://stackoverflow.com/questions/518000/is-javascript-a-pass-by-reference-or-pass-by-value-language)
@@ -141,6 +144,29 @@ change the parameter itself, that won't affect the item that was fed into the pa
 * **Placing scripts at the bottom of the <body> element improves the display speed, because script interpretation slows down the display.**
 * `external` Js can benefit from Cached JavaScript files that speeds up page loads
 
+## [Script loading strategies](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/First_steps/What_is_JavaScript#script_loading_strategies)
+
+HTML runs codes in the order they appear, therefore, when using JS with [DOM](#TODO) to dynamically adjust HTML before it's fully loaded and parsed will cause errors. 
+
+There're several ways of solving this:
+1. Add Event Listener to `DOMContentLoaded`: 
+  ```js
+  document.addEventListener('DOMContentLoaded', () => {
+    // …
+  });
+  ```
+2. Otherwise, as HTML runs codes in order, so place the `script` tag at the end of the `body` makes sure when JS is always running after HTML is loaded. But the performance is bad as JS is blocked until all HTML codes are loaded.
+
+3. Add `defer`/`async` attribute when including external JS code which tells tells the browser to continue downloading the HTML content once the `<script>` tag element has been reached. HTML and JS are loaded concurrently, and only run JS after HTML is full prepared.
+  ```html
+  <script src="script.js" defer></script>
+  ```
+> Refer to [async and defer](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/First_steps/What_is_JavaScript#script_loading_strategies) for comparison. 
+
+?> **When loading multiple external JS files and they have dependencies**, place them in order can solve the problem as HTML is parsed in code order, Or use `defer` attribute to speed up the process. Note: `async` attribute in this case can cause problem as it doesn't guarantee the execution order.
+
+
+
 ---
 
 ## Output
@@ -220,6 +246,8 @@ console.log(auto instanceof Object);
 ---
 
 ## String
+
+Strings are immutable.
 
 - `replace` will is case sensitive, use RegExpr with `i` to indicate case insensitive.
   ```js
@@ -358,7 +386,7 @@ const person = ["John", "Doe", 46];
 
 - There's no built in `MaxElement` nor `MinElement` functions, Use [Math.max](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/max) to address.
 
-  ```js
+  ```jsƒ
   Math.max.apply(null, [1,2,3]); // use null cause max expect 2 arguments.  
   ```
 
@@ -712,10 +740,6 @@ if (user.authenticated) {
 `this` is not a variable. It is a **keyword**. You cannot change the value of this.
 
 
-#### This substitution
-
-//TODO:
-
 #### This in normal function
 
 **The value of `this` is not the object that has the function as an own property, but the object that is used to call the function.** 
@@ -849,9 +873,6 @@ console.log(myCar.arrow() === myCar); // true
 
 #### [This in class](#https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes#binding_this_with_prototype_and_static_methods)
 
-
-
-
 > [Arrow function is extremely useful for asynchronous function calls](https://www.codementor.io/@dariogarciamoya/understanding-this-in-javascript-with-arrow-functions-gcpjwfyuc) as it remembers its context at creating and can't be changed no matter what.
   ```js
   myObject = {
@@ -882,6 +903,163 @@ console.log(myCar.arrow() === myCar); // true
   - [Reference](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions)
 
 
+## Promise
+
+Promise is used to attach callback functions to have a better syntax than the classic callback pyramid of doom.
+
+```js
+const promise = doSomething();
+const promise2 = promise.then(successCallback, failureCallback);
+```
+> `then` will be called after the completion of `doSomething`, and  `promise2` represents the completion of both `doSomething()` and `successCallback` or `failureCallback`. `promise2` is returned from `successCallback` or `failureCallback`.
+
+`successCallback` will be asynchronously called when `doSomething` is fulfilled and `failureCallback` will be called when `doSomething` rejects. 
+
+
+After have a long promise chain, `catch` can be used if promises have the same error handler.
+
+```js
+doSomething()
+  .then(function (result) {
+    return doSomethingElse(result);
+  })
+  .then(function (newResult) {
+    return doThirdThing(newResult);
+  })
+  .then(function (finalResult) {
+    console.log(`Got the final result: ${finalResult}`);
+  })
+  .catch(failureCallback);
+```
+
+!> Always return in `then`. Without `return`, the latter `then` will receive an `undefined`. Worse, latter `then` will be called early, causing race conditions. 
+
+In the following example, the first `then` didn't return a value, therefore, according to [the rule of return value in then](#promisethen), it will return an `undefined` and the `pending` promises after `fetch` will not be queued in front of the second `then` according to the return rule when returning another pending promise. Therefore, we have two independent chains and race condition will happen. 
+```js
+const listOfIngredients = [];
+doSomething()
+  .then((url) => {
+    // # 2
+    // I forgot to return this
+    fetch(url)
+      .then((res) => res.json())
+      .then((data) => {
+        listOfIngredients.push(data);
+      });
+  }
+  .then(() => { 
+    // # 2
+    console.log(listOfIngredients);
+    // Always [], because the fetch request hasn't completed yet.
+  });
+```
+
+Nested promise can restrict `catch` scope, and potentially lead to uncaught error. 
+```js
+Promise.resolve()
+.then(() => {
+    Promise.reject("Hello").catch((msg) => {console.log(`inner catch ${msg}`)}) // internal error can only be caught here. 
+}).catch((msg) => {
+    console.log(msg); // won't catch error.
+})
+
+```
+
+#### [promise.then](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then)
+
+Returns a new Promise immediately. This new promise is always pending when returned, **regardless of the current promise's status.**
+
+`then` **attaches** `successCallback` and `failureCallback` handlers to the **current** (the one returned from the previous call) Promise and they will be called based on the current promise. `then` also returns a **pending** promise **immediately**, whose behavior will be based on the return result of the handlers. Refer to [return value of then](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then#return_value) for more details.
+
+?> For `promise.resolve()`, it returns a `fulfilled` promise, and `promise.reject()` returns a `rejected` promise, and `then` returns a `pending` promise. 
+
+> When returning a non-promise object, `return` in `then` will automatically wrap it into a promise and **fulfill** the promise. It's always good practice to use `catch` to handle failure instead of using the `failureCallback`.
+```js
+Promise.reject()
+  .then(
+    () => 99,
+    () => 42,
+  ) // onRejected returns 42 which is wrapped in a fulfilled Promise
+  .then((solution) => console.log(`Resolved with ${solution}`)); // Fulfilled with 42
+```
+
+#### [promise timing](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises#timing)
+
+Read through [Event Loop](#event-loop) to have solid base first.
+
+In the follow example, when execution:
+0. the main (I imagined) is pushed into the `Stack`. (I'm not sure)
+1. line1 is pushed into the `Stack`. [Promise constructor](#promiseconstructor) is pushed into `Stack` and executed, then `setTimeout` is executed, and the callback is enqueued into the `Task Queue`. 
+> current `Stack` has only the main execution context after finishing line1, and 1 task(`resolve()`) in the `Task Queue`.
+2. line3 is pushed into `Stack` and get executed, handlers in `then()` are associated with the promise.
+> current `Stack` has only the main execution context after finishing line3, and 1 task(`resolve()`) in the `Task Queue`.
+> [rule of thumb of microTask](#event-loop): called only after the function which created it exits, and when the JavaScript execution stack is empty. Therefore, the task in `microTask` is not executed.
+3. line4 is pushed into the `Stack` and executed. 
+4. line5 is pushed into the stack and executed, `then()` returns a new promise and the handler(`console.log2`) is enqueued into the `microTasks` because its current promise is settled.
+5. line6 is pushed into the stack and handlers in `then()` are associated with promise return from line5.
+> current `Stack` has only the main execution context finishing line 4-6, and the `microTask` has 1 task, the `TaskQueue` has 1 task.
+7. line7 is pushed into the stack and prints `1`. 
+> The stack is empty, the `microTask` has 1 task, the `TaskQueue` has 1 task.
+8. `microTask` pops its task, pushes into the `Stack` to execute, prints 2 and resolves. The associated handler(`console.log3`) is enqueued into the `microTasks`, then pops...prints 3. 
+> The `TaskQueue` is not executed because [New tasks in TaskQueue will be executed in the next loop iteration](#event-loop). Because [all tasks in `microTasks` will be executed including the ones added in the interim](#event-loop), thus 2 and 3 are printed sequentially.
+9. Next iteration begins, only the `TaskQueue` has a task, pop it and push into the `Stack` to execute. The promise is resolved and its associated handler is enqueued into the `microTasks`.
+10. .... prints 4.
+
+```js
+1. const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms)); 
+2. 
+3. wait(0).then(() => console.log(4)); 
+4. Promise.resolve() 
+5.  .then(() => console.log(2)) 
+6.  .then(() => console.log(3)); 
+7. console.log(1); // 1, 2, 3, 4
+```
+
+[Another Example](https://javascript.info/microtask-queue):
+
+```js
+let promise1 = Promise.resolve();
+let promise2 = Promise.resolve();
+
+promise1
+.then(() => console.log(1))
+.then(() => console.log(2));
+
+promise2
+.then(() => console.log(3))
+.then(() => console.log(4))
+```
+
+> promise 1 and promise 2 have console.log(1) and console.log(3) event handlers directly attached, so these two goes into the event queue. after the global code is done executing, console.log(1) handler is first brought back to the call stack to be executed. after it is done, it returns a promise whose handler is console.log(2) it goes to the event queue for now. Next the console.log(3) is brought back from the even queue, and it also returns a promise whose handler i.e. the console.log(4) is stored in the event queue. Currently console.log(1) and console.log(3) is printed, and the handlers for these promises are (console.log(2), console.log(4)) is stored inside the event queue. Now as there are no global code remaining these two remaining handlers will be executed so the final order become 1,3,2,4
+
+#### [promise.constructor](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/Promise#parameters)
+
+The Promise constructor is primarily used to wrap functions that do not already support promises.
+
+```js
+const promise1 = new Promise((resolve, reject) => {
+    console.log("hello world");
+    resolve("foo");
+  });
+  
+  promise1.then((value) => { //
+    console.log(value);
+    // expected output: "foo"
+  });
+  
+  console.log(promise1);
+  // expected output: [object Promise]
+```
+```
+expected output:
+hello world
+Promise { <pending> }
+foo
+```
+
+> The executor function is executed immediately by the Promise implementation, passing resolve and reject functions (the executor is called before the Promise constructor even returns the created object) [From the MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/Promise#parameters)
+
+> In the above, `promise1.then()` is still available and return another promise. Because [then()](#promisethen) returns a new Promise immediately. This new promise is always pending when returned, **regardless of the current promise's status.**
 
 ## Function
 
@@ -894,6 +1072,48 @@ console.log(myCar.arrow() === myCar); // true
 `getter` and `setter` can have the same name as the property. However, the property will be accessed is it's public.
 
 getter and setter gains cleaner syntax and can play as they sound in C++ language.
+
+#### Async functions
+
+The purpose of async/await is to simplify the syntax necessary to consume [promise](#promise)-based APIs.
+
+Async functions **always** return a promise. If the return value of an async function is not explicitly a promise, it will be implicitly wrapped in a promise.
+```js
+async function foo() {
+  return 1;
+}
+// Similar but not equivalent.
+function foo() {
+  return Promise.resolve(1);
+}
+```
+
+We can use `await` keyword before a call to a function that **returns a promise**
+
+```js
+function alarm(person, delay) {
+  return new Promise((resolve, reject) => {
+    if (delay < 0) {
+      throw new Error('Alarm delay must not be negative');
+    }
+    setTimeout(() => {
+      resolve(`Wake up, ${person}!`);
+    }, delay);
+  });
+}
+
+button.addEventListener('click', async () => {
+  try {
+    const message = await alarm(name.value, delay.value);
+    output.textContent = message;
+  }
+  catch (error) {
+    output.textContent = `Couldn't set alarm: ${error}`;
+  }
+});
+```
+
+> Also, note that you can only use `await` inside an `async` function, unless your code is in a [JavaScript module](#modules). 
 
 
 ## [prototype](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Inheritance_and_the_prototype_chain)
@@ -909,7 +1129,7 @@ Each object has a property which holds a link to another object called its **pro
 - `{__proto__: xxx, ...}` is a standard way to defined `prototype` property in an object literal.
 - **functions do have a property named `prototype`.** to construct instances, but they also have their own `[[Prototype]]`.
 
-> function in JavaScript will always have a default prototype property — with one exception: an arrow function doesn't have a default prototype property:
+> [function in JavaScript will always have a default prototype property](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Inheritance_and_the_prototype_chain#inspecting_prototypes_a_deeper_dive) — with one exception: an arrow function doesn't have a default prototype property:
 
 When trying to access a property of an object, the property will not only be sought on the object but on the prototype of the object, the prototype of the prototype, and so on until either a property with a matching name is found or the end of the prototype chain is reached.
 
@@ -1156,7 +1376,7 @@ class Rectangle {
 
 ##### Private filed
 
-Private members can be emulated with [WeakMap](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap#emulating_private_members) or [Closure](#TODO)
+Private members can be emulated with [WeakMap](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap#emulating_private_members) or [Closure](#emulating-private-methods-with-closures)
 
 If you access a private property from an object that doesn't have the property, a `TypeError` is thrown, instead of returning undefined as normal properties do. Therefore, use `in` or `try...catch` to check before using it. **Normal print of the object won't show the private properties**.
 
@@ -1308,7 +1528,6 @@ class Foo { }
 class Bar extends calculatorMixin(randomizerMixin(Foo)) { } // So Bar extends a mixin of Foo
 ```
 
-
 #### super keyword 
 
 `super` keyword is used to represent methods of the super class (parent class). 
@@ -1316,5 +1535,466 @@ class Bar extends calculatorMixin(randomizerMixin(Foo)) { } // So Bar extends a 
 super.speak() // calls parent's speak() function
 super(); // calls parent's constructor.
 ```
+## Event 
+
+Event are fired when specific actions is performed, and associated handlers will be called by the standard mechanism. 
+
+Use `addEventListener` to register a handler
+```js
+btn.addEventListener('click', changeBackground);
+```
+or use elements' handler property:
+```js
+btn.onclick = () => {
+  const rndCol = `rgb(${random(255)}, ${random(255)}, ${random(255)})`;
+  document.body.style.backgroundColor = rndCol;
+}
+```
+> Using `addEventListener` allows to register multiple handlers by calling `addEventListener` multiple times with different handlers. However, using handler property of elements doesn't allow this, where the latter statements will override previous ones.
+
+Use `removeEventListener` to unregister a handler:
+```js
+btn.removeEventListener('click', changeBackground);
+```
+or `AbortSignal` as an option in `addEventListener`, details refer to [Removing Listeners](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Building_blocks/Events#removing_listeners)
+
+#### [Event Object](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Building_blocks/Events#event_objects)
+
+Event handlers can have a input argument, which has properties to use for instance `target` refers to the binding element, `key` in `keydown` event refers to the key pressed.
+```js
+function bgChange(e) {
+  e.target.style.backgroundColor = red; // target refers to btn.
+  console.log(e);
+}
+btn.addEventListener('click', bgChange);
+
+textBox.addEventListener('keydown', (event) => output.textContent = `You pressed "${event.key}".`);
+```
+
+Sometimes, we want to disable the default behavior of an event. For example, validating a form before submitting it, and cancel the submitting when error occurs. The default behavior of `submit` in a form is to sent the data to the sever side. Therefore, we can use [preventDefault()](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Building_blocks/Events#preventing_default_behavior) for this.
 
 
+#### Bubbling of Event
+
+The event bubbles up from the innermost element that was clicked. In the following example, when button is clicked, `button`'s onclick event is called, then `div` then `body`
+
+```html
+<body>
+  <div id="container">
+    <button>Click me!</button>
+  </div>
+  <pre id="output"></pre>
+</body>
+```
+In [addEventListener()](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener), there's an option called `capture`, it reverses the bubbling up order, meaning the least nested handler is called first to the most nested ones.
+
+#### Disadvantage of event propagation and solution
+See [Video player example](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Building_blocks/Events#video_player_example) to learn about how this mechanism cause problems and how to solve it with `event.stopPropagation()`
+
+#### Advantage of event propagation
+
+It enables **event delegation**. In this practice, when we want some code to run when the user interacts with any one of a large number of child elements, we set the event listener on their parent and have events that happen on them bubble up to their parent rather than having to set the event listener on every child individually.
+
+```js
+container.addEventListener('click', (event) => event.target.style.backgroundColor = bgChange()); 
+```
+
+> Note `event.target` is the actual element that this event is bound to, and `event.currentTarget` is element currently handling this event.
+
+
+1. It is a bad practice to pollute your HTML with JavaScript by using inline handlers. I
+```html
+<!-- Bad -->
+<button onclick="createParagraph()">Click me!</button> 
+```
+```js
+// Good
+button.addEventListener('click', createParagraph);
+```
+
+
+
+## Event Loop
+
+Background reading: 
+  1. [Event Loop Explained on YouTube](https://youtu.be/cCOL7MC4Pl0?t=1200)
+  2. [Event Loop and TaskQueue](https://developer.mozilla.org/en-US/docs/Web/JavaScript/EventLoop)
+
+![EventLoop](./Assets/the_javascript_runtime_environment_example.svg)
+
+Js is single threaded, and your code, browser rendering, etc. are all executed in the [main thread](https://developer.mozilla.org/en-US/docs/Glossary/Main_thread). 
+
+Synchronous function Calls are executed in `Stack` like C++
+
+Asynchronous calls(`setTimeout`) are enqueued into a `Task Queue`, which when executed will be pushed into the `Stack`. 
+
+> Not only asynchronous calls are enqueued into the `Task Queue`, In web browsers, Tasks(messages) are added anytime an event occurs and there is an event listener attached to it. If there is no listener, the event is lost. So a click on an element with a click event handler will add a message — likewise with any other event.
+
+There's a [Task Queue](https://developer.mozilla.org/en-US/docs/Web/JavaScript/EventLoop#queue) that stores all the pending actions (A.K.A messages or functions). Once a task is performed, its execution context is pushed into the execution `Stack`. And its sub-tasks (subroutines) are also pushed into the `Stack` in order to finish the task. **A task (message) is completed only when the execution stack is empty.**
+
+#### [Adding Tasks](https://developer.mozilla.org/en-US/docs/Web/JavaScript/EventLoop#adding_messages)
+
+`setTimeout(callback, delay)` when executing (already in the Task Queue, and is in the stack), will try to enqueue the `callback` task into the queue after (minimum) `delay` when the Task Queue is empty. Therefore the following example with `setTimeout(, 0)` will not run directly.
+
+```js
+setTimeout(function() { 
+    console.log('AAA');
+}, 0); // Call this in 0 milliseconds 
+
+for (i = 0; i < 1000; i++) {
+    console.log('BBB'); 
+}
+for (i = 0; i < 1000; i++) {
+    console.log('CCC'); 
+}
+for (i = 0; i < 1000; i++) {
+    console.log('DDD'); 
+}
+for (i = 0; i < 1000; i++) {
+    console.log('EEE'); 
+}
+https://stackoverflow.com/questions/33955650/what-is-settimeout-doing-when-set-to-0-milliseconds
+```
+
+#### [Task Queue vs microTask](https://developer.mozilla.org/en-US/docs/Web/API/HTML_DOM_API/Microtask_guide/In_depth#tasks_vs_microtasks)
+
+Background Reading:
+  1. [Pop difference on YouTube](https://youtu.be/cCOL7MC4Pl0?t=1657)
+
+Normal tasks are enqueued into `Task Queue` while [promises](#promise) are enqueued into `microTask`. 
+
+**Rule of thumb**: microTasks are executed when TaskQueue is empty. (**only after the function which created it exits**, and when the JavaScript execution stack is empty), just before control is returned to the event loop)
+
+Infinite Recursion in `microTask` cause block while `TaskQueue` doesn't, because tasks pushed in interim will still be executed in `microTask` until the queue is empty.
+
+Newly added `TaskQueue` will be executed in next loop iteration.
+
+Refer to [Promise Timing](#promise-timing) for going-through.
+
+
+## Worker
+
+The browser is run on the main thread, including the running code, and rendering. Therefore, to take advantages of Multithread, `workers` are used.
+
+#### Dedicated Worker
+
+It's used by a single script instance. To make the main code and the worker code in different world, they have to be put in different Js files, and only the main code is included in the HTML file. We'll use [Worker(workerFilePath)](https://developer.mozilla.org/en-US/docs/Web/API/Worker/Worker) to construct a worker in our main code. 
+
+> Because there's race condition if threads(workers) have shared resources(variables), thus the main code and your worker code never get direct access to each other's variables. **Workers can't access the DOM.**
+
+```js
+const worker = new Worker('./generate.js');
+```
+> As soon as the worker is created, the worker script is executed.
+
+We use `message event` to communicate between `worker` and `main` code. 
+
+#### [Shared Worker](https://developer.mozilla.org/en-US/docs/Web/API/SharedWorker)
+
+`Shared workers` can be shared by several different scripts running in different windows.
+
+
+#### [Service Worker](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API)
+
+Service workers act like proxy servers, caching resources so that web applications can work when the user is offline. They're a key component of Progressive Web Apps.
+
+
+#### Service Worker
+
+## [Modules](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules) 
+
+Modules are used to distribute JS files. **Modules share the same global environment**.
+
+Use `export` keyword in front of **top level**(not inner declared) variables/functions. Or `export` with a list of items **at the end** of the module file
+```js
+export let a = 10;
+export function myFunc() {
+  ...
+}
+// OR
+export { name, draw, reportArea, reportPerimeter };
+```
+
+Use `import` keyword to import:
+```js
+import { name, draw, reportArea, reportPerimeter } from './modules/square.js';
+```
+
+!> Imported variables are read only like `const`; They are also live bounded, meaning, the changes in exporting module reflect in the importing file.
+
+**You can only use import and export statements inside modules, not regular scripts, and the modules codes can only be used in the imported script (top-level script) not in the global scope**
+
+
+Use `export default` to indicate default behaviors.
+```js
+export default function() {
+  ...
+}
+// OR
+export default myFunc(); // at the end of the module file.
+
+// in import script:
+import whatEverNameYouWant from './modules/square.js';
+// OR
+import {default as myFunc} from './modules/square.js'; // when default is anonymous or you try to rename.
+```
+> There's no curly braces as there can only be one `default` export in a module file, thus you can name it whatever you want inside the importing scripts. If you add curly braces, it will be named exports and if the provided name is not found, error is thrown.
+
+#### [Modules vs Normal scripts](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules#other_differences_between_modules_and_standard_scripts)
+
+
+#### Module Aggregation
+
+When we want to aggregate all submodules into a single module, for example, `circle.js`, `triangle.js` into `shape.js`.
+Inside `shape.js`
+```js
+export { Triangle } from './shapes/square.js';
+export { Circle } from './shapes/square.js';
+```
+
+!> This doesn't import `Circle` and `Triangle` into `shape.js`, instead, it only redirects.
+
+
+#### [Renaming from imports or exports](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules#renaming_imports_and_exports)
+
+1. Rename in exporting scripts
+```js
+export {
+  name as squareName,
+  draw as drawSquare,
+  reportArea as reportSquareArea,
+  reportPerimeter as reportSquarePerimeter,
+};
+```
+2. Rename in importing scripts
+```js
+import {
+  name as triangleName,
+  draw as drawTriangle,
+  reportArea as reportTriangleArea,
+  reportPerimeter as reportTrianglePerimeter,
+} from './modules/triangle.js';
+```
+> It's preferred to rename imports to exports as it gives more control to the importing scripts, or use `export` classes in a C style. 
+3. Include in a **module Object**
+```js
+import * as Module from './modules/module.js';
+Module.function();
+```
+4. Export stuff in classes, and import the class. This is especially convenient when setting the class as `export default`. 
+
+#### Await in modules
+
+```js
+const colors = fetch('../data/colors.json')
+  .then((response) => response.json());
+
+export default await colors;
+```
+
+> This means any other modules which include this one will wait until colors has been downloaded and parsed before using it.
+
+
+
+#### Dynamic loading of modules
+
+We can load modules in runtime by using `import()` function which returns a promise that contains a **Module Object**. This API allows all scripts to `import` meaning the importing script doesn't have to be a module. (`<script>` tag doesn't need to specify `type="module"`)
+
+```js
+function myFunc() {
+    import('./second.mjs').then((Module)=> {
+        Module.default();
+    })
+}
+
+myFunc();
+Module.default(); // Error
+```
+
+> The scope of the imported module is limited based on where it's declared.
+
+
+
+
+
+
+
+
+## [Symbols](https://www.youtube.com/watch?v=4J5hnOCj69w)
+
+Symbol is a primitive type, but unlike other types you can instantiate as an object, it can be used with `new`
+```js
+let a = new Symbol(); // Error
+```
+
+Also, unlike other primitive type, you can omit the constructor, you can only create a Symbol value through its `Symbol()` constructor.
+
+> The optional parameter to the constructor is only a description that does nothing, but give yourself a description as the name implied.
+
+
+
+Symbols are unique (*imagine a hash code behind the scene*), therefore using them as property name doesn't overwrite original property. 
+
+```js
+let person {
+  id: 123;
+}
+
+let id = Symbol("id");
+person[id] = 345;
+console.log(person);
+// { id: 123, [Symbol(id)]: 345 }
+```
+
+!> You can't use dot notation on symbols as only bracket notations allow use to use variable names. 
+
+Symbols are not shown as an owned property, when using `Object.getOwnPropertyNames()` and `for...in`, it's not there. You need to use `Object.getOwnPropertySymbols()` to show it. 
+
+
+
+## Closure
+
+A closure is the combination of a function and the lexical environment within which that function was declared. It's the same as remembering the environment when the function is declared. Each **function instance** manages its own scope and closure
+
+```js
+function makeFunc() {
+  const name = 'Mozilla';
+  function displayName() {
+    console.log(name);
+  }
+  return displayName;
+}
+
+const myFunc = makeFunc();
+myFunc();
+```
+
+> In the above example. inner function `displayName` has `name` in its environment scope, and it creates a closure that remembers the environment at runtime. Therefore, returning function `displayName` not only returns the function and the associated closure with it. Thus, `myFunc` can still access `name` even after `makeFunc` has finished.
+
+
+```js
+function makeAdder(x) {
+  return function (y) {
+    return x + y;
+  };
+}
+
+const add5 = makeAdder(5);
+const add10 = makeAdder(10);
+
+console.log(add5(2)); // 7
+console.log(add10(2)); // 12
+```
+
+> This is very much like Haskell. 
+
+
+!> As mentioned previously, each function instance manages its own scope and closure. Therefore, it is unwise to unnecessarily create functions within other functions if closures are not needed for a particular task, as it will [negatively affect script performance](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures#performance_considerations) both in terms of processing speed and memory consumption.
+
+#### [Emulating private methods with closures](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures#emulating_private_methods_with_closures)
+```js
+const counter = (function () {
+  let privateCounter = 0;
+  function changeBy(val) {
+    privateCounter += val;
+  }
+
+  return {
+    increment() {
+      changeBy(1);
+    },
+
+    decrement() {
+      changeBy(-1);
+    },
+
+    value() {
+      return privateCounter;
+    },
+  };
+})();
+
+console.log(counter.value()); // 0.
+
+counter.increment();
+counter.increment();
+console.log(counter.value()); // 2.
+
+counter.decrement();
+console.log(counter.value()); // 1.
+```
+
+!> All three functions `increment()`, `decrement()`, `value()` have their own closure, they have their own environment which also includes the environment of the outer scope *the anonymous function*, and they **share** the same **anonymous** environment. 
+
+```js
+const funcs = []
+
+function setUp() {
+    let a = 10;
+    for (var i = 0; i < 3; i++) {
+        funcs.push(function () {
+            console.log(i);
+            console.log(a);
+            return function(x) {
+                a = x;
+            }
+        })
+    }
+}
+
+setUp();
+
+funcs[0]()(20); // 0 10
+funcs[1](); // 1 20
+funcs[2](); // 2 20
+```
+
+> In this example, better demonstrated how the outer scope is shared.
+
+We can use `function factory` to isolate sharing environments.
+```js
+function makeAdder(x) {
+  return function (y) {
+    return x + y;
+  };
+}
+
+const add5 = makeAdder(5);
+const add10 = makeAdder(10);
+
+console.log(add5(2)); // 7
+console.log(add10(2)); // 12
+```
+
+> In this example, `makeAdder` contains `x` in its environment, and each time we call `makeAdder`, we construct a closure `add5` and `add10` but they have different evn as `5` and `10` are different substitutions for `x`.
+
+
+#### Closure in module
+
+When function is imported from a different [module](#modules) it the closure is also imported.
+```js
+// myModule.js
+let x = 5;
+export const getX = () => x;
+export const setX = (val) => {
+  x = val;
+}
+
+import { getX, setX } from "./myModule.js";
+
+console.log(getX()); // 5
+setX(6);
+console.log(getX()); // 6
+```
+
+> However, `x` can not be accessed directly.
+
+
+#### [Mistakes in closure](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures#creating_closures_in_loops_a_common_mistake)
+
+Refer to [how environment are shared to better understand mistakes in above link](#emulating-private-methods-with-closures)
+
+
+
+
+## Technics
