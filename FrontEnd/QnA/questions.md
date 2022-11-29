@@ -62,3 +62,14 @@ FRAMEWORK: https://developer.mozilla.org/en-US/docs/Learn/Tools_and_testing/Clie
       1. [textarea内容自动撑开高度，实现高度自适应](https://cloud.tencent.com/developer/article/1840701)
       2. [Creating a textarea with auto-resize](https://stackoverflow.com/questions/454202/creating-a-textarea-with-auto-resize)
 
+
+## Misc
+
+1. What is `npm` or `yarn`?
+`npm` is a package manager tool. There's a also a package registry, that is the central place (server) where a package manager tool downloads all the packages from, named the same. 
+
+`yarn` is also a package manager tool. 
+
+> Since `yarn` is package manager tools, and `npm` is a package registry, it's possible that we use `yarn` as tool and `npm` registry running behind. 
+
+
