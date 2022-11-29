@@ -86,8 +86,15 @@ These tools make it easy to add things like testing (to ensure that your applica
 [*MDN-JS-Framework*](https://developer.mozilla.org/en-US/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Introduction#tooling)
 
 
-## In tandem with
+## [In tandem with](https://dictionary.cambridge.org/dictionary/english-chinese-simplified/in-tandem)
 
 To build for the web, developers use React **in tandem with** ReactDOM. React and ReactDOM are often discussed in the same spaces as — and utilized to solve the same problems as — other true web development frameworks.
 
 [*MDN-React*](https://dictionary.cambridge.org/dictionary/english-chinese-simplified/in-tandem)
+
+
+## [Superfluous](https://dictionary.cambridge.org/dictionary/english-chinese-simplified/superfluous)
+
+We will however be avoiding any **superfluous** tooling, with the aim of keeping complexity to a minimum.
+
+[*MDN-Toolchain*](https://developer.mozilla.org/en-US/docs/Learn/Tools_and_testing/Understanding_client-side_tools/Introducing_complete_toolchain#toolchains_and_their_inherent_complexity)

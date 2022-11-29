@@ -14,10 +14,32 @@ What is `npm` or `yarn`?
 
 
 
-## [npm update](https://developer.mozilla.org/en-US/docs/Learn/Tools_and_testing/Understanding_client-side_tools/Package_management#updating_dependencies)
+## [Upgrade packages](https://developer.mozilla.org/en-US/docs/Learn/Tools_and_testing/Understanding_client-side_tools/Package_management#updating_dependencies)
 
-It's important to remember that npm update will not upgrade the dependencies to beyond the range defined in the `package.json` — to do this you will need to install that version specifically.
+```bash
+npm update
+```
 
+It's important to remember that `npm update` will not upgrade the dependencies to beyond the range defined in the `package.json` — to do this you will need to install that version specifically.
+
+## [Install packages]
+
+- To install locally (only for the current project)
+```bash
+npm install pkg1 pkg2
+```
+
+- To install globally (for the whole computer environment)
+```bash
+npm install --globally pkg1 pkg2
+```
+
+- To install only for development
+```bash
+npm install --save-dev pkg1 pkg2
+```
+
+> This keyword tells the npm tool that these particular dependencies are only needed for development (npm therefore lists them in the `package.json` file under `devDependencies`, not `dependencies`)
 
 # Parcel
 
