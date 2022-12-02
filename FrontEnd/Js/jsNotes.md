@@ -1,24 +1,3 @@
-## Question
-1. [What's the difference between `let`, `var` and `const`?](#difference-between-let-var-const-bare)
-2. [Why variables can be used before declaration?](#hoisting)
-3. [What is `this`?](#this)
-4. [What's the back-tick](#string-template)
-5. [What's the difference between null and undefined](https://www.geeksforgeeks.org/undefined-vs-null-in-javascript/)
-6. [Is JS pass by value?](#pass-by-sharing)
-7. [What's the difference between map and object](https://www.geeksforgeeks.org/map-vs-object-in-javascript/)
-8. [How to define read only property?](https://stackoverflow.com/questions/7757337/defining-read-only-properties-in-javascript)
-9. [How to get a computed property name](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get#using_a_computed_property_name)
-10. [What is prototype and prototype chain in JS](#prototype)
-11. [What is class fields](#class-fields)
-13. [Why does console.log(this) in node return an empty object?](https://stackoverflow.com/questions/42631698/why-does-console-logthis-in-node-return-an-empty-object)
-14. [What are species in JS](#TODO)
-15. [https://stackoverflow.com/questions/650764/how-does-proto-differ-from-constructor-prototype](#prototype-with-constructor)
-16. [How to make sure the order when including multiple external JS files?](#script-loading-strategies)
-17. [How to create an abstract base class](https://stackoverflow.com/questions/597769/how-do-i-create-an-abstract-base-class-in-javascript)
-18. [What is User Agent](https://developer.mozilla.org/en-US/docs/Glossary/User_agent)
-19. [How to edit js code in browser](https://stackoverflow.com/questions/16494237/chrome-dev-tools-modify-javascript-and-reload)
-20. [What is closure](#closure)
-
 
 ## [Pass by sharing](https://stackoverflow.com/questions/518000/is-javascript-a-pass-by-reference-or-pass-by-value-language)
 
@@ -361,6 +340,20 @@ const person = ["John", "Doe", 46];
   const fruits = ["Banana", "Orange", "Apple", "Mango"];
   delete fruits[0]; // undefined, orange, apple, mango
   ```
+
+#### Array Hacks
+
+Use [Spread Syntax](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax) before the original list and concatenate new items. 
+
+> The triple dots syntax is also the [Rest Operator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters), 
+
+```js
+let list = [1, 2, 3];
+
+list = [...list, 4];
+
+console.log(list);
+```
 
 ---
 

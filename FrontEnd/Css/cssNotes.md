@@ -21,8 +21,6 @@ Some properties like `font`, `background`, `padding`, `border`, and `margin` are
 ![Process](./Assets/rendering.svg)
 
 
-
-
 ## Cascading oder
 
 Some properties are inherited from the parent nodes, such as `color`. There are several inheritance values allowing us to control how the property works.
@@ -100,6 +98,7 @@ select elements based on name, id, class
     color: blue;
     }
     ```
+> Universal selector often work with [Pseudo-element ::after and ::before](#pseudo-class-and-pseudo-elements) to apply [box-sizing](#box-sizing) to all elements, the reason for requiring to include `::after` and `::before` is that [universal selector doesn't select pseudo-elements](https://stackoverflow.com/questions/24794545/universal-selector-and-pseudo-elements)
 
 * the precedence of selector: `id` > `class` > `element` > `universal`; The **latter** declared selectors have higher precedence: the same attributes declared within same kind selector will be overwritten by latter declared ones.
 
@@ -120,6 +119,12 @@ combinations of elements (element `?` element)
 
 1. All have the same precedence, latter declared ones have higher precedence.
 
+#### [Misc selector](https://www.w3schools.com/cssref/css_selectors.php)
+
+`[attribute~=value]`: Selects all elements with a attribute containing the word "value"
+`[attribute|=value]`: Selects all elements with a attribute value equal to "value" or starting with "value"
+`[attribute*=value]`: Selects all element whose attribute value contains the substring "value"
+...
 
 #### Pseudo-class selectors
 
@@ -156,9 +161,8 @@ combinations of elements (element `?` element)
     }
     ```
 
-?> All Pseudo-classes and Pseudo-elements [->Ref](https://www.w3schools.com/css/css_pseudo_elements.asp)
+3. `::before` and `::after`: Check [Pseudo-class and Pseudo-elements](#pseudo-class-and-pseudo-elements)
 
-3. `::before` and `::after`: TODO
 #### Attribute Selectors
 
 1.  is used to select elements with a specified attribute.
@@ -179,6 +183,15 @@ combinations of elements (element `?` element)
     }
     ```
 3. attributes with value starts with "a whole word" "a string"/ ends with ... [->Ref](https://www.w3schools.com/css/css_attribute_selectors.asp)
+
+
+## [Pseudo-class and Pseudo-elements](#)
+
+Check [all Pseudo-classes and Pseudo-elements](https://www.w3schools.com/css/css_pseudo_elements.asp)
+
+[::after](https://developer.mozilla.org/en-US/docs/Web/CSS/::after) creates a pseudo-element that is the last child of the selected element. It is often used to add cosmetic content to an element with the content property. It is inline by default.
+
+[::before](https://developer.mozilla.org/en-US/docs/Web/CSS/::before) does the same as `::after` just in the opposite direction.
 
 ## Text
 

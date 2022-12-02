@@ -1,12 +1,7 @@
+let list = [1, 2, 3];
 
-function myFunc() {
-    import('./second.mjs').then((Module)=> {
-        Module.default();
-    })
-}
+list = [...list, 4];
 
-
-myFunc();
-Module.default();
+console.log(list);
 
 
