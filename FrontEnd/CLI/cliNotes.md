@@ -41,6 +41,17 @@ npm install --save-dev pkg1 pkg2
 
 > This keyword tells the npm tool that these particular dependencies are only needed for development (npm therefore lists them in the `package.json` file under `devDependencies`, not `dependencies`)
 
+
+## [Move devDependencies to dependencies](https://stackoverflow.com/questions/46903002/move-a-module-from-devdependencies-to-dependencies-in-npm-package-json)
+
+```bash
+# devD -> dep
+npm i <module_name> -P
+
+# dep -> devD
+npm i <module_name> -D
+```
+
 # Parcel
 
 Parcel is a front-end tool with many built-in features, including `serving`, `tree shaking`, `auto dependency installation`, `compilation`, and etc.
