@@ -98,3 +98,9 @@ To build for the web, developers use React **in tandem with** ReactDOM. React an
 We will however be avoiding any **superfluous** tooling, with the aim of keeping complexity to a minimum.
 
 [*MDN-Toolchain*](https://developer.mozilla.org/en-US/docs/Learn/Tools_and_testing/Understanding_client-side_tools/Introducing_complete_toolchain#toolchains_and_their_inherent_complexity)
+
+## [Flaky](https://dictionary.cambridge.org/dictionary/english-chinese-simplified/flaky)
+
+Manual mocks are used to stub out functionality with mock data. For example, instead of accessing a remote resource like a website or a database, you might want to create a manual mock that allows you to use fake data. This ensures your tests will be fast and not **flaky**.
+
+[*Jest-Manual-Mocks*](https://jestjs.io/docs/manual-mocks)
