@@ -726,6 +726,16 @@ if (user.authenticated) {
 }
 ```
 
+#### [Computed Property Name](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Object_initializer#computed_property_names)
+
+Using bracket notation.
+
+```js
+const obj = {
+  [items]: "Hello",
+};
+```
+
 ---
 
 ## [This](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this)
@@ -1732,6 +1742,18 @@ import whatEverNameYouWant from './modules/square.js';
 import {default as myFunc} from './modules/square.js'; // when default is anonymous or you try to rename.
 ```
 > There's no curly braces as there can only be one `default` export in a module file, thus you can name it whatever you want inside the importing scripts. If you add curly braces, it will be named exports and if the provided name is not found, error is thrown.
+
+
+#### [Export importing modules](https://developer.mozilla.org/en-US/docs/web/javascript/reference/statements/export#syntax)
+
+```js
+export * from "module-name";
+export * as name1 from "module-name";
+export { name1, /* …, */ nameN } from "module-name";
+export { import1 as name1, import2 as name2, /* …, */ nameN } from "module-name";
+export { default, /* …, */ } from "module-name";
+```
+
 
 #### [Modules vs Normal scripts](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules#other_differences_between_modules_and_standard_scripts)
 
