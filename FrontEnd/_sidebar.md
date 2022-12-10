@@ -2,6 +2,16 @@
 - [HTML](/FrontEnd/Html/htmlNotes.md)
 - [CSS](/FrontEnd/Css/cssNotes.md)
 - JS
-    - [Js](/FrontEnd/Js/jsNotes.md)
-    - [DOM](/FrontEnd/Js/domNotesmd)
+  - [Js](/FrontEnd/Js/jsNotes.md)
+  - [DOM](/FrontEnd/Js/domNotesmd)
+- React
+  - [React](/FrontEnd/React/reactNotes.md)
+  - [Library](/FrontEnd/React/libraryNotes.md)
+  - [Test](/FrontEnd/React/testNotes.md)
+- NextJs
+  - [NextJs](/FrontEnd/Next/nextNotes.md)
+- UI-UX
+  - [Sketch](/FrontEnd/UI-UX/sketchNotes.md)
+- [Webpack](/FrontEnd/webpack/webpackNotes.md)
+
 - [Q&A](/FrontEnd/QnA/questions.md)
