@@ -783,3 +783,26 @@ class Wrapper extends React.Component {
   }
 }
 ```
+
+# Questions
+
+#### [How can I use multiple refs for an array of elements with hooks?](https://stackoverflow.com/questions/54633690/how-can-i-use-multiple-refs-for-an-array-of-elements-with-hooks)
+
+- [Hooks can only be called at the Top Level](https://reactjs.org/docs/hooks-rules.html#only-call-hooks-at-the-top-level) (not inside loops)
+- The [official recommended way](https://beta.reactjs.org/learn/manipulating-the-dom-with-refs#how-to-manage-a-list-of-refs-using-a-ref-callback) to solve this is to pass a function to the ref attribute. This is called a ref callback.
+
+#### How to integrate React with the backend?
+
+When using `create-react-app` to create the React app, we have two commands out of the box. `npm start` and `npm run build`, which starts a server with auto rebuild in development settings, and compile a production version of the project respectively. The latter command also creates a `build` folder that contains all the compiled files. 
+
+* One way to integrate React with the backend (assuming using Django) is to configure Django to use the files in `build` folder as its template. As such, the integration is complete. A detail guide can be found in this [video](https://www.youtube.com/watch?v=FhkqMHxchZ8)
+
+> However, the above solution is bad for development. Because, `npm run build` is not only slow and skips many important development warnings. Even worse, it doesn't come with `watch` mode, meaning changes are not auto rebuild. Thus, we can't view changes immediately. 
+
+* Another way is to use proxy. The above solution runs the backend and frontend on a single server which is the Django server. In this solution, we'll run them on separate servers and proxy all API requests to the backend server. More details can be found on the official website of [create-react-app](https://create-react-app.dev/docs/proxying-api-requests-in-development/)
+
+* In a production scenario, `create-react-app` is rarely used as its big and less flexible. Projects are often initialized from scratch and using `webpack` to bundle together. Thus, we can control the development build, which uses the first solution without its overheads. More details can be referred to [React Integration Using Webpack & Babel](https://www.youtube.com/watch?v=6c2NqDyxppU&list=PLzMcBGfZo4-kCLWnGmK0jUBmGLaJxvi4j&index=3)
+
+#### [How to solve CSRF token missing error when using Axios](https://stackoverflow.com/questions/39254562/csrf-with-django-reactredux-using-axios)
+
+#### [React useState - update all object values to true](https://stackoverflow.com/questions/72528022/react-usestate-update-all-object-values-to-true)

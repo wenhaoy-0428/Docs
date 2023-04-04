@@ -353,7 +353,15 @@ let list = [1, 2, 3];
 list = [...list, 4];
 
 console.log(list);
+
+
+let list2 = [4, 5, 6];
+list = [...list, list2]; // [1, 2, 3, [1, 2, 3]]
+list = [...list, ...list2] // [1, 2, 3, 4, 5, 6]
 ```
+
+[How to append an array to another array](https://linuxhint.com/append-one-array-to-another-array-in-javascript/)
+
 
 ---
 
