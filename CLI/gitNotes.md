@@ -134,6 +134,18 @@ git commit --amend # attach new edits to the commit.
 git rebase --continue
 ```
 
+### [Untrack already tracked files](https://stackoverflow.com/questions/1274057/how-do-i-make-git-forget-about-a-file-that-was-tracked-but-is-now-in-gitignore)
+
+```bash
+# remove the file from index 
+git rm --cached <file>
+# --cached means the action is applied on git and not on filesystem
+```
+
+
+
+
+
 ### [What is dot-dot in Git](https://stackoverflow.com/questions/7251477/what-are-the-differences-between-double-dot-and-triple-dot-in-git-dif)
 
 * `git diff A..B` and `git diff A...B` show the difference of tip A and tip B, and the difference between B from A since their common ancestor (basically saying the all commits of B since the common ancestor).
