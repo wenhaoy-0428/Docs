@@ -805,4 +805,18 @@ When using `create-react-app` to create the React app, we have two commands out 
 
 #### [How to solve CSRF token missing error when using Axios](https://stackoverflow.com/questions/39254562/csrf-with-django-reactredux-using-axios)
 
+When using [Django](../../BackEnd/Django/djangoNotes.md) as the backend or using [Django Rest Framework](../../BackEnd/Django/DRF/drfNotes.md), by default, DRF uses [`SessionAuthentication` and `BasicAuthentication`](https://www.django-rest-framework.org/api-guide/authentication/#sessionauthentication) that come out of Django. Also, Django enables CSRF token protection by default as the [official docs](https://docs.djangoproject.com/en/4.2/howto/csrf/) say. Thus, when using `SessionAuthentication` in DRF will come with CSRF token by default, meaning ALL `POST`, `PUT` `PATCH` and other **unsafe** requests, CSRF token is required.
+
+One difference between DRF and Django is that, CSRF token is not required for anonymous users in DRF due to the fact that DRF has to support not only `SessionAuthentication` but other methods. Thus, for login pages, and other pages that can only be accessed by anonymous users, the associated APIs (normally marked as `permission_class = [AllowAny,]`) doesn't come with CSRF checking. However, unprotected login forms and registration forms are suffered from other attacks as described [here](https://stackoverflow.com/questions/6412813/do-login-forms-need-tokens-against-csrf-attacks) (I personally somehow don't understand `:(` ),  also DRF [official docs](https://www.django-rest-framework.org/api-guide/authentication/#sessionauthentication) also indicate it is necessary to enforce CSRF protection for login pages.
+
+To send CSRF token from backend to frontend is easy, [Django](https://docs.djangoproject.com/en/4.2/howto/csrf/#acquiring-the-token-if-csrf-use-sessions-and-csrf-cookie-httponly-are-false) noticed that CSRF token is automatically sent along with cookie named `csrftoken` when requested, and can be programmatically manually retrieved using methods in the former link or use third-party library `js-cookie`.
+
+For sending `unsafe` requests using axios, including CSRF token in the request can be achieved in the following there ways according to the header of this question.
+
+
+> For login pages and register pages, we normally enforce a backend view to check CSRF first, then create a new API ( `getCSRFToken` )that helps retrieve CSRF token.A detail walkthrough can be found in this [video](https://www.youtube.com/watch?v=EMKRnPeiD5A&t=1990s) or [How to implement Registration API using DRF?](../../BackEnd/Django/djangoNotes.md#how-to-implement-registration-api-using-drf)
+
+ 
 #### [React useState - update all object values to true](https://stackoverflow.com/questions/72528022/react-usestate-update-all-object-values-to-true)
+
+

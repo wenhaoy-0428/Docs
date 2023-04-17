@@ -5,6 +5,14 @@
 #### [How to integrate Django with React?](../../FrontEnd/React/reactNotes.md#how-to-integrate-react-with-the-backend)
 #### [How to parse request.body from POST in Django](https://stackoverflow.com/questions/29780060/trying-to-parse-request-body-from-post-in-django)
 #### [How to filter a query with a list of values?](https://stackoverflow.com/questions/9304908/how-can-i-filter-a-django-query-with-a-list-of-values)
+#### [What are cookies, local storage, session storage](https://www.youtube.com/watch?v=GihQAC1I39Q)
+
+A cookie is a payload of data that will be exchanged between server and client on **EVERY** request. Therefore, all necessary tokens are stored inside the cookie.
+
+Local storage is a cache section on the computer, meaning data inside of which will be accessed by everyone and won't be automatically deleted.
+
+Session storage is a cache section stores inside the browser memory and only a specific tab can view it, which also will be deleted once the section is closed.
+
 
 
 
@@ -356,10 +364,46 @@ Also this [article](https://www.digitalocean.com/community/tutorials/how-to-add-
 As for the React Part, this [youtube mix](https://www.youtube.com/watch?v=brcHK3P6ChQ&list=RDCMUCY38RvRIxYODO4penyxUwTg&start_radio=1&rv=brcHK3P6ChQ&t=48) provides step by step implementation of the whole authentication system using React.
 
 
+### How to implement Registration API using DRF?
+
+User is stored as a model in Django. Thus, we can treat it as a normal model with DRF by writing a serializer. 
+
+For the React part, a simple form that submits user password and necessary info with a `POST` request is enough.
+
+The detail implementation of the registration API can be referred to this two pages. 
+
+1. [How to Create Register and Login API using Django Rest Framework and Token Authentication](https://www.codersarts.com/post/how-to-create-register-and-login-api-using-django-rest-framework-and-token-authentication)
+
+2. [Django REST Framework Tutorial – Register Login Logout API](https://studygyaan.com/django/django-rest-framework-tutorial-register-login-logout)
+
+3. [](https://iheanyi.com/journal/user-registration-authentication-with-django-django-rest-framework-react-and-redux/)
+
+4. [Digital Ocean](https://www.digitalocean.com/community/tutorials/how-to-add-login-authentication-to-react-applications)
+
+More reference can be found here:
+
+1. [.](https://medium.com/@ronakchitlangya1997/jwt-authentication-with-react-js-and-django-c034aae1e60d)
+
+2. [.](https://blog.devgenius.io/django-rest-framework-react-authentication-workflow-2022-part-2-d299b7fef875)
+
+3. [.](https://www.reddit.com/r/django/comments/vp93md/comment/iei6lqu/)
+
+4. [.](https://www.reddit.com/r/django/comments/l6tmfx/django_react_best_authentication_method/)
+
+4. [.](https://www.digitalocean.com/community/tutorials/how-to-add-login-authentication-to-react-applications)
+
+
+For password validation, Django provides default validators in the `settings.py`. We can also write our own validators. An official reference can be found at [Writing your own validator¶](https://docs.djangoproject.com/en/4.1/topics/auth/passwords/#writing-your-own-validator). We can then add the path to `settings.py` following the syntax. 
+
+> A step by step demonstration can be found at [Default and Custom password validators in Django](https://www.letscodemore.com/blog/how-to-add-custom-password-validators-in-django/)
 
 
 
+### How to implement block anonymous users from calling APIs using DRF?
 
+In a normal Django function based view, a `login_required` decorator can be used to block any unauthenticated users. In a class based view, URLConf decorator, derived from a `Mixin` or `method_decorator` on `dispatch` method all all possible. A detail reference can be found in this [page](https://stackoverflow.com/questions/6069070/how-to-use-permission-required-decorators-on-django-class-based-views)
+
+As for Django Rest Framework, [Permission classes](https://www.django-rest-framework.org/api-guide/permissions/) can be used. 
 
 
 

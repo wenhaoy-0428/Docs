@@ -102,3 +102,105 @@ More details can be found in this video: [React Router in Depth #10 - Forms & Ac
 Fetcher is used to do a manual loading or submitting.
 
 
+#### How to use React Router to implement Protected Routers
+
+Please follow [this video](https://www.youtube.com/watch?v=2k8NleFjG7I) for a very quick demonstration first or alternatively read [this article](https://medium.com/@dennisivy/creating-protected-routes-with-react-router-v6-2c4bbaf7bc1c) first.
+
+A more detail step by step tutorial can be found in [this video](https://www.youtube.com/watch?v=oUZjO00NkhY) including `role based` protection.
+
+!> At this very moment, React Router doesn't support a clean and nice way to block firing `loaders` in child routes when the path name matches. The related problem I encountered is posted [here](https://stackoverflow.com/questions/76023757/how-to-prevent-child-loader-from-being-fired-if-not-rendered-in-react-router). The problem is answered by the official crew at [github](https://github.com/remix-run/react-router/issues/9529). 
+
+
+> Note: If we use states inside the `PrivateRoute`, like the following code snippet. `Outlet` is never used. Reason of this is that whenever the pages refreshed or after login. The PrivateRoutes is rendered and `isAuthenticated` is `false` and a navigation is triggered. Only after `PrivateRoutes` finishes rendering, `useEffect` will take place and `isAuthenticated` will be true. However, even its true the page is now at `login` and thus we'll stuck in the login page.
+
+```js
+export const PrivateRoutes = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
+
+  useEffect(() => {
+    let checkAuth = async () => {
+      try {
+        let response = await axios.get(API_CHECK_AUTH);
+        console.log(response);
+        setIsAuthenticated(true);
+      } catch (e) {
+        console.log(e);
+      }
+    };
+    checkAuth();
+  });
+
+  useEffect(() => {
+    console.log(isAuthenticated);
+  });
+
+  return isAuthenticated ? <Outlet /> : <Navigate to="/account/login" />;
+};
+```
+
+My solve to the above problem is to use `loader` in PrivateRoutes which happens before rendering. or use context that is set before PrivateRoutes renders.
+
+1. loader:
+
+```js
+/**
+ * loader function that tries to check authentication before render and redirect page if necessary
+ * @returns null if authenticated and redirect otherwise
+ * @deprecated
+ */
+const loadPrivate = async () => {
+  try {
+    let response = await axios.get(API_CHECK_AUTH);
+    console.log(response);
+    return null;
+  } catch (e) {
+    console.log(e);
+  }
+  return redirect("/account/login");
+};
+
+<Route element={<PrivateRoutes />} loader={loadPrivate}>
+...
+</Route>
+```
+
+2. Context
+
+```js
+export const PrivateRoutes = () => {
+  const { auth } = useAuth();
+  return auth ? <Outlet /> : <Navigate to="/account/login" />;
+};
+
+
+export function useAuth() {
+  return useContext(AuthContext);
+}
+
+export function AuthProvider({ children }) {
+  const [auth, setAuth] = useState(false);
+
+  useEffect(() => {
+    let checkAuth = async () => {
+      try {
+        let response = await axios.get(API_CHECK_AUTH);
+        console.log(response);
+        setAuth(true);
+      } catch (e) {
+        console.log(e);
+      }
+    };
+    checkAuth();
+  });
+
+  return (
+    <AuthContext.Provider value={{ auth, setAuth }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+```
+
+
+

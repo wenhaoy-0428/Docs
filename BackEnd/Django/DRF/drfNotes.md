@@ -188,5 +188,10 @@ class RecordSerializer(serializers.ModelSerializer):
 The [entire official documentation of relational serializing](https://www.django-rest-framework.org/api-guide/relations/#stringrelatedfield) is based on the reverse relations
 
 
+#### Permissions
+
+
+
+
  
   
