@@ -203,4 +203,40 @@ export function AuthProvider({ children }) {
 ```
 
 
+## PageTransition
 
+Transition animation can be easily done with [Framer Motion](../FramerMotion/framerMotionNotes.md). 
+
+#### Before React-Router V6, routes are created in this way:
+
+```js
+
+function Temp() {
+  const location = useLocation();
+  console.log(location);
+  useEffect(() => {
+    console.log("changes");
+    console.log(location.pathname);
+  });
+  return (
+    <AnimatePresence mode="wait">
+      <Routes key={location.pathname} location={location}>
+        <Route path="/account/login" element={<Login />}></Route>
+        <Route path="/account/register" element={<Register />}></Route>
+      </Routes>
+    </AnimatePresence>
+  );
+}
+```
+
+The `key` prop is necessary to let AnimatePresence to know its direct children is re-mounted. An official reference can be found [here](https://www.framer.com/motion/animate-presence/##exit-animations)
+
+The `location` prop is also required. It's original intention is to filter all children `Route` that matches the location. If not specified, default url object will be used. An official reference can be found [here](https://reactrouter.com/en/main/components/routes). 
+
+However, it's problematic for animation if we don't specify `location` prop. The reason is that **During** transition, we'll have 2 routes mounted on the tree the same time. The *old* Route will gradually be animated out and unmounted, the *new* Route will be mounted and animated in. The problem here is by default, `Route` will read the latest pathname, hence, both the old and new Routes will have the same URL which points the new content. The will cause problem for animation. **MAY BE**, for framer motion it will does nothing when the unmounting and mounting components are the same.
+
+More reference can be found [1](https://github.com/remix-run/react-router/issues/4351), [2](https://zhuanlan.zhihu.com/p/51949609)
+
+##### After React-Router V6.4
+
+`createBrowserRouter` and `createRoutesFromElements` does not accept other components aside of `Route`. The detail can be following by this [stack-overflow](https://stackoverflow.com/questions/74190609/exit-animations-with-animatepresence-framer-motion-and-createbrowserrouter-r)

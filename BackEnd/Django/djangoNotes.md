@@ -407,3 +407,23 @@ As for Django Rest Framework, [Permission classes](https://www.django-rest-frame
 
 
 
+#### How to export all dependencies (libraries) that current project is rely on
+
+```bash
+pip3 freeze > requirements.txt  # Python3
+```
+
+[Reference to](https://stackoverflow.com/questions/31684375/automatically-create-requirements-txt)
+
+
+#### How to implement Email Verification?
+
+1. For email verification, the most important thing is `token` generation. A token is a block of **hashed** data which indicates the data is not changed. 
+
+A big misunderstanding is that `hashes` like `SHA1` are **not** encryptions. Hashes only cares about the data is not changed, and it's irreversible, while encryption also cares about reversion.
+
+2. By default, Django provides `default_token_generator` which is an alias of `PasswordResetTokenGenerator`. After read the source code, it's not hard to understand that Django uses `hashlib` and [hmac](https://www.liaoxuefeng.com/wiki/1016959663602400/1183198304823296) standard library to help generate the token. Therefore, we can implement a subclass that is derived from `PasswordResetTokenGenerator` and override its `_make_hash_value` function (which indicates all value to be checked). A step by step tutorial can be found [here](https://www.youtube.com/watch?v=Rbkc-0rqSw8&t=1873s)
+
+> One problem of the above method is that `token` is only used as an indicator that shows if the data is modified. Meaning we have to include a `userid` in plaintext (even use [base64 encode](https://www.youtube.com/watch?v=8qkxeZmKmOY) it's still plaintext in a random look).
+
+1. An alternative way is to use `encryption` to generate the token, which encodes everything including the user information. The server then decodes from the token to retrieve user info for further actions. A reference can be found [1](https://blog.csdn.net/qq_51014805/article/details/119987513) [2](https://blog.csdn.net/weixin_43903639/article/details/122898902)
