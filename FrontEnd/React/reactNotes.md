@@ -797,6 +797,8 @@ When using `create-react-app` to create the React app, we have two commands out 
 
 * One way to integrate React with the backend (assuming using Django) is to configure Django to use the files in `build` folder as its template. As such, the integration is complete. A detail guide can be found in this [video](https://www.youtube.com/watch?v=FhkqMHxchZ8)
 
+Follow [a text instruction from deploying notes](../../BackEnd/serverNotes.md#prepare-settings-for-production-part3)
+
 > However, the above solution is bad for development. Because, `npm run build` is not only slow and skips many important development warnings. Even worse, it doesn't come with `watch` mode, meaning changes are not auto rebuild. Thus, we can't view changes immediately. 
 
 * Another way is to use proxy. The above solution runs the backend and frontend on a single server which is the Django server. In this solution, we'll run them on separate servers and proxy all API requests to the backend server. More details can be found on the official website of [create-react-app](https://create-react-app.dev/docs/proxying-api-requests-in-development/)

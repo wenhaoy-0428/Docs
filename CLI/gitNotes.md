@@ -77,6 +77,13 @@ git clean -fd
 git clean -fx
 ```
 
+### create a local branch based on a remote branch
+
+```bash
+git fetch origin
+git checkout <remote-branch-name> # without remote/origin/ prefix
+```
+
 ### check "lost" commits.
 
 This happens when I worked on the detached Head branch and checkout to an older commit and the I can't find the latest commit.

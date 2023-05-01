@@ -52,6 +52,22 @@ npm i <module_name> -P
 npm i <module_name> -D
 ```
 
+## [Upgrade npm to a specific version](https://docs.npmjs.com/try-the-latest-stable-version-of-npm)
+
+Install `n` first, which is a popular command-line utility for installing and managing multiple versions of Node.js on a single machine
+
+```bash
+sudo npm install n -g
+sudo n 14.17.0 # 14.17.0 is the version number
+```
+
+update npm second.
+```bash
+npm install -g npm@9.6.4
+```
+
+> If you update npm first, you may encounter an error complains that `npm` requires a higher version of node, and `npm install n` may keeps complaining. If that is the case use `/usr/bin/npm install n` which will use the default npm. (your updated npm will be install at `/ur/local/bin/npm`)
+
 # Parcel
 
 Parcel is a front-end tool with many built-in features, including `serving`, `tree shaking`, `auto dependency installation`, `compilation`, and etc.
