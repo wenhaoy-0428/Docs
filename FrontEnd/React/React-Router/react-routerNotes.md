@@ -83,6 +83,20 @@ createBrowserRouter([
 
 Data can be fetched when routing using `loader` attribute of a route, and `useLoaderData` in the landing component to retrieve.
 
+The native way of react to fetch data is using `useEffect`. 
+
+* This approach has 1 minor issue is data is fetched after the component is already mounted. 
+
+* More importantly this approach cause waterfall. That is when building the React hierarch tree, the parent component is mounted and its data is fetched first, only after which will the child components start to fetch data. 
+
+A more better way is to fetch data of children/parent in parallel which is what `loader` does. 
+
+A complete guid of loader can be found at [Remixing React Router about loader](https://remix.run/blog/remixing-react-router) and a more in_depth analysis can be found at [Lazy Loading Routes in React Router 6.4+](https://remix.run/blog/lazy-loading-routes)
+
+
+### [How to implement a loading indicator when loader is fetching data?](https://reactrouter.com/en/main/hooks/use-navigation#usenavigation)
+
+React-Router provides a hook named `useNavigation` which is totally different from `useNavigate` even they have very similar names. This hook tells everything you need to know about a page navigation. Including the state of router, such as if it is `loading/submitting/idle`. Hence we can use this information to build a loading indicator.
 
 ## [Actions and Form](https://reactrouter.com/en/main/components/form)
 

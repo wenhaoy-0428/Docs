@@ -1,6 +1,7 @@
 ## Questions
 
 1. [What is stack context](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Positioning/Understanding_z_index/The_stacking_context)
+2. [How background-position works](https://stackoverflow.com/questions/51731106/using-percentage-values-with-background-position-on-a-linear-gradient)
 
 ## Index
 1. There are four different techniques to create multi-column layouts.
@@ -906,3 +907,30 @@ html {
     display: inline-block;
     }
     ```
+
+## CSS3D
+
+In CSS3, `transform` gives us more control over the elements. `translateZ` and `rotateZ` are methods allows us to transform the element in a 3D way.
+
+To enable `z` axis transform, `perspective` attribute in the **direct** parent element must be specified. All elements have a default `transform-style: flat` meaning all child elements are treated in 2D world. Also child elements will **not** inherit this property from parent. 
+
+```html
+<div id="scene" style={perspective:100px}> 
+    <div id="cube-wrapper"> 
+        <div id="front"> </div>
+    </div>
+</div>
+```
+
+In the above example, by adding `perspective` in the `scene` element, we can now treat `cube-wrapper` in a 3D way, like `translateZ` and etc. However, `front` element will be adjusted according to `cube-wrapper` in a 2D way. And `z` related properties can not be applied to `front`. The reason is that `cube-wrapper` has a default  `transform-style: flat`. To solve this, set `transform-style: preserve-3d` to allow children to be render in a 3D space.
+
+
+For a detail demonstration of how to use `CSS3D` can be found at [3D CSS - lighting, animations, and more!](https://www.youtube.com/watch?v=NdftnCDwKaU). 
+
+
+#### Limitations
+
+Once you understand the basic of CSS3D, you will quickly find that all facets of a 3D objects have to be the same shape in order to connect them seamlessly together. For example, if you have an triangular object that is of an iPhone shape, where the front and back facets have border-radius, there is no easy way to connect them with the side facets.
+
+One work around is to add many layers of the same shape with border-radius then stack them up on the z-axis. A demo can be found at [3D CSS: Interactive SNES Controller](https://codepen.io/alvaromontoro/pen/PoEgRPG)
+

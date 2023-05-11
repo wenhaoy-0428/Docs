@@ -31,3 +31,6 @@
     * RSYNC
 
 ## [Web Security](https://developer.mozilla.org/en-US/docs/Learn/Server-side/First_steps/Website_security)
+
+
+## [DevOps](https://www.youtube.com/watch?v=j5Zsa_eOXeY&t=278s)
