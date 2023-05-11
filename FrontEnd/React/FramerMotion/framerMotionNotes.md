@@ -102,5 +102,22 @@ export const Slideshow = ({ image }) => (
 )
 ```
 
+> Note, `AnimatePresence` only works when the component defines it is still mounted while its direct component is unmounted.
+
+Such as unmounting `LoadingIndictor` while App is still mounted. Also, exit prop of nested `motion` will also be activated. Also, you can't use ternary operator inside.
+
+```js
+function App {
+  <AnimatePresence>
+    {showLoadingIndicator && <LoadingIndicator />}
+  </AnimatePresence>
+
+
+  <AnimatePresence>
+    // This will not work
+    {showLoadingIndicator ? <LoadingIndicator /> : null} 
+  </AnimatePresence>
+}
+```
 
 
