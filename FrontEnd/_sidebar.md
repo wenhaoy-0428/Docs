@@ -1,14 +1,16 @@
 - [**Home**](README.md)
-- [HTML](/FrontEnd/Html/htmlNotes.md)
-- [CSS](/FrontEnd/Css/cssNotes.md)
-- JS
+- Basic
+  - [HTML](/FrontEnd/Html/htmlNotes.md)
+  - [CSS](/FrontEnd/Css/cssNotes.md)
   - [Js](/FrontEnd/Js/jsNotes.md)
   - [DOM](/FrontEnd/Js/domNotesmd)
+  - [CLI](/FrontEnd/CLI/cliNotes.md)
 - React
   - [React](/FrontEnd/React/reactNotes.md)
   - [Library](/FrontEnd/React/libraryNotes.md)
   - [React Router](/FrontEnd/React/React-Router/react-routerNotes.md)
   - [Test](/FrontEnd/React/testNotes.md)
+  - [Framer Motion](/FrontEnd/React/FramerMotion/framerMotionNotes.md)
 - NextJs
   - [NextJs](/FrontEnd/Next/nextNotes.md)
 - UI-UX
