@@ -3,6 +3,34 @@
 DRF is a framework of Django that provides an abstraction of **API** for not only Web APP, but Mobile APP.
 
 
+# Requests
+
+For **Get** requests, data are accessed through `request.query_param`, also axios has to use 
+
+```js
+axios.get('/user', {
+    params: {
+      ID: 12345
+    }
+  })
+// or
+axios.get('/user?ID=12345')
+  .then(function (response) {
+    // handle success
+    console.log(response);
+  })
+  .catch(function (error) {
+    // handle error
+    console.log(error);
+  })
+  .finally(function () {
+    // always executed
+  });
+```
+
+
+For **Post** requests, data are accessed through `request.data`
+
 
 
 
@@ -183,9 +211,62 @@ class RecordSerializer(serializers.ModelSerializer):
         fields = ['user_id', 'word_id']
 ```
 
+> Also, we can use [to_representation](https://www.django-rest-framework.org/api-guide/relations/#custom-relational-fields) to customize exactly how the field is going to be displayed.
+
+```python
+
+class TagAssignmentToTagField(serializers.RelatedField):
+    """ A custom relational filed that is used by @link QuoteSerializer
+    """
+
+    def to_representation(self, value):
+        return f'{value.tag_id}'
+
+
+class QuoteSerializer(serializers.ModelSerializer):
+    tag = TagAssignmentToTagField(source='tagAssignment_id', read_only=True)
+
+    class Meta:
+        model = Quote
+        fields = ['pk', 'link', 'value', 'tag']
+
+```
+
 * For models are referenced, and try to access the related model, add `_set` lookup option. (e.g. `field_name_set` ) or add `related_name` in the model.
 
 The [entire official documentation of relational serializing](https://www.django-rest-framework.org/api-guide/relations/#stringrelatedfield) is based on the reverse relations
+
+
+
+In the above cases, we're accessing the related model as a single field of the current model. Sometimes, we also want to nest the whole related model inside the current model. Thus, we'll write a serializer for the child model called child serializer then specify the filed in parent serializer equal to the child serializer
+
+```py
+
+class QuoteSerializer(serializers.ModelSerializer):
+    tag = TagAssignmentToTagField(source='tagAssignment_id', read_only=True)
+
+    class Meta:
+        model = Quote
+        fields = ['pk', 'link', 'value', 'tag']
+
+
+class RecordSerializer(serializers.ModelSerializer):
+    word = serializers.StringRelatedField(source='word_id')
+    quotes = QuoteSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Record
+        fields = ['pk', 'word', 'date_added', 'mastery', 'quotes']
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        # update the representation of mastery so that it shows decayed value since last reviewed.
+        ret['mastery'] = utils.calcDecayedMastery(instance)
+        return ret
+
+```
+
+> Note, nested serializers are **read-only**, meaning we can only get Models to Json, but can create Model from json. To make writable nested serializer, we have to explicitly write the create process in the `.create` method of the root serializer. We **can't** have nested `create`, meaning it's not allowed to let parent'create method call children't create method.
 
 
 #### Permissions

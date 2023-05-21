@@ -7,6 +7,11 @@
 #### [How to filter a query with a list of values?](https://stackoverflow.com/questions/9304908/how-can-i-filter-a-django-query-with-a-list-of-values)
 #### [What are cookies, local storage, session storage](https://www.youtube.com/watch?v=GihQAC1I39Q)
 
+#### [How to select specific fields in query](https://stackoverflow.com/questions/7503241/how-to-obtain-a-queryset-of-all-rows-with-specific-fields-for-each-one-of-them)
+
+
+#### [How to extend user model]()
+
 A cookie is a payload of data that will be exchanged between server and client on **EVERY** request. Therefore, all necessary tokens are stored inside the cookie.
 
 Local storage is a cache section on the computer, meaning data inside of which will be accessed by everyone and won't be automatically deleted.
@@ -427,3 +432,323 @@ A big misunderstanding is that `hashes` like `SHA1` are **not** encryptions. Has
 > One problem of the above method is that `token` is only used as an indicator that shows if the data is modified. Meaning we have to include a `userid` in plaintext (even use [base64 encode](https://www.youtube.com/watch?v=8qkxeZmKmOY) it's still plaintext in a random look).
 
 1. An alternative way is to use `encryption` to generate the token, which encodes everything including the user information. The server then decodes from the token to retrieve user info for further actions. A reference can be found [1](https://blog.csdn.net/qq_51014805/article/details/119987513) [2](https://blog.csdn.net/weixin_43903639/article/details/122898902)
+
+
+
+
+##### [How to extend user model](https://docs.djangoproject.com/en/4.2/topics/auth/customizing/#extending-user)
+
+Substitute User model mid project is complicated than thought. An workaround is to add another Model like Profile model and has a `oneToOneField` relationship between User model.
+
+However, the profile model is no difference than a normal model. Thus, it will not be automatically created when a User instance is created. Thus, we have to manually create it.
+
+* If the project already implements registration, we can create the Profile model at registration. 
+
+> This is really tedious that we have to do this manually. There has to be a better way!
+
+* We can also use [Signal](#signal) to automate the creation of Profile model. 
+  
+Whenever a user create signal is send, a callback function we provided will be fired. 
+
+
+However, in mid-project, many users have already been created, and hence there is no Profile instances associate with them. In order to solve this, we have to manually create Profile instances for them. A quick way of doing this is to use Django shell script. 
+
+```py
+import sys
+import django
+from account.models import UserProfile
+from django.contrib.auth.models import User
+
+# os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'your_project.settings')
+# django.setup()
+
+
+def create_user_profiles(dry_run=False):
+    users = User.objects.all()
+
+    for user in users:
+        if not dry_run:
+            UserProfile.objects.get_or_create(user=user)
+        else:
+            print(f"Creating UserProfile for user: {user.username} (Dry Run)")
+
+    if not dry_run:
+        print('User profiles created successfully!')
+    else:
+        print('Dry run completed. No changes were made.')
+
+
+# Check if the script is run with a dry run flag
+if "--dry-run" in sys.argv:
+    create_user_profiles(dry_run=True)
+else:
+    create_user_profiles()
+```
+
+> You may have to include settings `env` and `setup` to make this script work properly, [How to execute a Python script from the Django shell?](https://stackoverflow.com/questions/16853649/how-to-execute-a-python-script-from-the-django-shell)
+
+
+
+## [Signal](https://docs.djangoproject.com/en/4.2/topics/signals/)
+
+A signal is sent when certain default events happen and the corresponding callback function will be fired. 
+
+#### Listen to a signal
+
+A `receiver` is a callback function to be fired. In order to let system know to fire this function when a signal is fired. We have to link it to the signal.
+
+There are 2 ways of [linking:](https://docs.djangoproject.com/en/4.2/topics/signals/#connecting-receiver-functions)
+
+1. Manually call `your_signal.connect(callback)`
+
+2. Use `receiver` decorator.
+
+
+Commonly, we'll create a `signals.py` file that stores all related signals to an APP. No matter what, they code we define our linking as be executed by the system to let it know. The right place is inside `ready` function of `app.py`. [Ref](https://docs.djangoproject.com/en/4.2/topics/signals/#connecting-receiver-functions)
+
+```py
+from django.apps import AppConfig
+from django.core.signals import request_finished
+
+
+class MyAppConfig(AppConfig):
+    ...
+
+    def ready(self):
+        # Implicitly connect signal handlers decorated with @receiver.
+        from . import signals
+
+        # Explicitly connect a signal handler.
+        request_finished.connect(signals.my_callback)
+
+```
+
+## Upload and serve images
+
+ImageField allows us to store image files. In order to use it, we have to [install pillow](https://docs.djangoproject.com/en/4.2/ref/models/fields/#imagefield) as Django relies on it to help identify the image format. 
+
+Also, by default, images/files are not stored in the database rather on the local storage on the sever. More specifically, a folder specified by `media`. Hence, we have to specify the `MEDIA_ROOT` and `MEDIA_URL` inside `settings.py`
+
+```py
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR/'media'
+```
+
+After the above configurations, we can treat image field as a normal field. 
+
+For example use `serializer`, access it through `serializer.validated_data`, and etc.
+
+> When returning image as response, it's more recommended to return the url path of the image through `url` attribute of the field. This not only make the response easier to maintain in json format, and also easier for frontend, as a single `img` element with src to set to the returned url solves the problem.
+
+Example code:
+
+```py
+# serializer
+class AvatarSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = ['avatar']
+
+# view
+class view(...):
+    ...
+    userProfile = None
+    try:
+        userProfile = UserProfile.objects.get(user=request.user)
+    except UserProfile.DoesNotExist:
+        userProfile = UserProfile.objects.create(user=request.user)
+    response = {
+        ...
+        "avatar": userProfile.avatar.url,
+        ...
+    }
+```
+
+#### [Add image size constraints](https://stackoverflow.com/questions/39677349/django-admin-and-imagefield-dimension-restrictions)
+
+First implement a validator:
+
+```py
+from django.core.files.images import get_image_dimensions
+def MaxAvatarSizeValidator(image):
+    """
+    Validates avatar size to be within 400x400
+    """
+    image_width, image_height = get_image_dimensions(image)
+    max_width = 400
+    max_height = 400
+
+    if image_width > max_width or image_height > max_height:
+        raise ValidationError(f"The maximum image dimensions allowed are {max_width}x{max_height} pixels.")
+```
+
+Add the validator to field
+
+```py
+avatar = models.ImageField(upload_to="avatars/", validators=[MaxAvatarSizeValidator])
+```
+
+
+#### How to serve images
+
+Returning image url makes life easier, but we have to configure something more to enable backend to serve the url. 
+
+In production, this can be easily done through server, like `nginx`. All we need to do is add the `MEDIA_ROOT` to the listen block that listens to `media` path. 
+
+In development, since we don't have a server to configure, we have to add a temporary url pattern which works in dev inside `urls.py`, as the official docs say [Serving files uploaded by a user during development](https://docs.djangoproject.com/en/4.2/howto/static-files/#serving-files-uploaded-by-a-user-during-development)
+
+```py
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+```
+
+
+## Logging
+
+Django uses and extends Python’s builtin logging module.
+
+The Logging model has `Logger`, `Handler`, `Formatter`, `Filter` components. A quick introduction can be found here [Overview](https://docs.djangoproject.com/en/4.2/topics/logging/#overview)
+
+
+To configure logging in Django, we have to use `dicConfig`, which is one of the three ways to configure logging in Python. We specify the `LOGGING` attribute in side `settings.py` following the format and syntax of [dicConfig](https://docs.python.org/3/library/logging.config.html#logging-config-dictschema) described in python doc.
+
+> The `LOGGING` attribute specified in settings.py will be `merged` to the default one.
+
+
+```py
+# settings.py
+
+import os
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "WARNING",
+    },
+}
+
+```
+
+1. `version` at present can only be 1
+2. `disable_existing_loggers` by default is set to True, which will disable all non-root loggers.
+3. `console` is just an id or name of a handler, it can be anything you want.
+4. `root` specifies the behavior of a root logger. 
+
+> In Python's logging module, loggers are organized in a hierarchical structure known as the logger hierarchy. The hierarchy allows for flexible configuration and filtering of log messages. When a log message is generated, it is processed by the logger that is closest in the hierarchy to the logger that generated the message. If the logger does not handle the message, it is passed up the hierarchy to the parent logger. This continues until a logger handles the message or until it reaches the root logger (the top-level logger in the hierarchy).
+
+> child logger is indicated by its name. For example, logger named `app.model` is a child of logger named `app`
+
+
+### How to add custom information to the log 
+
+Since Django uses python's logging system, we are basically dealing with Python not Django. 
+
+Python by default supports these [attributes](https://docs.python.org/3/library/logging.html#logrecord-attributes) can be used to display info in a formatter. However, in many cases, we wish to have include more custom information in the logs like IP address, username and etc. 
+
+* Extra attribute
+
+One way is to add `extra` argument in the logger when logging messages, so that additional attributes can be displayed in a formatter.
+
+```py
+# view
+logger = logging.getLogger('my_logger')
+class MyView(APIVIEW):
+    def post(self, request):
+        logger.info("my message", extra={'ip': request.ip, 'user': request.user})
+
+# settings
+
+LOGGING = {
+    ...
+    'formatters': {
+        "simple": {
+            "format": "{levelname} {asctime} {ip} {funcName} {user} {message}",
+            "style": "{",
+        },
+    },
+    ...
+}
+```
+
+This is definitely a valid approach, however, it will be extremely cumbersome to include that extra block. Also since we have the formatter defined to include `ip` and `user` fields, emitting any of them in the logger's extra block will cause exception.
+
+Hence, it will soon become unmanageable if we have many logs and try to add new fields or edit existing fields in the formatter.
+
+* some methods I also tried but failed
+
+1. I tried to wrap the logger with my custom logger to include an abstraction, which will automatically inject ip and user
+
+```py
+class MyLogger():
+    __init__(self):
+        self.logger = logging.getLogger('api_log')
+    
+    def info(self, msg, request, *args, **kwargs):
+        self.logger(msg, extra={'ip': request.ip, 'user': request.user}, *args, **kwargs)
+```
+
+This approach seems to work, and we only have to modify this one place for future modification of Formatters. BUT, `funcName` of the formatter will always be our custom wrapper. since this is the one that calls the built-in logger. 
+
+
+#### [Python Docs methods](https://docs.python.org/3/howto/logging-cookbook.html#adding-contextual-information-to-your-logging-output)
+
+* [LoggerAdapter](https://docs.python.org/3/library/logging.html#loggeradapter-objects)
+
+LoggerAdapter gives us the same syntax as a normal logger. It wraps a normal logger and extra context. so that all logging with has that extra information build-in, However, I find this method only useful for static information. 
+
+```py
+logger = logging.getLogger(__name__)
+adapter = CustomAdapter(logger, {'connid': some_conn_id})
+```
+
+* thread local storage and middleware
+
+According to python docs, we can [Using Filters to impart contextual information¶ ](https://docs.python.org/3/howto/logging-cookbook.html#using-filters-to-impart-contextual-information). Also it states the use of `thread.local`. So we can write a custom filter that populate info to the logRecord, and provide default values. So that formatter can always be fulfilled.
+
+```py
+import logging
+import threading
+
+local = threading.local()
+
+class RequestFilter(logging.Filter):
+    def filter(self, record):
+        request = getattr(local, 'request', None)
+        if request:
+            record.ip = request.META.get('REMOTE_ADDR')
+            record.user = request.user.username
+        else:
+            record.ip = '-'
+            record.user = '-'
+        return True
+```
+
+The problem here is that how can we set `request` to thread local storage. The answer is middleware of django. Each request passed to django will go through all middleware defined in settings.py in order. So we can customize a middleware that stores the request in the thread local storage. 
+
+```py
+class LogRequestMiddleware:
+    """
+    A middleware that stores request object into the thread local storage,
+    so that logging filter can access it and populate necessary information to the logs
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        setattr(local, 'request', request)
+        return self.get_response(request)
+```
+
+Hence, as long as, the execution of middleware and the filter is in the same thread, `request` is shared globally.
+
+> A reference to this method [How can I add the currently logged in username to the access log of django.server?](https://stackoverflow.com/questions/75325514/how-can-i-add-the-currently-logged-in-username-to-the-access-log-of-django-serve), [Django日志中要包括主机名、客户端IP](https://blog.csdn.net/leiwuhen92/article/details/118759096)
+
+Some useful links to determine if it is safe to use this method [Does Django use one thread to process several requests in WSGI or Gunicorn?](https://stackoverflow.com/questions/66631489/does-django-use-one-thread-to-process-several-requests-in-wsgi-or-gunicorn)
