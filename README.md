@@ -13,9 +13,7 @@
 4. ### [JavaScript](/FrontEnd/Js/jsNotes.md)
     1. #### [Canvas API](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Client-side_web_APIs/Drawing_graphics)
     2. #### [DOM](#)
-5. ### jQuery
-
-6. ### React
+5. ### React
 
 ---
 
