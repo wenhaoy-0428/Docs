@@ -318,11 +318,11 @@ cout << endl;
 ### Inheritance
 
 1. `Inheritance`
-    | inheritance level | public members of derived class |  protected members of derived class | private members of derived class |
-    |-------------------|---------------------------------|-------------------------------------|----------------------------------|
-    | :`public` Base    |  remain `public`                | remain `protected`                  | remain `private`                 |
-    | :`proetcted` Base | change to `protected`           | remain `protected`                  | remain `private`                 |
-    | :`private` Base   | change to `private`             | change to `private`                 | remain `private`                 |
+    | inheritance level | public members of derived class | protected members of derived class | private members of derived class |
+    | ----------------- | ------------------------------- | ---------------------------------- | -------------------------------- |
+    | :`public` Base    | remain `public`                 | remain `protected`                 | remain `private`                 |
+    | :`proetcted` Base | change to `protected`           | remain `protected`                 | remain `private`                 |
+    | :`private` Base   | change to `private`             | change to `private`                | remain `private`                 |
 2. `friend` ship will not be inheritated. In the derived class we can use Base specifier to call Base functions/variables.
     ```cpp
     Derived::getVal() {
@@ -816,13 +816,13 @@ int main() {
 
 1. Common Operations
 
-    | Expression                |  functionality                              |
-    |--------------------       |---------------------------------------------|
-    | `shared_ptr<T> sp`        | construct an empty pointer which equals 0   |
-    | `p`                       | `p = true` if `p` points to something       |
-    | `*p`                      | retrieve the object/value that `p` points to|
-    | `p.get()`                 | return the pure `pointer` that `p` stores   |
-    | `swap(p, q) / p.swap(q)`  | swap the pure `pointer` that `p` `q` stores |
+    | Expression               | functionality                                |
+    | ------------------------ | -------------------------------------------- |
+    | `shared_ptr<T> sp`       | construct an empty pointer which equals 0    |
+    | `p`                      | `p = true` if `p` points to something        |
+    | `*p`                     | retrieve the object/value that `p` points to |
+    | `p.get()`                | return the pure `pointer` that `p` stores    |
+    | `swap(p, q) / p.swap(q)` | swap the pure `pointer` that `p` `q` stores  |
 
 2. Destruction of smart pointer will always happen regardless of exceptions.
 
@@ -837,13 +837,13 @@ int main() {
 
 2. `unique_ptr`
 
-    | Expression                |  functionality                                                          |
-    |--------------------       |-------------------------------------------------------------------------|
-    | `make_unique(args)`       | construct an unique pointer which equals 0 with default destructor      |
-    | `unique_ptr<T,D> up(agrs)`| `T` is the type of the managed object, `D` is a destructor function     |
-    | `up.release()`            | release the ownership if any and return a pointer to the managed object |
-    | `up.reset(args = nullptr)`| replaces the managed object with `args`                                 |
-    | `swap(p, q) / p.swap(q)`  | swap the pure `pointer` that `p` `q` stores                             |
+    | Expression                 | functionality                                                           |
+    | -------------------------- | ----------------------------------------------------------------------- |
+    | `make_unique(args)`        | construct an unique pointer which equals 0 with default destructor      |
+    | `unique_ptr<T,D> up(agrs)` | `T` is the type of the managed object, `D` is a destructor function     |
+    | `up.release()`             | release the ownership if any and return a pointer to the managed object |
+    | `up.reset(args = nullptr)` | replaces the managed object with `args`                                 |
+    | `swap(p, q) / p.swap(q)`   | swap the pure `pointer` that `p` `q` stores                             |
 
     ```cpp
     // helper class for runtime polymorphism demo below
@@ -915,8 +915,8 @@ int main() {
 
 2. `shared_ptr`
 
-    | Expression                              |  functionality                                                          |
-    |-----------------------------------------|-------------------------------------------------------------------------|
+    | Expression                              | functionality                                                           |
+    | --------------------------------------- | ----------------------------------------------------------------------- |
     | `make_shared(args)`                     | construct an unique pointer which equals 0 with default destructor      |
     | `shared_ptr<T> sp2(sp1)`                | `sp2` will make a copy of `sp1` and increase the counter of `sp1`/`sp2` |
     | `sp1 = sp2` (different managed objects) | decrease the counter of `sp1` by 1 and increase counter of `sp2` by 1   |
@@ -958,13 +958,13 @@ int main() {
     * `make_shared` also has its downside, we can't specify the `deleter` as well as `initializer list`
 
 3. `weak_ptr`
-    | Expression                              |  functionality                                                          |
-    |-----------------------------------------|-------------------------------------------------------------------------|
-    | `weak_ptr<T>(sp)`                       | construct an weak pointer points to the same object as shared pointer   |
-    | `w = p`                                 | `w`/`p` share the same object where `p` can only be **weak/shared** pointer |
-    | `w.use_count()`                         | number of referecences to the **shared pointer's** managed object       |
-    | `w.expired()`                           | return `true` if `w.usecount() = 0`                                     |
-    | `w.lock()`                              | return an empty `shared_ptr` if `expired() = true` otherwise, return a shared_pointer to the managed object |
+    | Expression        | functionality                                                                                               |
+    | ----------------- | ----------------------------------------------------------------------------------------------------------- |
+    | `weak_ptr<T>(sp)` | construct an weak pointer points to the same object as shared pointer                                       |
+    | `w = p`           | `w`/`p` share the same object where `p` can only be **weak/shared** pointer                                 |
+    | `w.use_count()`   | number of referecences to the **shared pointer's** managed object                                           |
+    | `w.expired()`     | return `true` if `w.usecount() = 0`                                                                         |
+    | `w.lock()`        | return an empty `shared_ptr` if `expired() = true` otherwise, return a shared_pointer to the managed object |
 
     * `weak_ptr` is designed to resolve the **Deadlock** caused by `shared_ptr`
         ```cpp
@@ -1109,3 +1109,13 @@ int main() {
     }
 
     ```
+
+## [Structure Binding](https://en.cppreference.com/w/cpp/language/structured_binding)
+
+Structured binding is a feature introduced in **C++17** that allows you to decompose a complex data structure, such as a pair, tuple, or array, into individual variables in a more concise and readable way. It provides a convenient syntax for unpacking the elements of a structure and assigning them to separate variables.
+
+The basic syntax is 
+
+```cpp
+auto [variable1, variable2, ...] = structure;
+```
