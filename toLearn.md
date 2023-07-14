@@ -37,3 +37,4 @@
 
 
 ## [ELK](https://www.youtube.com/watch?v=Hqn5p67uev4)
+1. [ELK with Django](https://remaster.com/blog/django-centralised-logging-using-elasticsearch-logstash-kibana-elk-filebeat)

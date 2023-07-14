@@ -1,3 +1,27 @@
+# Network
+
+
+## Multicast
+
+Multicast is used to allow multiple devices to receive the same content without needing the source server to send packets to each receiver. The distribution is handled by the network devices (A.K.A routers).
+
+`IGMP` is the protocol used between the router and switches that receives the packets. This protocol is used to maintain if a device is subscribed/unsubscribed to a multicast group. 
+
+`PIM` is the protocol between routers so that the router in the final segment can find a path to the source server. 
+
+> In multicast, all receiver subscribe to a **shared multicast IP** address. That multicast IP address in IGMP will be converted into multicast MAC address in the router of final segment, since switches are in Layer 2.
+
+![](./Assets/Screen%20Shot%202021-10-16%20at%207.58.24%20PM.png)
+
+
+Extremely useful references:
+
+1. [What is Multicast Networking and How Does It Work?](https://www.auvik.com/franklyit/blog/multicast-networking/#:~:text=Multicast%20networking%20is%20based%20on,broadcast%20because%20it%27s%20more%20selective.)
+
+2. [Multicast Explained in 5 Minutes | CCIE Journey for Week 6-12-2020](https://www.youtube.com/watch?v=W5oMvrMRM3Q)
+
+
+
 ## [What is the purpopse of br-lan in openwrt?](https://forum.openwrt.org/t/what-is-the-purpopse-of-br-lan-in-openwrt/122316)
 
 A bridge interface is like a virtual Ethernet switch. It lets you connect more than one thing to the "port" (interface) in the kernel that holds an IP address. The usual usage is to connect both Ethernet and wifi to the lan network. On a dual band router there may be two APs connected, one for each band. On a wired only router the br-lan is still set up for the possibility to add something later. There is a really insignificant performance drop going through a bridge with only two ports (the kernel and the eth port) compared to a direct connection, it doesn't hurt to leave it in.
