@@ -179,3 +179,5 @@ struct ContentView: View {
     }
 }
 ```
+
+##### [How to draw a rounded border for a view](https://www.appcoda.com/swiftui-border/)

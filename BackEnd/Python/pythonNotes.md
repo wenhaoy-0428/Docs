@@ -25,6 +25,28 @@ The following code gives us a list of **n**  `0`s
 dp = [0] * n
 ```
 
+## walrus operator
+
+The `:=` symbol is known as the "walrus operator" in Python. It was introduced in Python 3.8 and is used for assignment expressions.
+
+The walrus operator allows you to assign a value to a variable within an expression. It combines the assignment statement with a conditional expression, making it useful in various scenarios, including loops, comprehensions, and conditional statements.
+
+```python
+while (input_value := input("Enter a value: ")) != "exit":
+    print("You entered:", input_value)
+```
+
+## Reference 
+
+Mutable data structures are stored as reference.
+
+```python
+t = [1]
+s = [t]
+print(s) # [[1]]
+t.append(10) 
+print(s) # [[1, 10]]
+```
 
 
 ## Manipulate with Files
