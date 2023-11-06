@@ -37,10 +37,7 @@ find . -name .DS_Store -print0 | xargs -0 git rm --cached
     # vim ~/.ssh/config and add the followings
     Host github.com
     Hostname ssh.github.com
-    Port 443
-    ```
-
-### Fetch and Get a clean branch
+    Port 443## Fetch and Get a clean branch
 
 ```bash
 # First, run a fetch to update master refs to latest:

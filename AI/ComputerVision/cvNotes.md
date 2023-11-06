@@ -107,7 +107,7 @@ In SVM, we interpret the score just as higher the better. In SoftMax, we'll tran
 
 ![softmax](Assets/Screenshot%202023-05-30%20at%2019.08.04.png)
 
-1. We take exponential of the score: so that all scores no matter negative and positive will result in positive with the same monotonic increment. 
+1. We take exponential of the score: **so that all scores no matter negative and positive will result in positive with the same monotonic increment**. 
 2. divide the exponential value by the sum: so that all values sum to 1 and live in a probability distribution.
 3. We take log maximum likelihood so that the function is easier to deal with. Check [MLE](../../Stats/statsNotes.md#maximum-likelihood-estimation) for more detail.
 4. We take negative because Loss function measures how bad the data is, while MLE measures how good the data is.
