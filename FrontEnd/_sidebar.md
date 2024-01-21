@@ -1,5 +1,6 @@
 - Web
   - [HTML :hammer: CSS](/FrontEnd/HTML_CSS/_sidebar.md)
+  - [JS & TS](/FrontEnd/JS_TS/_sidebar.md)
   - React
     - [React](/FrontEnd/React/reactNotes.md)
     - [Library](/FrontEnd/React/libraryNotes.md)

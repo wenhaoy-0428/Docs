@@ -1,2 +1,2 @@
 - [HTML](/FrontEnd/HTML_CSS/Html/htmlNotes.md)
-- [CSS](/FrontEnd/Css/cssNotes.md)
+- [CSS](/FrontEnd/HTML_CSS/Css/cssNotes.md)

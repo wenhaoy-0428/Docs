@@ -1,6 +1,6 @@
 # [NextJS](https://www.youtube.com/watch?v=Sklc_fQBmcs&t=139s)
 
-`NextJS` is a framework designed for [React](/FrontEnd/React/reactNotes.md) applications. Unlike normal React app that uses `Client Side Rendering` (CSR), NextJS uses `Server Side Rendering` (SSR) and `Static Site Generation` (SSG).
+`NextJS` is a framework designed for [React](../React/reactNotes.md) applications. Unlike normal React app that uses `Client Side Rendering` (CSR), NextJS uses `Server Side Rendering` (SSR) and `Static Site Generation` (SSG).
 
 Normal `CSR` sends bundled files including HTML, JS and Assets to the user, after which the browser will receive an **empty** HTML and only after `React` finishes executing the JS file will the content be properly rendered. Thus, there will be a huge bottleneck when the application is large. 
 
