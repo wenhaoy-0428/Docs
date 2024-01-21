@@ -6,6 +6,7 @@
   - [React](/FrontEnd/React/_sidebar.md)
   - [NextJs](/FrontEnd/Next/nextNotes.md)
   - [Webpack](/FrontEnd/webpack/webpackNotes.md)
+  - [Common Commands](/FrontEnd/cliNotes.md)
   - [Q&A](/FrontEnd/questions.md)
 - IOS
   - [Swift](/FrontEnd/IOS/swift/swiftNotes.md)

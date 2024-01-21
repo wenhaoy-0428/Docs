@@ -1,0 +1,1 @@
+Check out the [source code](https://github.com/wenhaoy-0428/Docs/tree/master/AI/GradientDescentWalkThrough) which includes a comprehensive mathematic walkthrough of **Gradient Descent**
