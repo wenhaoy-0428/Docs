@@ -1,42 +1,40 @@
-# RoadMap
+# To Learn
 
-> ## [FrontEnd](/FrontEnd/README.md)
+### Address Sanitizer
+- [Reference1](https://blog.csdn.net/weixin_40563850/article/details/118381938)
 
-1. ### [HTML](/FrontEnd/Html/htmlNotes.md)
+### GitHubPages
+- [Intro](https://zhuanlan.zhihu.com/p/266572902)
+- [Tutorial](https://sspai.com/post/54608)
 
-2. ### [CSS](/FrontEnd/Css/cssNotes.md)
-    1. #### CSS float
-    2. #### CSS flexBox
-    3. #### CSS Grid
-    4. #### BootStrap
+### Device Tree
 
-4. ### [JavaScript](/FrontEnd/Js/jsNotes.md)
-    1. #### [Canvas API](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Client-side_web_APIs/Drawing_graphics)
-    2. #### [DOM](#)
-5. ### React
+### Android Binder 
 
----
+### Design Pattern
 
-> ## [BackEnd](/BackEnd/README.md)
+### Configure Apache for Node.Js
+- [->Ref](https://blog.logrocket.com/configuring-apache-for-node-js/)
 
-1. ### Node.JS
+<!-- ## LEDs lights with Raspberry pi
+- [LED1](https://ubuntu.com/tutorials/gpio-on-raspberry-pi#3-basic-gpio-example)
+- [LED2](https://www.youtube.com/watch?v=w_z0BUkzbIg)
+- [LEDStrip](https://dordnung.de/raspberrypi-ledstrip/) -->
 
-2. ### Express
-
-3. ### API
-
-4. ### Docker.
-
-5. ### DataBase
-
----
-
-> ## Network
+### RegExp
 
 
----
+### [HOST SERVER] (https://developer.mozilla.org/en-US/docs/Learn/Common_questions/Tools_and_setup/How_much_does_it_cost#hosting)
 
-> ## IOS Development
+## [HOW TO UPLOAD FILES TO SERVER](https://developer.mozilla.org/en-US/docs/Learn/Common_questions/Tools_and_setup/Upload_files_to_a_web_server)
 
-1. ### Swift
+    * RSYNC
 
+### [Web Security](https://developer.mozilla.org/en-US/docs/Learn/Server-side/First_steps/Website_security)
+
+
+### [DevOps](https://www.youtube.com/watch?v=j5Zsa_eOXeY&t=278s)
+
+
+### [ELK](https://www.youtube.com/watch?v=Hqn5p67uev4)
+1. [ELK with Django](https://remaster.com/blog/django-centralised-logging-using-elasticsearch-logstash-kibana-elk-filebeat)
