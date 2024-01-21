@@ -2,6 +2,8 @@
 * [FrontEnd](/FrontEnd/)
 * [BackEnd](/BackEnd/)
 * [CLI](/CLI/)
+* [Stats](/Stats/statsNotes.md)
+* [Math](/Math/_sidebar.md)
 - Work
     * [Commands](/Work/commands.md)
     * [ErrCode](/Work/errCode.md)

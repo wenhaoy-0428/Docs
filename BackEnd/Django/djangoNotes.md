@@ -12,11 +12,21 @@
 
 #### [How to extend user model]()
 
+Why do I need local storage?
+
+Since local storage is persistent, it's your best bet to retain data across user visits. If you want to store site preferences or cache long-term data, local storage is appropriate. You may not want to store more sensitive data using local storage, since it is permanent.
+
+
 A cookie is a payload of data that will be exchanged between server and client on **EVERY** request. Therefore, all necessary tokens are stored inside the cookie.
+
+> In modern implementations of Browsers, cookies are cached, so that next time you open a webpage, the cookie is still there.
 
 Local storage is a cache section on the computer, meaning data inside of which will be accessed by everyone and won't be automatically deleted.
 
-Session storage is a cache section stores inside the browser memory and only a specific tab can view it, which also will be deleted once the section is closed.
+Session storage is a cache section stores inside the browser memory and only a specific tab can view it, which also will be deleted once the session is closed.
+
+
+
 
 
 

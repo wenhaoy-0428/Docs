@@ -53,7 +53,7 @@ Now, SVMs come to rescue. For 1 dimension data, it will create a y-axis that sto
 
 ![svg_dimension_elevation](Assets/Screenshot%202023-05-30%20at%2001.57.02.png)
 
-In the above example, y-axis is created and represents the value of `dosage ^ 2`, and thus data can be separated. A new data we try to classified will first be transformed into the new dimension before be classified.
+In the above example, y-axis is created and represents the value of `dosage^2`, and thus data can be separated. A new data we try to classified will first be transformed into the new dimension before be classified.
 
 ### [Multi-class SVM](https://www.youtube.com/watch?v=zK2-ngR9w2Q)
 

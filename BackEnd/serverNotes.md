@@ -5,9 +5,13 @@
 
 #### What is CGI (Common Gateway Interface) [->Ref](https://zhuanlan.zhihu.com/p/246268005) :id=what-is-cgi
 
-CGI is a standard method used to generate dynamic content on web pages. CGI stands for Common Gateway Interface and provides an interface between the HTTP server and **programs generating web content**. These programs are better known as CGI scripts. They are written in a scripting language. The Network Component provides such a scripting language. The HTTP server processes the script source file line by line and calls the CGI functions as needed. The output from a CGI function is sent to the web client (browser) as a part of the web page.
+CGI is a standard method used to generate dynamic content on web pages. CGI stands for Common Gateway Interface and provides an interface between the HTTP server and **programs generating web content**. (We're talking about dynamic content only here, like API returns, static content like HTML is directly returned by the server)
+
+These programs are better known as CGI scripts. They are written in a scripting language. The Network Component provides such a scripting language. The HTTP server processes the script source file line by line, and the results that is printed in the standard output is sent to the web client (browser) as a part of the web page.
 
 ps: CGI programs are like c programms, CGI script are like php and python. For better understanding, please combine this section with [Difference between node.js and Apache](#is-nodejs-a-server-what39s-the-difference-between-it-and-apache).
+
+A comprehensive video of what CGI is can be found at [The Magic of cgi-bin](https://www.youtube.com/watch?v=NwRVJX0Ieno).
 
 ```plantuml
 @startuml
@@ -16,11 +20,20 @@ note right of Browser : The request is a URL like\nwww.google.com/scriptName?num
 
 Server -> CGI_Program : Parse and Process the requests
 
-CGI_Program -> Server : Return the processed conntent in stardard out.
+CGI_Program -> Server : Return the processed content in standard out.
 
 Server -> Browser : Return the content
 @enduml
 ```
+
+> CGI is only a **protocol** that is well defined beforehand. CGI scripts/program are application logics we're dealing with, only that they need to return the result by printing to the standard out. 
+
+**The question I ever came up with is: If CGI scripts/program are just application logics, and I am not following any protocols at all except returning results to the standard out, where CGI plays a role?**
+
+**The answer is that the server supports it.**. Therefore, when a request comes in, the server will follow the CGI protocol to start up a new process to run the CGI scripts/program, and a pipe between to read/write input/out streams. All we need to do is specify the location of all the cgi scripts/program inside the server `conf` file. Also, later when talking about [Nginx](#nginx) and [gunicorn](#gunicorn) you'll find that since Nginx doesn't support CGI (in this case WSGI), therefore, we need an extra layer of gunicorn to do the job. This case, Nginx is simply a request forwarder.
+
+> Do note that, for a CGI program, we have to compile it in order to use.
+
 
 To better demonstrate, here's the code written myself in the `webDev` project.
 

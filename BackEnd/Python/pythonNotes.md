@@ -10,6 +10,8 @@ For virtual environments, `venv` is a built-in library that come from python3.3 
 
 `Pyenv` is a popular Python version management tool that allows you to easily switch between multiple versions of Python on your system. It enables you to install and manage different versions of Python side by side, and set specific versions as the default for different projects or shell sessions.
 
+> Tutorial: [Installation](https://www.youtube.com/watch?v=1F2IK7CU76U)
+
 `Anaconda` is a distribution of Python. It also provides python version controls. It allows user to create virtual evn as well as specify the python version to be used. Not only that, it by default comes with more than enough machine learning/data analysis related packages installed out of the box. 
 
 `JupyterNoteBook` is a web based tool that allows us to write markdown and python code together and run code as well. This is typically useful in document sharing in collaborations. Thus, it's one of the most popular tool in data analysis and machine learning. `JupyterLab` is a newer version of notebook that provides more IDE like interface and allows to have multiple tabs, which is more recommended. 
@@ -147,3 +149,23 @@ W(f)
 ```
 
 For even more, the wrapper function can not only just call function `F` but also add some more attributes and conditions by adding more code before calling `F`. In summary, the reason to use wrapper function is to add more functionality to the original function `F` . **A decorator is a shorthand to the wrapper function notation.**
+
+
+## [yield](https://www.youtube.com/watch?v=HnggP09mKpM)
+
+Like Haskell, function with `yield` keyword inside is regarded as a generator. All codes will only be run during the first `next` call. The generator will be suspended at the line of `yield`, and resume when the next `next` is called.
+
+```py
+def func():
+    print("hello world")
+    for i in range(10):
+        yield i
+
+#prints nothing
+count10 = func()
+
+#prints Helloworld, 1
+print(next(count10))
+# prints 2
+print(next(count10))
+```
