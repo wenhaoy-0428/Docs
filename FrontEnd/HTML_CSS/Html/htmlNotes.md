@@ -165,7 +165,7 @@ The target attribute can have one of the following values:
     </tr>
     ...
     ```
-    <iframe src="./HtmlSamples/colgroup.html"></iframe>
+    <iframe src="/Docs/FrontEnd/HTML_CSS/Html/HtmlSamples/colgroup.html"></iframe>
 
 3. Headers can be vertical/horizontal. They can also occupy multiple rows/cols by using `rowspan`/`colspan` respectively. [->Ref](https://www.w3schools.com/html/html_table_headers.asp)
 
@@ -181,7 +181,7 @@ The target attribute can have one of the following values:
     <dd>- white cold drink</dd>
     </dl>
     ```
-    <iframe src="/FrontEnd/Html/HtmlSamples/dl.html" name="iframe_a" height="100px" width="100%"></iframe>
+    <iframe src="/Docs/FrontEnd/HTML_CSS/Html/HtmlSamples/dl.html" name="iframe_a" height="100px" width="100%"></iframe>
 
 
 ### Block/Inline

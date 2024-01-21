@@ -113,7 +113,7 @@ select elements based on name, id, class
     ```
 
 > selector.css
-<iframe src="/FrontEnd/Css/CssSamples/index.html" height="40px"></iframe>
+<iframe src="/Docs/FrontEnd/HTML_CSS/Css/CssSamples/index.html" height="40px"></iframe>
 
 #### Combinator selectors [->Ref](https://www.w3schools.com/css/css_combinators.asp)
 combinations of elements (element `?` element)
@@ -267,7 +267,7 @@ Margins doesn't count into the Box size. Refer to [Box-sizing](#box-sizing) for 
 1. Top and bottom margins of elements are sometimes collapsed into a single margin that is equal to the largest of the two margins.
 Check out [Mastering margin collapsing](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Box_Model/Mastering_margin_collapsing) for more details.
 Check this classic [Example](https://stackoverflow.com/questions/9519841/why-does-this-css-margin-top-style-not-work)
-    <iframe src="/FrontEnd/Css/CssSamples/collapse.html"></iframe>
+    <iframe src="/Docs/FrontEnd/HTML_CSS/Css/CssSamples/collapse.html"></iframe>
 
 #### Box-Sizing
 
@@ -287,7 +287,7 @@ Check this classic [Example](https://stackoverflow.com/questions/9519841/why-doe
     /*box-sizing: border-box;*/
     }
     ```
-    <iframe src="/FrontEnd/Css/CssSamples/boxSizing.html"></iframe>
+    <iframe src="/Docs/FrontEnd/HTML_CSS/Css/CssSamples/boxSizing.html"></iframe>
 
 ## Units
 
@@ -327,10 +327,10 @@ However, in layout, like [grid](#grid) the img will not be stretched to fill the
 1. `position: static`
 2. `position: relative`: is positioned relative to its **normal** position. use in combination with `left/right/top/bottom`(Other content will not be adjusted to fit into any gap left by the element.)
 3. `position: absolute`: is positioned relative to the nearest positioned ancestor, if no positioned ancestor body is used as reference. *positioned ancestor stands for an ancestor with position attribute specified other than `static`*. [Example](https://www.w3schools.com/css/tryit.asp?filename=trycss_image_text_center), The absolute position frees the element from the normal flow of the text. That element is then above all other elements and **has no influence on the position of the elements within the design**. [->Ref](https://disenowebakus.net/en/position-div-css).
-    <iframe src="/FrontEnd/Css/CssSamples/absolute.html"></iframe>
+    <iframe src="/Docs/FrontEnd/HTML_CSS/Css/CssSamples/absolute.html"></iframe>
 
     * **absolutely positioned elements that have height and width set to auto are sized so as to fit their contents**[->Ref](https://stackoverflow.com/questions/31398209/does-adding-a-position-absolute-to-a-block-element-make-it-behave-like-an-inlin)
-    <iframe src="/FrontEnd/Css/CssSamples/absolute1.html"></iframe>
+    <iframe src="/Docs/FrontEnd/HTML_CSS/Css/CssSamples/absolute1.html"></iframe>
 
     * absolute elements can set `left` and `right` not only by px, but by percentage, and the percentage is relative to the width of it's parent (the one with relative position).
 
@@ -346,8 +346,8 @@ When more than one positioned elements and they start to overlap, and positioned
 ## float
 
 1. `float: left/right/none/inherit`: The floated element is moved to the left or right and removed from normal flow, and the surrounding content floats around it.
-    <iframe src="/FrontEnd/Css/CssSamples/float1.html"></iframe>
-    <iframe src="/FrontEnd/Css/CssSamples/float2.html"></iframe>
+    <iframe src="/Docs/FrontEnd/HTML_CSS/Css/CssSamples/float1.html"></iframe>
+    <iframe src="/Docs/FrontEnd/HTML_CSS/Css/CssSamples/float2.html"></iframe>
 
 2. `float` property will disregard target element's display property as always generate `display: block`, and if no `width` specified, it will only occupy space as it needs as opposed to standard block element behavior of taking up 100% width automatically. [->Ref](https://stackoverflow.com/questions/9774282/css-display-property-when-a-float-is-applied)
 
@@ -359,7 +359,7 @@ Refer [Visualize formatting model](https://developer.mozilla.org/en-US/docs/Web/
 
 
 3. `clear: none/left/right/both/both/inherit`: specifies an element is pushed below a floating element when it is on the floating element's left/right/both side. For example, `clear: left` means if it's left side has a floating element, then it will be pushed blow that element.
-    <iframe src="/FrontEnd/Css/CssSamples/clear.html" style="height: 200px"></iframe>
+    <iframe src="/Docs/FrontEnd/HTML_CSS/Css/CssSamples/clear.html" style="height: 200px"></iframe>
 
 #### [Fix floating element that is larger than its container.](https://developer.mozilla.org/en-US/docs/Learn/CSS/CSS_layout/Floats#the_clearfix_hack)
 
@@ -391,9 +391,9 @@ display: flow-root;
 
 1. Why paragraph is aside of floating elements? instead of below?
     * Because the div container is so thin, and floating elements overflow outside the elements, and the paragraph is actually below the div, only the texts are wrapped around.
-    <iframe src="/FrontEnd/Css/CssSamples/float3.html"></iframe>
+    <iframe src="/Docs/FrontEnd/HTML_CSS/Css/CssSamples/float3.html"></iframe>
     * This is a better demonstration.
-    <iframe src="/FrontEnd/Css/CssSamples/float4.html"></iframe>
+    <iframe src="/Docs/FrontEnd/HTML_CSS/Css/CssSamples/float4.html"></iframe>
 
 
 ## Math
@@ -464,7 +464,7 @@ transform: translate(-100%, 50%) rotate(45deg) translate(100%, -50%);
 2. `transform-origin` no longer works after `translate` is ever called on the element. (I don't know why, but this is how I see). `translate` also moves the `transform-origin` the same amount from the center. Therefore, the `scale` will be originated to the upper left corner as `translate(-50%, -50%)` shifts origin 50% of width to the left and 50% of height to the top.
 [->Ref](https://developer.mozilla.org/en-US/docs/Web/CSS/transform-origin)
 
-<iframe src="/FrontEnd/Css/CssSamples/transformOrigin.html" style="height: 500px"></iframe>
+<iframe src="/Docs/FrontEnd/HTML_CSS/Css/CssSamples/transformOrigin.html" style="height: 500px"></iframe>
 
 ## Transition
 
@@ -548,7 +548,7 @@ transform: translate(-100%, 50%) rotate(45deg) translate(100%, -50%);
 6. animations are applied once element is shown or the name of the animation is added to the element.
 
 6. Example
-    <iframe src="/FrontEnd/Css/CssSamples/animation.html" width=1px></iframe>
+    <iframe src="/Docs/FrontEnd/HTML_CSS/Css/CssSamples/animation.html" width=1px></iframe>
 ## StyleImage
 
 1. `filter` can be applied on images. [->Ref](https://www.w3schools.com/cssref/css3_pr_filter.asp)
@@ -664,9 +664,9 @@ transform: translate(-100%, 50%) rotate(45deg) translate(100%, -50%);
 
 The Flexible Box Layout Module, makes it easier to design flexible responsive layout structure **in 1 dimension**, either  either as a row or as a column, without using float or positioning
 
-    <iframe src="/FrontEnd/Css/CssSamples/flex.html" height="200px"></iframe>
+<iframe src="/Docs/FrontEnd/HTML_CSS/Css/CssSamples/flex.html" height="200px"></iframe>
 
-    > Removing flex in the above example will cause top margin of the items to [collapse](#margin-collapse) with the container.
+> Removing flex in the above example will cause top margin of the items to [collapse](#margin-collapse) with the container.
 
 The direct child elements of a flex container automatically becomes flexible (flex) items.
 
@@ -732,7 +732,7 @@ It's really powerful to use FlexBox in combination with [Media Queries](#media-q
 
 3. `grid-template-columns: auto auto auto;` specifies how many columns are used, `grid-column-start: 1; *end: 3` specifies the grid item starts from index 1 inclusive to index 3 inclusive, with starting index 1.
 
-    <iframe src="/FrontEnd/Css/CssSamples/grid.html" height="200px"></iframe>
+    <iframe src="/Docs/FrontEnd/HTML_CSS/Css/CssSamples/grid.html" height="200px"></iframe>
 
 ```css
 .container {
@@ -785,7 +785,7 @@ The cons of this is that:
 
 The grid-area property can also be used to assign names to grid items. Where a period sign represents a grid item with no name. Each row is defined by apostrophes (' ')
 
-    <iframe src="/FrontEnd/Css/CssSamples/gridArea.html" height="200px"></iframe>
+    <iframe src="/Docs/FrontEnd/HTML_CSS/Css/CssSamples/gridArea.html" height="200px"></iframe>
 
 #### Gap
 
@@ -831,7 +831,7 @@ Use the `repeat()` and `minmax()` mentioned above, we can achieve to adjust the 
 
 Add a container element (like `<div>`) with overflow-x:auto around the `<table>` element to make it responsive:
 
-<iframe src="/FrontEnd/Css/CssSamples/responsiveTable.html" width=1px></iframe>
+<iframe src="/Docs/FrontEnd/HTML_CSS/Css/CssSamples/responsiveTable.html" width=1px></iframe>
 
 ### Make floating elements not just side by side, but with equal hight  [->Ref](https://www.w3schools.com/css/tryit.asp?filename=trycss_float_boxes_flex)
 
@@ -874,7 +874,7 @@ html {
     text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
     }
     ```
-<iframe src="/FrontEnd/Css/CssSamples/textShadow.html" height=100px></iframe>
+<iframe src="/Docs/FrontEnd/HTML_CSS/Css/CssSamples/textShadow.html" height=100px></iframe>
 
 ### How to make a tooltip
 
@@ -884,7 +884,7 @@ html {
 
 3. center the tooltip.
 
-<iframe src="/FrontEnd/Css/CssSamples/tooltip.html" height=100px></iframe>
+<iframe src="/Docs/FrontEnd/HTML_CSS/Css/CssSamples/tooltip.html" height=100px></iframe>
 
 ###  Image Hover Overlay
 
