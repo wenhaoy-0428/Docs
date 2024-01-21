@@ -1,0 +1,1 @@
+- [Scrapy](/WebScaping/Scrapy/scrapyNotes.md)

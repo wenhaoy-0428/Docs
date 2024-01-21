@@ -1,0 +1,2 @@
+- [Algorithm](/Readings/Algorithm/algorithmNotes.md)
+- [Design Pattern](/Readings/DesignPattern/designPatternNotes.md)
