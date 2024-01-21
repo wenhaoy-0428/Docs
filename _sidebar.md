@@ -1,5 +1,6 @@
 * [ToLearn](toLearn.md)
 * [CLI](/CLI/_sidebar.md)
+* [Devops](/devOps/README.md)
 * [FrontEnd](/FrontEnd/)
 * [BackEnd](/BackEnd/)
 * [Network](/Network/README.md)
