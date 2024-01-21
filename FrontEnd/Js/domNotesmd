@@ -1,0 +1,23 @@
+# [DOM](https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model)
+
+## Intro
+
+DOM (Document Object Model) is a browser web API that enables us to interact with the browser to change the content dynamically.
+
+Internally, **it's a tree based on the HTML** layout. And everything therefore is a `node`. 
+
+Refer to [this link](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Client-side_web_APIs/Manipulating_documents#the_document_object_model) to have a look at rendered tree.
+
+**Each element is a node, and text are classified as `textNode`**
+```js
+const text = document.createTextNode(' — the premier source for web development knowledge.');
+linkPara.appendChild(text);
+```
+
+There're several ways to select an element: `document.querySelector()`, `document.getElementById()` .. In the modern application, use `document.querySelector()` as it enables CSS selector, and can be used to select element by `Id`, `tagName` which is much more succinct than having them in each specific function.
+
+## Moving/Removing Elements
+
+We use [Node.appendChild(ele)](https://developer.mozilla.org/en-US/docs/Web/API/Node/appendChild) to add or move elements. When the provided `ele` is a reference to an existing element, this function will move it. 
+
+> Note Js treats variables as references, instead of copies. When you truly wish to copy an element use [Node.cloneNode()](https://developer.mozilla.org/en-US/docs/Web/API/Node/cloneNode)
