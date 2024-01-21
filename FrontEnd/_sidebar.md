@@ -2,7 +2,7 @@
   - [Sketch](/FrontEnd/UI-UX/sketchNotes.md)
 - Web
   - [HTML :hammer: CSS](/FrontEnd/HTML_CSS/_sidebar.md)
-  - [JS & TS](/FrontEnd/JS_TS/_sidebar.md)
+  - [JS](/FrontEnd/Js/jsNotes.md)
   - [React](/FrontEnd/React/_sidebar.md)
   - [NextJs](/FrontEnd/Next/nextNotes.md)
   - [Webpack](/FrontEnd/webpack/webpackNotes.md)
