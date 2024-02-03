@@ -1,5 +1,24 @@
 # To Learn
 
+### Electronics
+
+1. All kinds of circuits
+
+### Embedded System
+
+1. Clock / Thermometer
+
+### 3D modeling
+
+1. Fusion 360
+
+### SoftDev
+
+1. React-Native
+2. Type Script
+
+
+
 ### Address Sanitizer
 - [Reference1](https://blog.csdn.net/weixin_40563850/article/details/118381938)
 

@@ -80,10 +80,10 @@ Parcel expects an `index.html` and an `index.js` file to work with.
 parcel index.html
 ```
 
+
 > This serves the website as development, and supports many features benefit development
 
 #### Serve for development
-
 ```bash
 parcel serve index.html
 ```
