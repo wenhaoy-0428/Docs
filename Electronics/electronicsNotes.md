@@ -16,15 +16,54 @@ https://www.youtube.com/watch?v=UrCFv2qCELI
 # Components
 
 
-
-
 ## Resistor
 
 
 ## Capacitor
 
+#### What is capacitance?
 
-#### Capacitor blocks DC
+Capacitance is the capacity to store charges. It is a measure of how much charge can be stored on the capacitor for a given voltage.
+
+> The capacitance of a capacitor is determined by various factors, including the physical characteristics of the capacitor such as its size, shape, and the materials used in its construction. It is also influenced by the distance between the capacitor's plates, the dielectric material between the plates, and the surface area of the plates.
+
+The formula for between Charges (Q), Capacitance (C) and Voltage (V) is
+
+$$
+Q = C \cdot V
+$$
+
+Total Capacitance of Capacitors in Parallel:
+
+$$
+C_{total} = C_1 + C_2 + C_3 + ... + C_n
+$$
+
+Total Capacitance of Capacitors in Series:
+
+$$
+\frac{1}{C_{total}} = \frac{1}{C_1} + \frac{1}{C_2} + \frac{1}{C_3} + ... + \frac{1}{C_n}
+$$
+
+> Because capacitors are places in series and we know when stabilized, there's no current flow. Meaning there's no charge differences. Hence, the number of charges in capacitors is the same.
+
+$$
+Q_{total} = Q_1 = Q_2   \\
+
+V_{total} = V_1 + V_2 \\
+
+V_{total} = \frac{Q}{C_1} + \frac{Q}{C_2} \\ 
+
+V_{total} = Q \cdot (\frac{1}{C_1} + \frac{1}{C_2}) \\ 
+
+\frac{V_{total}}{Q} = \frac{1}{C_1} + \frac{1}{C_2} \\ 
+
+\frac{1}{C_total} = \frac{1}{C_1} + \frac{1}{C_2}
+
+$$
+
+
+#### [Capacitor blocks DC](https://youtu.be/UrCFv2qCELI?t=556)
 
 
 
@@ -126,7 +165,7 @@ where $\varepsilon$ is *electro-motive force*, $N$ is the *number of turns* in t
 
 The direction of the induced current is described by **Lenz's Law**. More specifically, it states the any magnetic field produced by an induced current will be in the **opposite** direction to the **change** in the original field.
 
-[For example](https://zh.wikipedia.org/zh-hk/楞次定律), when a magnet approaches a coil, according to [magnetic flux](#magnetic-flux), we know adding a magnet near the center of a coil will increase the magnetic flux. Therefore, a positive **change** of magnetic flux occurs as the magnet approaches to the coil, thus induced current is created.
+[For example](http$$s://zh.wikipedia.org/zh-hk/楞次定律), when a magnet approaches a coil, according to [magnetic flux](#magnetic-flux), we know adding a magnet near the center of a coil will increase the magnetic flux. Therefore, a positive **change** of magnetic flux occurs as the magnet approaches to the coil, thus induced current is created.
 
 According to Lenz's law, in order to **prevent** the changes, a force of pushing the magnet away is created by the induced current. So the direction of the force is to the *left*. This is same as have a magnet with N on the left, and S on the right. Applying [right-hand rule of coil](
 https://zhuanlan.zhihu.com/p/85791685?utm_id=0), where thumb is pointing to the N, and the fingers are pointing to the current, we know the direction of the induced current is counter-clockwise.
@@ -138,12 +177,21 @@ More of the basics can be found at [Ref1](https://zhuanlan.zhihu.com/p/85791685?
 
 
 
+---
+
+# Circuits
+
+## RC Circuits
+
+[Analysis 1](https://www.youtube.com/watch?v=OIpHPsnLlNU)
 
 
 
+## [LC Oscillating Circuit](https://www.youtube.com/watch?v=qg4P_G-86wc)
 
+In a LC circuit, the charged Capacitor will discharge and convert the electric energy into magnetic energy of the inductor. So at `T/4`, capacitor is fully discharged, and the magnetic field starts to collapse into electric energy that keeps the current flow (This will actually charge up the capacitor in a different direction). Therefore, the current keeps moving but slows all the way down to 0, while the voltage of capacitor is charged down.
 
-
+![LC_OSCILLATING_CIRCUIT](./Assets/Screenshot%202024-01-25%20at%2001.31.16.png)
 
 
 
