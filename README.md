@@ -1,59 +1,17 @@
-# To Learn
-
-### Electronics
-
-1. All kinds of circuits
-
-### Embedded System
-
-1. Clock / Thermometer
-
-### 3D modeling
-
-1. Fusion 360
-
-### SoftDev
-
-1. React-Native
-2. Type Script
+Hello, my amazing friend.
 
 
+# [HTML && CSS](./FrontEnd/HTML_CSS/_sidebar.md)
+> Both HTML and CSS can give a fundamental understanding of Web basics. I recommend skimming through HTML knowing the basic structure is good enough and **spend more effort on CSS**. Especially, `Flex` of CSS, which will be used heavily in later project.
 
-### Address Sanitizer
-- [Reference1](https://blog.csdn.net/weixin_40563850/article/details/118381938)
+# [JavaScript](./FrontEnd/Js/jsNotes.md)
+> JS is a weird language, there are some of the main quirks you should get yourself familiar with. 1. `Object`, 2. `Function` (normal & arrow function) 3. `Difference between Class and function`, 4. `this` keyword.
 
-### GitHubPages
-- [Intro](https://zhuanlan.zhihu.com/p/266572902)
-- [Tutorial](https://sspai.com/post/54608)
+# [TypeScript](./BackEnd/TypeScript/tsNotes.md)
+> With some basic understanding of JS, Ts should be a small cake. But pay attention to `type union`, `type vs interface`
 
-### Device Tree
+# [React](./FrontEnd/React/_sidebar.md)
+> Inside section, fundamentals of react is included covering JSX. This notes so far, only covers React, not [React Native](https://reactnative.dev/docs/platform-specific-code). However, the fundamentals are the same. 
 
-### Android Binder 
-
-### Design Pattern
-
-### Configure Apache for Node.Js
-- [->Ref](https://blog.logrocket.com/configuring-apache-for-node-js/)
-
-<!-- ## LEDs lights with Raspberry pi
-- [LED1](https://ubuntu.com/tutorials/gpio-on-raspberry-pi#3-basic-gpio-example)
-- [LED2](https://www.youtube.com/watch?v=w_z0BUkzbIg)
-- [LEDStrip](https://dordnung.de/raspberrypi-ledstrip/) -->
-
-### RegExp
-
-
-### [HOST SERVER] (https://developer.mozilla.org/en-US/docs/Learn/Common_questions/Tools_and_setup/How_much_does_it_cost#hosting)
-
-## [HOW TO UPLOAD FILES TO SERVER](https://developer.mozilla.org/en-US/docs/Learn/Common_questions/Tools_and_setup/Upload_files_to_a_web_server)
-
-    * RSYNC
-
-### [Web Security](https://developer.mozilla.org/en-US/docs/Learn/Server-side/First_steps/Website_security)
-
-
-### [DevOps](https://www.youtube.com/watch?v=j5Zsa_eOXeY&t=278s)
-
-
-### [ELK](https://www.youtube.com/watch?v=Hqn5p67uev4)
-1. [ELK with Django](https://remaster.com/blog/django-centralised-logging-using-elasticsearch-logstash-kibana-elk-filebeat)
+# [ExpressJS](./BackEnd/Express/expressNotes.md)
+> To be learnt by me.
