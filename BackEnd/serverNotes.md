@@ -139,6 +139,10 @@ Therefore, add host entry in `IP DomainName` pair in `/etc/hosts` file on Mac ca
 
 > It's a common practice to have a host software managing local hosts for you. [switchHost](https://swh.app)
 
+### [What is Restful API](https://zhuanlan.zhihu.com/p/334809573)
+
+
+
 
 ## Notes
 
