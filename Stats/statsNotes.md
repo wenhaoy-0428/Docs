@@ -34,7 +34,7 @@ A Supported Vector Classifier does most of the job A SVM does as the above menti
 
 ![svc](Assets/Screenshot%202023-05-30%20at%2001.37.17.png)
 
-In the above example, to classify the new **black** data, we can find which clause of data pink or green it is **closer** to. However, how to determine which clause the **black** data? The most obvious way of doing this is find a **mid point between two edge** data as a **threshold**. And the distance of one edge point to the threshold is called `Margin` and when the threshold is not placed in the middle, the smaller distance is used as margin.
+In the above example, to classify the new **black** data, we can find which clause of data pink or green it is **closer** to. However, how to determine which clause the **black** data belongs to? The most obvious way of doing this is find a **mid point between two boundary** data as a **threshold**. And the distance of one edge point to the threshold is called `Margin` and when the threshold is not placed in the middle, the smaller distance is used as margin.
 
 > This threshold is the hyperplane that a SVC tries to find, as well as what a SVM tries to find.
 

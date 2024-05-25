@@ -145,7 +145,18 @@ HStack() {
 
 The above notation makes the bracket a trailing closure (a function) that can be later evaluated. Even though, the closure is a function and it passed along as a function which can be found at the description of [HStack](https://developer.apple.com/documentation/swiftui/hstack/init(alignment:spacing:content:)) that it accepts a function closure in the end, it seems that indeed its **not** really handled as a function by Swift. Under the hood, HStack or other containers invoke `@ViewBuilder` which is an implementation of `@resultBuilder`. How resultBuilder handlers the closure is called [result builder transform](https://github.com/apple/swift-evolution/blob/main/proposals/0289-result-builders.md#the-result-builder-transform). It reads each statement inside the closure and calls one of the required function named `buildBlock` to build a hierarchy. More of `resultBuilder` can be found at [A deep dive into Swift’s result builders](https://www.swiftbysundell.com/articles/deep-dive-into-swift-function-builders/).
 
+The same is NOT true for body
 
+```swift
+var body: some View {
+    ChannelView()
+    VStack {
+        Text("Helo")
+    }
+}
+```
+
+`body` here is a [computed property](#properties)
 
 ## KeyPath
 
