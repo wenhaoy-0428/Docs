@@ -821,4 +821,13 @@ For sending `unsafe` requests using axios, including CSRF token in the request c
  
 #### [React useState - update all object values to true](https://stackoverflow.com/questions/72528022/react-usestate-update-all-object-values-to-true)
 
+## Memoization
+
+`useMemo` is a hook that tells React not to render certain values. This is useful when you have a computed variable that is not yet a state in the component.
+
+[Learn React Hooks: useMemo - Simply Explained!](https://www.youtube.com/watch?v=vpE9I_eqHdM)
+
+`React.memo` on the other hand is to memoize components, that the component will only be re-rendered when its props are changed.
+
+Sometimes, using Memoization is error-prone that gives you an illusion that u have optimized the performance while actually not and making the code harder to read. [You Probably Shouldn't Use React.memo()](https://www.youtube.com/watch?v=Yh2eH4fXgbU)
 
