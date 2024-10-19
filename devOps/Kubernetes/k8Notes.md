@@ -74,6 +74,20 @@ Define services before Workload Resources.
 
 When Kubernetes starts a container, it provides environment variables pointing to all the Services which were running when the container was started. **any Service that a Pod wants to access must be created before the Pod itself,**
 
+For clusterIP:
+
+`port` is the listing port that the service itself listens to. (not defined will be random but matches the service port of an Ingress)
+`targetPort` is the destination it should forward to.
+
+> `targetPort` should match an open port of a pod.
+
+For NodePort:
+
+Cluster doesn't have an IP address, but nodes have. Therefore, NodePort Service **statically** assigns a port on **each worker node**. Also necessary bounding to clusterIP service is automatically created. So that We can use the **public** ip of a node and the port to access.
+
+> You have to get a public ip for the node yourself, the node ip itself is private.
+
+
 
 
 ## [Volumes](https://www.youtube.com/watch?v=0swOh5C3OVM)
@@ -125,13 +139,7 @@ Under the hood it uses the [API server](#api-server).
 
 lets you run Kubernetes **locally**. minikube runs an all-in-one or a multi-node local Kubernetes cluster on your personal computer. For testing purposes.
 
-
-## [Write Yaml](https://kubernetes.io/docs/concepts/overview/working-with-objects/#describing-a-kubernetes-object)
-
-We can regard all the components of Kubernetes as objects, and use yaml file to declare objects.
-
-
-## Commands
+#### Commands
 
 
 Apply Pods
@@ -145,4 +153,22 @@ List all contexts. Context stores the user and cluster information used for auth
 ```bash
 kubectl config get-contexts
 ```
+
+
+## [Write Yaml](https://kubernetes.io/docs/concepts/overview/working-with-objects/#describing-a-kubernetes-object)
+
+We can regard all the components of Kubernetes as objects, and use yaml file to declare objects.
+
+
+### Service accounts
+
+Service Accounts are used to authenticate **pods** when they need to interact with the Kubernetes API server or other cluster resources. This identity is useful in various situations, including authenticating to the API server or implementing identity-based security policies.
+
+Here's how it works:
+
+1. Pod Authentication: When a pod needs to make requests to the Kubernetes API server or access other resources within the cluster, it uses its associated Service Account for authentication.
+2. Service Account Token: Each pod is mounted with a Service Account token at a specific path within the pod's filesystem. This token is a credential that allows the pod to authenticate with the Kubernetes API server.
+3. **RBAC Permissions**: The permissions granted to a pod are determined by the Service Account's associated Role-Based Access Control (RBAC) policies. These policies define what resources the pod can access and what actions it can perform within the cluster.
+
+
 
