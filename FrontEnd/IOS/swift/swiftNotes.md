@@ -10,7 +10,7 @@ A very quick introduction to Swift can be found at [A Swift tour](https://docs.s
 
 ## Structure vs Classes
 
-Use `struct` to create a structure. Structures support many of the same behaviors as classes, including methods and initializers.** One of the most important differences between structures and classes is that structures are always copied when they’re passed around in your code, but classes are passed by reference.**
+Use `struct` to create a structure. Structures support many of the same behaviors as classes, including methods and initializers. **One of the most important differences between structures and classes is that structures are always copied when they’re passed around in your code, but classes are passed by reference.**
 
 
 ### Properties
@@ -182,4 +182,128 @@ In the following code, it's forced to unwrap the value returned from `...min()`.
 guard !ranges.isEmpty else { return 0..<0 }
 let low = ranges.lazy.map { $0.lowerBound }.min()!
 ```
+
+
+## Do,Try,Catch
+
+`Result` is a generic type that can be used as a return type that has a chance of failure, we can use `switch` to handle the result.
+
+```swift
+func getTitle() -> Result<String, Error> {
+    if isActive {
+        return .success("Hello")
+    } else {
+        return .failure(URLError(.appTransportSecurityRequiresSecureConnection))
+    }
+}
+
+...
+    switch result {
+        case .success(let newTitle):
+            self.text = newTitle
+        case .failure(let error):
+            self.text = error.localizedDescription
+    }   
+...
+```
+
+> For the odd grammar check [Associated Values of Enumeration & Matching](https://docs.swift.org/swift-book/documentation/the-swift-programming-language/enumerations#Associated-Values)
+
+Using `do, try catch` can simplify the return type into a single type like `String`
+
+> Do note that, a single do closure can handle multiple try statements, but once one try statement throws an error, the following statements will **not be executed**
+
+## Async
+
+### [@escaping closure](https://www.youtube.com/watch?v=7gg8iBH2fg4)
+
+Before Async/Await were introduced, the main approach to write async functions is to use @escaping closure.
+
+As how callback functions work, @escaping closure is marked as the callback. It tells the system that the closure will not return when the function returns.
+
+```swift
+func downloadData(completionHandler: @escaping (_ data: String) -> ()) {
+    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+        completionHandler("New Data")
+    }
+}
+
+downloadData { [weak self] returnedData in 
+    self.text = returnedData
+}
+```
+
+> All function that is not run directly within the caller closure will be marked as escaping closure.
+
+```swift
+    ...
+    private let content: () -> Content
+    
+    
+    init(@ViewBuilder content: @escaping () -> Content) {
+        self.content = content
+    }
+    ...
+```
+
+The self in the callback function is a must, as when the function is called, it has to add up the number of reference to make sure the class is still alive. An performance improvement of this is to use [weak self](https://www.youtube.com/watch?v=TPHp9kR0Go8), which makes sure if the reference can be eliminated during process.
+
+## [some vs any](https://medium.com/@bakshioye/some-and-any-keyword-in-swift-8efaffaf8228)
+
+`some` only allows homogeneous collection, meaning only similar conforming type are allowed inside the collection. Meanwhile `any` allows heterogeneous collection meaning any conforming type is allowed inside the collection
+
+## Actor
+
+Actors are thread-safe version of classes. Also, all properties and functions are **forced** to be run inside an **asynchronous** environment (without explicit `async` keywords) which can be done using **Tasks**
+
+```swift
+actor DataManager {
+
+    nonisonlated func returnSomething -> String {
+        return "Hello World"
+    }
+
+    // This will be marked as async automatically.
+    func getDataFromDatabase() -> [String] {
+        return ...
+    }
+}
+```
+
+Sometimes, actor may have some functions that doesn't need to be run in a thread-safe environment, we can use `nonisolated` keyword
+
+## GlobalActor
+
+we use `nonisolated` keyword to extract properties of an actor out of the isolated environment. But on the other hand, we may need to put a normal function that is declared outside of the actor and force it to be run within the actor's env, that's the usage of GlobalActor.
+
+Basically, this is a **singleton** instance that is used to make sure some code being run will be thread safe.
+
+To create a global actor and global instance named shared has to be created.
+
+```swift
+@globalActor struct MyGlobalActor {
+    static var shared = DataManager()
+}
+
+actor DataManager {
+    ...
+}
+
+...
+    let manager = MyGlobalActor.shared
+
+    // will be implicitly marked as async 
+    @MyGlobalActor func normalFunc() {
+
+    }
+```
+
+`@MainActor` is a global actor that is always run on the main thread.
+
+## ToLearn:
+
+what is `\.self`, `\Swift`, `Intake.self`
+
+
+
 
