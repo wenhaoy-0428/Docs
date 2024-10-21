@@ -143,6 +143,8 @@ struct ChildView: View {
 
 To enable the subview to modify the state’s stored value, pass a Binding instead， [by using the `$ prefix` to access a binding to the state.](https://developer.apple.com/documentation/swiftui/state#Share-state-with-subviews)
 
+> $ prefix is owned by property wrapper, check for swift notes.
+
 
 ## @Binding
 
@@ -522,3 +524,7 @@ struct ContentView: View {
 
 
 ##### [How to solve the flicking shadow when using contextMenu](https://stackoverflow.com/questions/65492918/swiftui-shadow-glitch-after-context-menu)
+
+#### How to dismissSearch from parent
+
+ The dismissSearch is designed that can only be called within the SearchedView, where the SearchedView has to be a separate view from where .suggestable() is defined. Official example can be found on [StackOverflow](https://developer.apple.com/documentation/swiftui/environmentvalues/dismisssearch)
