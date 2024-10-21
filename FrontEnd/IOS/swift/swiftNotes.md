@@ -158,6 +158,39 @@ var body: some View {
 
 `body` here is a [computed property](#properties)
 
+
+## Property Wrapper
+
+Property Wrapper is used to add new logics to the property.
+
+For a property wrapper, there will be 2 accessible values.
+
+1. WrappedValue
+2. ProjectedValue
+
+1. **WrappedValue** is the internal value (can regard it as the untouched value)
+   > can be accessed by directly reading the property
+2. **ProjectedValue** is the projection of the wrapped value, like `map`, you can add additional logics that modifies the WrappedValue and return as the projected value
+
+```swift
+  var wrappedValue: String
+  var projectedValue: Bool {
+    let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
+    let emailPred = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
+    return emailPred.evaluate(with: wrappedValue)
+  }
+```
+
+> ProjectedValue are accessed by dollar sign prefix `$`
+
+In swiftUI, 
+
+`flag`: Bool (wrappedValue)
+`$flag`: Binding (projectedValue)
+`_flag`: State itself
+
+In summary, it's not dollar sign $ represents a binding, its the projected value of a State is a binding. So in combine frame work, the projectedValue of a `@Published` wrapper is a publisher, and has nothing to do with binding.
+
 ## KeyPath
 
 A key path is a reference to properties. Meaning, we are referencing to the properties itself, not the value of it. For example, with the following code snippet. A keyPath `\A.prop1` is a reference to the `prop1` itself, instead of the value of it. Hence, we're sorting a array of objects based on certain property. We can just tell the keyPath as it references to the property itself rather than the value.
@@ -303,7 +336,3 @@ actor DataManager {
 ## ToLearn:
 
 what is `\.self`, `\Swift`, `Intake.self`
-
-
-
-
