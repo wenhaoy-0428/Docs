@@ -127,6 +127,33 @@ class BookspiderSpider(scrapy.Spider):
 
 Normally, after scraping, we're going to return a map object that stores the information we're interested in. This can be done in the parser by returning an object. However, this is not clean enough, it would be better if we define a class somewhere as a template and initialize that class with the data we extracted.
 
+## Item Loader
+
+For a cleaner data collection, we can use ItemLoader that has preprocessor functions we can define so that all data inserted will be preprocessed automatically.
+
+```py
+    l = ItemLoader(item=NutritionItem(), selector=response)
+    # Use TakeFirst to store a single value instead of a list
+    l.default_output_processor = TakeFirst()
+    # name
+    l.add_css("name", ".nutritionFactsTitle::text")
+
+    # calorie
+    calorie = {
+        'value': response.css(".nft-cal-amt::text").get(),
+        'dv': '-'
+    }
+    if calorie['value'] == '--':
+        return
+    l.add_value("calorie", calorie, MapCompose(self.clean_data))
+
+    ...
+    yield l.load_item()
+```
+
+Item loader supports `add_css` that uses css selector `add_xpath` and `add_value` which is random value we can use.
+
+
 ## [Pipelines](freeCodeCamp Scrapy Beginners Course Part 6: Items & Item Pipelines)
 
 Pipelines are all about **post processing**, which includes data cleaning, data storage and so on.
@@ -260,13 +287,6 @@ def start_request(self):
 By using the Proxy API, [Faking User Agent](#fake-user-agent) can also be handled by the service provider.
 
 We can also transform the above `get_proxy_url` into a middleware as well. We can choose to implement our own middleware, or use the written one by installing `scrapeops-scrapy-proxy-sdk` using `pip`.
-
-
-
-
-
-
-
 
 
 
