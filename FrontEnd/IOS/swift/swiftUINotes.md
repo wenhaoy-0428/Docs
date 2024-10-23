@@ -36,6 +36,36 @@ In SwiftUI, you can use container views like `VStack`, `HStack`, and `ZStack` al
 
 While the terminology and specific syntax may differ from the traditional CSS box model, the principles of creating layouts with flexible and responsive behavior are similar in both approaches. SwiftUI's layout system offers a powerful and intuitive way to create dynamic and adaptive user interfaces.
 
+## Alignment
+
+For alignment in a layout like VStack, there's a `alignment` property we can specify when declaring the VStack, it alone can only specify the **horizontal** alignment between its **contents**.
+
+```swift
+   var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text("Nutrition Fact")
+                .font(.title)
+                .bold()
+                .background(Color.green)
+            Text("Hello")
+        }
+        .padding(0)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+```
+
+![vstack_alignment](./assets/Screenshot%202024-10-23%20at%2022.18.13.png)
+
+However, the overall content is still centered in the frame. In order to adjust the horizontal content alignment, we have to specify the alignment of the frame.
+
+```swift
+    ...
+    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+```
+
+For vertical alignment, use `Spacer()`
+
+> A reference can be found [VStack .leading alignment](https://stackoverflow.com/questions/65450178/vstack-leading-alignment)
 
 ## Positioning
 
