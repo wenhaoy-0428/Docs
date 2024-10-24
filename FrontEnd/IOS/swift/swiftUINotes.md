@@ -521,13 +521,99 @@ struct MyView: View {
 
 ## [Documentations](https://www.youtube.com/watch?v=O8_meC7hIwI)
 
+How to make comments more readable.
 
 ## Safe Coding
 
 `if let & guard`
     
+## @ViewBuilder
 
-## Swift
+Long story short, the ViewBuilder attribute simply follows the hierarchy of the body which can be multiple view statements, and combine them into a single view. Like `HStack` that accepts a bunch of parallel views, is a ViewBuilder and will combine all the inner statements into a single view.
+
+This is exactly what we need to achieve wrapper view.
+
+```jsx
+function FancyBorder(props) {
+  return (
+    <div className={"FancyBorder FancyBorder-" + props.color}>
+      {props.children}
+    </div>
+  );
+}
+```
+
+More importantly, now, the children can be multiple parallel view statements.
+
+```swift
+struct CustomHStack<Content: View> {
+    private let content: Content
+
+    init(@ViewBuilder content: () -> Content) {
+        self.content = content()
+    }
+
+    var body: some View {
+        // similar to children in react
+        content
+    }
+}
+
+
+CustomHStack {
+    Text("hello")
+    Text("hello")
+}
+```
+
+
+Another usefulness of `@ViewBuilder` is to create a tiny view within a view to handle some complexity.
+
+```swift
+
+struct SomeView: View {
+
+    var body: some View {
+        ....
+
+
+    }
+    // ERROR!
+    private myTinyView: some View  {
+        If type == .one {
+            ViewOne()
+        } else if type == .two {
+            ViewTwo()
+        } else if type == .three {
+            ViewThree()
+        }
+    }
+
+    // Correct
+    @ViewBuilder private myTinyView: some View  {
+        If type == .one {
+            ViewOne()
+        } else if type == .two {
+            ViewTwo()
+        } else if type == .three {
+            ViewThree()
+        }
+    }
+}
+```
+
+This tiny subview makes more sense when we wish to extract certain complexity. However, the first approach will cause an error as the return view `ViewOne` `ViewTwo` and `ViewThree` are different views. Therefore, [some](../swift/swiftNotes.md#some-vs-any) view that requires a homogeneous type will throw errors. However, using any view will also solve the error but will cause a new error when putting inside the body.
+
+Therefore, we can use @ViewBuilder.
+
+
+## [PreferenceKey](https://www.youtube.com/watch?v=OnbBc00lqWU&t=94s)
+
+Similar to React, in SwiftUI, we normally only pass states and control views from parent views to children views. Also, we can use [Bindings](#binding) to create a 2-way connection to control the parent view from children view as well.
+
+However, Like `TabView`, where we define the tabs within the `TabItem` inside of passing a state variable explicitly. This sort of effect is done by [PreferenceKey](https://developer.apple.com/documentation/swiftui/preferencekey) to allow us to control parent based on children.
+
+
 
 ## HowTo
 
