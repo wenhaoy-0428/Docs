@@ -613,7 +613,296 @@ Similar to React, in SwiftUI, we normally only pass states and control views fro
 
 However, Like `TabView`, where we define the tabs within the `TabItem` inside of passing a state variable explicitly. This sort of effect is done by [PreferenceKey](https://developer.apple.com/documentation/swiftui/preferencekey) to allow us to control parent based on children.
 
+> After a bit of research, I found the same effect can also be achieved by using Environment.
 
+Here is an example of using PreferenceKey to build a Custom TabView
+
+```swift
+//
+//  MainTabView.swift
+//  App
+//
+//  Created by Wenhao Yan on 2024/10/19.
+//
+
+import SwiftUI
+
+struct MainTabView<Content: View>: View {
+    
+    @State private var index: Int = 0
+    @State private var tabs: [MainTabBarItem] = []
+    @Binding var selection: MainTabBarItem
+    private let content: Content
+    
+    init(selection: Binding<MainTabBarItem>, @ViewBuilder content: () -> Content) {
+        self._selection = selection
+        self.content = content()
+    }
+
+    var body: some View {
+        ZStack {
+            Color(UIColor.secondarySystemBackground)
+                .ignoresSafeArea()
+            ZStack(alignment: .bottom) {
+                // Content
+                content
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                
+//                Spacer()
+                // TabBar
+                MainTabBarView(tabs: tabs, selection: $selection)
+            }
+            .ignoresSafeArea(.all, edges: .bottom)
+        } // Listen to PreferenceKey to update registered tabs
+        .onPreferenceChange(MainTabBarItemsPreferenceKey.self) { value in
+            self.tabs = value
+        }
+    }
+}
+
+struct MainTabBarView: View {
+    let tabs: [MainTabBarItem]
+    @Binding var selection: MainTabBarItem
+    
+    var body: some View {
+        if !tabs.isEmpty {
+            Grid(alignment: .bottom, horizontalSpacing: 60, verticalSpacing: 0) {
+                GridRow {
+                    Button {
+                        selection = tabs[0]
+                    } label: {
+                        tabs[0].tabView
+                    }
+                    MainInsertButton()
+                        .offset(y: -25)
+                    
+                    Button {
+                        selection = tabs[1]
+                    } label: {
+                        tabs[1].tabView
+                    }
+                    
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 35)
+            .background(Color(UIColor.systemBackground))
+            .clipShape(ArcShape())
+        }
+    }
+}
+
+struct ArcShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        return Path { path in
+            path.move(to: CGPoint(x:0, y:35))
+            path.addLine(to: CGPoint(x: 0, y: rect.height))
+            path.addLine(to: CGPoint(x: rect.width, y: rect.height))
+            path.addLine(to: CGPoint(x: rect.width, y: 35))
+            
+            path.addArc(center: CGPoint(x: rect.width / 2, y: 35), radius: 35, startAngle: .zero, endAngle: .init(degrees: 180), clockwise: true)
+        }
+    }
+}
+
+
+#Preview {
+    @Previewable @State var selection: MainTabBarItem = .home
+    let tabs: [MainTabBarItem] = [.home, .misc]
+    
+    MainTabView(selection: $selection) {
+        Color.red
+            .mainTabbarItem(tab: .home, selection: selection)
+        
+        Color.green
+            .mainTabbarItem(tab: .misc, selection: selection)
+    }
+}
+```
+
+```swift
+//
+//  MainTabBarItemsPreferenceKey.swift
+//  App
+//
+//  Created by Wenhao Yan on 2024/10/24.
+//
+
+import Foundation
+import SwiftUI
+
+// https://www.youtube.com/watch?v=FxW9Dxt896U&t=1388s
+
+struct MainTabBarItemsPreferenceKey: PreferenceKey {
+    static var defaultValue: [MainTabBarItem] = []
+    
+    static func reduce(value: inout [MainTabBarItem], nextValue: () -> [MainTabBarItem]) {
+        value += nextValue()
+    }
+}
+
+struct MainTabBarItemViewModifier: ViewModifier {
+    
+    // init
+    let tab: MainTabBarItem
+    let selection: MainTabBarItem
+    
+    
+    func body(content: Content) -> some View {
+        Group {
+            if selection == tab {
+                content
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                Color.clear.frame(width: 0, height: 0)
+                    .background(.green)
+            }
+        }.preference(key: MainTabBarItemsPreferenceKey.self, value: [tab])
+    }
+}
+
+extension View {
+    func mainTabbarItem(tab: MainTabBarItem, selection: MainTabBarItem) -> some View {
+        modifier(MainTabBarItemViewModifier(tab: tab, selection: selection))
+    }
+}
+```
+
+```swift
+//
+//  MainTabItems.swift
+//  App
+//
+//  Created by Wenhao Yan on 2024/10/24.
+//
+
+import SwiftUI
+
+enum MainTabBarItem{
+    case home, misc
+    
+    
+    @ViewBuilder var tabView: some View {
+        switch self {
+        case .home: Text("Home").frame(width: 50, height: 50)
+        case .misc: Text("Misc").frame(width: 50, height: 50)
+        }
+    }
+}
+
+```
+
+
+The same effect can also be achieved using `Environment`, only that `class` has to be used for passing an environment object.
+
+```swift
+//
+//  TabBarItem.swift
+//  App
+//
+//  Created by Wenhao Yan on 2024/10/25.
+//
+
+import SwiftUI
+
+@Observable
+class TestTabBarItem {
+    var items: [Item]
+    
+    init(items: [Item]) {
+        self.items = items
+    }
+    
+    enum Item {
+        case home, misc
+    }
+    
+    @ViewBuilder func tabView(item: TestTabBarItem.Item) -> some View {
+        switch item {
+        case .home: Text("Home").frame(width: 50, height: 50)
+        case .misc: Text("Misc").frame(width: 50, height: 50)
+        }
+    }
+}
+
+
+struct TabBarItemViewModifier: ViewModifier {
+    @Environment(TestTabBarItem.self) var tabs
+    let tab: TestTabBarItem.Item
+    
+    init(tab: TestTabBarItem.Item) {
+        self.tab = tab
+    }
+    
+    func body(content: Content) -> some View {
+        content
+            .onAppear {
+                tabs.items.append(tab)
+            }
+    }
+}
+
+extension View {
+    func tabBarItem(tab: TestTabBarItem.Item) -> some View {
+        modifier(TabBarItemViewModifier(tab: tab))
+    }
+}
+
+#Preview {
+    @Previewable @State var tabItem: TestTabBarItem = TestTabBarItem(items: [])
+    let tab: TestTabBarItem.Item = .home
+
+    HStack {
+        Text("Hello, world!")
+            .tabBarItem(tab: tab)
+    }.environment(tabItem)
+}
+```
+
+```swift
+//
+//  TabView.swift
+//  App
+//
+//  Created by Wenhao Yan on 2024/10/25.
+//
+
+import SwiftUI
+
+struct TestTabView<Content: View>: View {
+    
+    let content: Content
+    @Binding var selection: TestTabBarItem.Item
+    @State private var tab: TestTabBarItem = TestTabBarItem(items: [])
+    
+    init( selection: Binding<TestTabBarItem.Item>, @ViewBuilder content: () -> Content) {
+        self.content = content()
+        self._selection = selection
+    }
+    
+    var body: some View {
+        content
+            .environment(tab)
+        ForEach(tab.items, id: \.self) {item in
+            HStack {
+                tab.tabView(item: item)
+            }
+        }
+    }
+}
+
+#Preview {
+    @Previewable @State var selection: TestTabBarItem.Item = .home
+    TestTabView(selection: $selection) {
+        Text("")
+            .tabBarItem(tab: .home)
+        
+        Text("")
+            .tabBarItem(tab: .misc)
+
+    }
+}
+```
 
 ## HowTo
 
