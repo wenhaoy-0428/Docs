@@ -134,8 +134,6 @@ More info can be referred to [Why do I see some variables used with leading dot?
 To update a view, there are multiple ways of marking the variable as need the view to be updated in reflect to the changes. They are `@State` `@StateObject` `@ObservedObject` and `@EnvironmentObject`. The main difference can be found at this article [SwiftUI: @State vs @StateObject vs @ObservedObject vs @EnvironmentObject](https://levelup.gitconnected.com/state-vs-stateobject-vs-observedobject-vs-environmentobject-in-swiftui-81e2913d63f9) which gives thorough and easy to understand comparison.
 
 
-
-
 ## @State
 
 `@` is called property wrapper, `@State` wrapper is the same as `useState` in React that marks the variable as a state that needs to be monitored to update the view.
@@ -278,7 +276,7 @@ class User {
 
 To solve the problem to allow us to use class and monitor class, we need [`@StateObject`](#stateobject) and @ObservedObject together with [@ObservableObject] to monitor changes to the underline properties of a class.
 
-> ! Before diving in, `StateObject` and `ObservableObject` are deprecated can the transition to `State` and Observable is more recommended as the official doc [Migrating from the Observable Object protocol to the Observable macro](https://developer.apple.com/documentation/swiftui/migrating-from-the-observable-object-protocol-to-the-observable-macro) says.
+> ! Before diving in, `StateObject` and `ObservableObject` are deprecated can the transition to `State` and `Observable` is more recommended as the official doc [Migrating from the Observable Object protocol to the Observable macro](https://developer.apple.com/documentation/swiftui/migrating-from-the-observable-object-protocol-to-the-observable-macro) says.
 
 
 > Here a question comes out. If we can use `Struct` in pair with `@State` to have the same effect as using `class` in pair with `@StateObject` what are the difference. In many cases, they do achieve the similar effect. However, in rae cases, especially when dealing with network requests that encounter asynchronous functions that requires references, struct is not going to work. Therefore, in practice, Model as well as ViewModels are often using **Class** 
@@ -366,7 +364,11 @@ In summary, `@ObservedObject` is like the `props` of React, where `@StateObject`
 
 ### [@EnvironmentObject](https://www.hackingwithswift.com/quick-start/swiftui/how-to-use-environmentobject-to-share-data-between-views)
 
+
+> Use [Environment](#environment) only to access both custom env and system env, no more use of `@EnvironmentObject`.
+
 > [Migrating from the Observable Object protocol to the Observable macro](https://developer.apple.com/documentation/swiftui/migrating-from-the-observable-object-protocol-to-the-observable-macro)
+
 
 No matter of @State of @StateObject, we're using prop drilling that passes states down the view hierarchy one level after another. This is cumbersome if we have a huge hierarchy. Therefore, @EnvironmentObject is the same as `Context` of React, that allows to read all the contexts set by the parent view.
 
@@ -428,6 +430,85 @@ The reason for this that in subViews, the variable is accessed through `@Environ
 ### [Migrating from the Observable Object protocol to the Observable macro](https://developer.apple.com/documentation/swiftui/migrating-from-the-observable-object-protocol-to-the-observable-macro)
 
 With the basic idea of what `ObservableObject`, `@StateObject`, `@EnvironmentObject` are, we should now NOT be using them but use `@Observable`, and `@State` only.
+
+
+## @Observable
+
+Applying `@Observable` macro to a class, without using `@published` and whatsoever we can a state object.
+
+```swift
+@Observable
+class ViewModel {
+    var model: Model()
+    var anotherModel: AnotherModel()
+
+    func getModelCount() -> Int {
+        ...
+    }
+    ...
+}
+
+struct MyView: View {
+    @State vm: ViewModel
+    
+    var body: some View {
+        ...
+    }
+}
+```
+
+And we can use `State` directly when accessing it.
+
+
+## @Environment
+
+[Use @Environment when using @Observable macro](https://developer.apple.com/documentation/swiftui/view/environment(_:))
+
+```swift
+struct ParentView: View {
+    @State var vm = ViewModel()
+
+    ...body
+        childView()
+            .environment(vm)
+    ...
+}
+
+struct childView: View {
+    @Environment(ViewModel.self) var G_AppErrorDispatcher
+}
+```
+
+## [Bindable](https://developer.apple.com/documentation/swiftui/bindable)
+
+Similar to observedObject under normally cases. However, Environment variables do not providing binding. Therefore, we can use Bindable to create a binding to that Env.
+
+The following code will throw error as type of `book` is `Book` while Textfield expects a binding.
+
+```swift
+struct TitleEditView: View {
+    @Environment(Book.self) private var book
+
+    // ERROR
+    var body: some View {
+        TextField("Title", text: $book.title)
+    }
+}
+```
+
+@Bindable can used anywhere inside body.
+
+```swift
+struct TitleEditView: View {
+    @Environment(Book.self) private var book
+
+
+    var body: some View {
+        @Bindable var book = book
+        TextField("Title", text: $book.title)
+    }
+}
+```
 
 
 ## [LazyVGrid](https://www.youtube.com/watch?v=vHvb7LH8VuE)
@@ -606,6 +687,37 @@ This tiny subview makes more sense when we wish to extract certain complexity. H
 
 Therefore, we can use @ViewBuilder.
 
+## AnyView
+
+Using @ViewBuilder we can already build views conditionally. However, ViewBuilder regards all its content as a single view and no explicit return keyword is allowed. However, under many occasions, we may want to do an early return when rendering a view.
+
+```swift
+ func rowView(for category: Nutrient.NutrientCategory, value: Double?, isBold: Bool?)  -> some View {
+        // Extract current processing nutrient
+        guard let nutrient = nutrients.filter({ $0.category == category }).first else {
+            return EmptyView()
+        }
+
+        return HStack {
+            ....
+        }
+```
+
+We certainly can use ViewBuilder, but the code will not be clean as the above. Without using ViewBuilder, the body is divergent from return type. A solution is to use [AnyView](https://developer.apple.com/documentation/swiftui/anyview)
+
+> AnyView: An AnyView allows changing the type of view used in a given view hierarchy. Whenever the type of view used with an AnyView changes, the old hierarchy is destroyed and a new hierarchy is created for the new type.
+
+We can use AnyView to remove the type so that the body always returns some view (AnyView)
+
+```swift
+    func myFunc() -> some View
+    ...
+        return AnyView(EmptyView)
+    }
+    return AnyView(HStack {
+        ....
+    })
+```
 
 ## [PreferenceKey](https://www.youtube.com/watch?v=OnbBc00lqWU&t=94s)
 
@@ -933,3 +1045,9 @@ struct ContentView: View {
 #### How to dismissSearch from parent
 
  The dismissSearch is designed that can only be called within the SearchedView, where the SearchedView has to be a separate view from where .suggestable() is defined. Official example can be found on [StackOverflow](https://developer.apple.com/documentation/swiftui/environmentvalues/dismisssearch)
+
+
+#### How to use conditions to render views conditionally
+
+1. [@ViewBuilder](#viewbuilder)
+2. [AnyView](#anyview)
