@@ -1,3 +1,26 @@
+## Pinned
+
+1. [What's the difference between `let`, `var` and `const`?](/FrontEnd/Js/jsNotes.md#difference-between-let-var-const-bare)
+2. [Why variables can be used before declaration?](/FrontEnd/Js/jsNotes.md#hoisting)
+3. [What is `this`?](/FrontEnd/Js/jsNotes.md#this)
+4. [What's the back-tick](/FrontEnd/Js/jsNotes.md#string-template)
+5. [What's the difference between null and undefined](https://www.geeksforgeeks.org/undefined-vs-null-in-javascript/)
+6. [Is JS pass by value?](/FrontEnd/Js/jsNotes.md#pass-by-sharing)
+7. [What's the difference between map and object](https://www.geeksforgeeks.org/map-vs-object-in-javascript/)
+8. [How to define read only property?](https://stackoverflow.com/questions/7757337/defining-read-only-properties-in-javascript)
+9. [How to get a computed property name](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get#using_a_computed_property_name)
+10. [What is prototype and prototype chain in JS](/FrontEnd/Js/jsNotes.md#prototype)
+11. [What is class fields](/FrontEnd/Js/jsNotes.md#class-fields)
+12. [Why does console.log(this) in node return an empty object?](https://stackoverflow.com/questions/42631698/why-does-console-logthis-in-node-return-an-empty-object)
+13. [What are species in JS](#TODO)
+14. [https://stackoverflow.com/questions/650764/how-does-proto-differ-from-constructor-prototype](/FrontEnd/Js/jsNotes.md#prototype-with-constructor)
+15. [How to make sure the order when including multiple external JS files?](/FrontEnd/Js/jsNotes.md#script-loading-strategies)
+16. [How to create an abstract base class](https://stackoverflow.com/questions/597769/how-do-i-create-an-abstract-base-class-in-javascript)
+17. [What is User Agent](https://developer.mozilla.org/en-US/docs/Glossary/User_agent)
+18. [How to edit js code in browser](https://stackoverflow.com/questions/16494237/chrome-dev-tools-modify-javascript-and-reload)
+19. [What is closure](/FrontEnd/Js/jsNotes.md#closure)
+20. [How to force focus on a element](https://developer.mozilla.org/en-US/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_accessibility#prepare_the_heading)
+
 
 ## [Pass by sharing](https://stackoverflow.com/questions/518000/is-javascript-a-pass-by-reference-or-pass-by-value-language)
 
@@ -600,7 +623,7 @@ Only object with [prototype](https://developer.mozilla.org/en-US/docs/Web/JavaSc
 
 
 #### Scope of Object Literal
-* Object doesn't have a [scope](https://developer.mozilla.org/en-US/docs/Glossary/Scope). [All the properties of an object are associated with the object itself but the scope.](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Working_with_Objects#objects_and_properties). Therefore, object doesn't have its own context.
+* Object doesn't have a [scope](https://developer.mozilla.org/en-US/docs/Glossary/Scope). [All the properties of an object are associated with the object itself but not the scope.](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Working_with_Objects#objects_and_properties). Therefore, object doesn't have its own context.
 
 > To be more precise, it's that object literal (`const a = {...}`) doesn't have a scope, constructor (indeed a function) does have a scope.
 
@@ -679,9 +702,9 @@ Only object with [prototype](https://developer.mozilla.org/en-US/docs/Web/JavaSc
 
 > `Car.engine` doesn't add new property to an object, instead it defines a [static property](#static-methods-and-properties) for class `Car`.
 
-#### Null prototype objects
+#### [Null prototype objects](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object#null-prototype_objects)
 
-Objects that have `null prototype` doesn't inherit functions form `Object.prototype` meaning, `toString`, `valueOf`, etc. property methods are all unavailable to use.
+Objects that have `null prototype` doesn't inherit functions from `Object.prototype` meaning, `toString`, `valueOf`, etc. property methods are all unavailable to use.
 
 To objects null prototype objects, the follow ways can be used to achieve
   1. call `static` function `Object.create(null)`
@@ -703,6 +726,7 @@ To objects null prototype objects, the follow ways can be used to achieve
     console.log(new Obj().toString) // undefined.
     ```
     > [objects created by `new` will always inherit from `Object.prototype`](https://stackoverflow.com/questions/18198178/null-prototype-object-prototype-and-object-create)
+    > When calling `new`, the newly created instance `newInstance`:  Points newInstance's [[Prototype]] to the constructor function's prototype property, if the prototype is an `Object`. Otherwise, newInstance stays as a plain object with Object.prototype as its [[Prototype]]. Reference from [new](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/new#description). Therefore, by setting `Obj.prototype = null` which is no longer an Object will cause the newInstance.prototype to be `Object.prototype`.
 
 The benefits of using `null prototype` seem unobvious, util you find yourself suffers from the expected result of `Object.prototype`, and prototype pollution attacks. 
 ```js
@@ -914,222 +938,12 @@ console.log(myCar.arrow() === myCar); // true
   - [Reference](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions)
 
 
-## Promise
-
-Promise is used to attach callback functions to have a better syntax than the classic callback pyramid of doom.
-
-```js
-const promise = doSomething();
-const promise2 = promise.then(successCallback, failureCallback);
-```
-> `then` will be called after the completion of `doSomething`, and  `promise2` represents the completion of both `doSomething()` and `successCallback` or `failureCallback`. `promise2` is returned from `successCallback` or `failureCallback`.
-
-`successCallback` will be asynchronously called when `doSomething` is fulfilled and `failureCallback` will be called when `doSomething` rejects. 
-
-
-After have a long promise chain, `catch` can be used if promises have the same error handler.
-
-```js
-doSomething()
-  .then(function (result) {
-    return doSomethingElse(result);
-  })
-  .then(function (newResult) {
-    return doThirdThing(newResult);
-  })
-  .then(function (finalResult) {
-    console.log(`Got the final result: ${finalResult}`);
-  })
-  .catch(failureCallback);
-```
-
-!> Always return in `then`. Without `return`, the latter `then` will receive an `undefined`. Worse, latter `then` will be called early, causing race conditions. 
-
-In the following example, the first `then` didn't return a value, therefore, according to [the rule of return value in then](#promisethen), it will return an `undefined` and the `pending` promises after `fetch` will not be queued in front of the second `then` according to the return rule when returning another pending promise. Therefore, we have two independent chains and race condition will happen. 
-```js
-const listOfIngredients = [];
-doSomething()
-  .then((url) => {
-    // # 2
-    // I forgot to return this
-    fetch(url)
-      .then((res) => res.json())
-      .then((data) => {
-        listOfIngredients.push(data);
-      });
-  }
-  .then(() => { 
-    // # 2
-    console.log(listOfIngredients);
-    // Always [], because the fetch request hasn't completed yet.
-  });
-```
-
-Nested promise can restrict `catch` scope, and potentially lead to uncaught error. 
-```js
-Promise.resolve()
-.then(() => {
-    Promise.reject("Hello").catch((msg) => {console.log(`inner catch ${msg}`)}) // internal error can only be caught here. 
-}).catch((msg) => {
-    console.log(msg); // won't catch error.
-})
-
-```
-
-#### [promise.then](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then)
-
-Returns a new Promise immediately. This new promise is always pending when returned, **regardless of the current promise's status.**
-
-`then` **attaches** `successCallback` and `failureCallback` handlers to the **current** (the one returned from the previous call) Promise and they will be called based on the current promise. `then` also returns a **pending** promise **immediately**, whose behavior will be based on the return result of the handlers. Refer to [return value of then](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then#return_value) for more details.
-
-?> For `promise.resolve()`, it returns a `fulfilled` promise, and `promise.reject()` returns a `rejected` promise, and `then` returns a `pending` promise. 
-
-> When returning a non-promise object, `return` in `then` will automatically wrap it into a promise and **fulfill** the promise. It's always good practice to use `catch` to handle failure instead of using the `failureCallback`.
-```js
-Promise.reject()
-  .then(
-    () => 99,
-    () => 42,
-  ) // onRejected returns 42 which is wrapped in a fulfilled Promise
-  .then((solution) => console.log(`Resolved with ${solution}`)); // Fulfilled with 42
-```
-
-#### [promise timing](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises#timing)
-
-Read through [Event Loop](#event-loop) to have solid base first.
-
-In the follow example, when execution:
-0. the main (I imagined) is pushed into the `Stack`. (I'm not sure)
-1. line1 is pushed into the `Stack`. [Promise constructor](#promiseconstructor) is pushed into `Stack` and executed, then `setTimeout` is executed, and the callback is enqueued into the `Task Queue`. 
-> current `Stack` has only the main execution context after finishing line1, and 1 task(`resolve()`) in the `Task Queue`.
-2. line3 is pushed into `Stack` and get executed, handlers in `then()` are associated with the promise.
-> current `Stack` has only the main execution context after finishing line3, and 1 task(`resolve()`) in the `Task Queue`.
-> [rule of thumb of microTask](#event-loop): called only after the function which created it exits, and when the JavaScript execution stack is empty. Therefore, the task in `microTask` is not executed.
-3. line4 is pushed into the `Stack` and executed. 
-4. line5 is pushed into the stack and executed, `then()` returns a new promise and the handler(`console.log2`) is enqueued into the `microTasks` because its current promise is settled.
-5. line6 is pushed into the stack and handlers in `then()` are associated with promise return from line5.
-> current `Stack` has only the main execution context finishing line 4-6, and the `microTask` has 1 task, the `TaskQueue` has 1 task.
-7. line7 is pushed into the stack and prints `1`. 
-> The stack is empty, the `microTask` has 1 task, the `TaskQueue` has 1 task.
-8. `microTask` pops its task, pushes into the `Stack` to execute, prints 2 and resolves. The associated handler(`console.log3`) is enqueued into the `microTasks`, then pops...prints 3. 
-> The `TaskQueue` is not executed because [New tasks in TaskQueue will be executed in the next loop iteration](#event-loop). Because [all tasks in `microTasks` will be executed including the ones added in the interim](#event-loop), thus 2 and 3 are printed sequentially.
-9. Next iteration begins, only the `TaskQueue` has a task, pop it and push into the `Stack` to execute. The promise is resolved and its associated handler is enqueued into the `microTasks`.
-10. .... prints 4.
-
-```js
-1. const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms)); 
-2. 
-3. wait(0).then(() => console.log(4)); 
-4. Promise.resolve() 
-5.  .then(() => console.log(2)) 
-6.  .then(() => console.log(3)); 
-7. console.log(1); // 1, 2, 3, 4
-```
-
-[Another Example](https://javascript.info/microtask-queue):
-
-```js
-let promise1 = Promise.resolve();
-let promise2 = Promise.resolve();
-
-promise1
-.then(() => console.log(1))
-.then(() => console.log(2));
-
-promise2
-.then(() => console.log(3))
-.then(() => console.log(4))
-```
-
-> promise 1 and promise 2 have console.log(1) and console.log(3) event handlers directly attached, so these two goes into the event queue. after the global code is done executing, console.log(1) handler is first brought back to the call stack to be executed. after it is done, it returns a promise whose handler is console.log(2) it goes to the event queue for now. Next the console.log(3) is brought back from the even queue, and it also returns a promise whose handler i.e. the console.log(4) is stored in the event queue. Currently console.log(1) and console.log(3) is printed, and the handlers for these promises are (console.log(2), console.log(4)) is stored inside the event queue. Now as there are no global code remaining these two remaining handlers will be executed so the final order become 1,3,2,4
-
-#### [promise.constructor](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/Promise#parameters)
-
-The Promise constructor is primarily used to wrap functions that do not already support promises.
-
-```js
-const promise1 = new Promise((resolve, reject) => {
-    console.log("hello world");
-    resolve("foo");
-  });
-  
-  promise1.then((value) => { //
-    console.log(value);
-    // expected output: "foo"
-  });
-  
-  console.log(promise1);
-  // expected output: [object Promise]
-```
-```
-expected output:
-hello world
-Promise { <pending> }
-foo
-```
-
-> The executor function is executed immediately by the Promise implementation, passing resolve and reject functions (the executor is called before the Promise constructor even returns the created object) [From the MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/Promise#parameters)
-
-> In the above, `promise1.then()` is still available and return another promise. Because [then()](#promisethen) returns a new Promise immediately. This new promise is always pending when returned, **regardless of the current promise's status.**
-
-## Function
-
-#### [All functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Method_definitions)
-
-#### [Generators](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function*)
-
-#### [getter/setter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get)
-
-`getter` and `setter` can have the same name as the property. However, the property will be accessed is it's public.
-
-getter and setter gains cleaner syntax and can play as they sound in C++ language.
-
-#### Async functions
-
-The purpose of async/await is to simplify the syntax necessary to consume [promise](#promise)-based APIs.
-
-Async functions **always** return a promise. If the return value of an async function is not explicitly a promise, it will be implicitly wrapped in a promise.
-```js
-async function foo() {
-  return 1;
-}
-// Similar but not equivalent.
-function foo() {
-  return Promise.resolve(1);
-}
-```
-
-We can use `await` keyword before a call to a function that **returns a promise**
-
-```js
-function alarm(person, delay) {
-  return new Promise((resolve, reject) => {
-    if (delay < 0) {
-      throw new Error('Alarm delay must not be negative');
-    }
-    setTimeout(() => {
-      resolve(`Wake up, ${person}!`);
-    }, delay);
-  });
-}
-
-button.addEventListener('click', async () => {
-  try {
-    const message = await alarm(name.value, delay.value);
-    output.textContent = message;
-  }
-  catch (error) {
-    output.textContent = `Couldn't set alarm: ${error}`;
-  }
-});
-```
-
-> Also, note that you can only use `await` inside an `async` function, unless your code is in a [JavaScript module](#modules). 
-
 
 ## [prototype](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Inheritance_and_the_prototype_chain)
 
 While [classes](#class) abstract most of the prototypical mechanism away, understanding how prototypes work under the hood is still useful.
+
+Every object in JavaScript has a built-in property, which is called its prototype. The prototype is itself an object, so the prototype will have its own prototype, making what's called a prototype chain. The chain ends when we reach a prototype that has null for its own prototype.
 
 Each object has a property which holds a link to another object called its **prototype**. It's a chain up to `null` as the final link. 
 
@@ -1546,6 +1360,223 @@ class Bar extends calculatorMixin(randomizerMixin(Foo)) { } // So Bar extends a 
 super.speak() // calls parent's speak() function
 super(); // calls parent's constructor.
 ```
+
+
+
+## Promise
+
+Promise is used to attach callback functions to have a better syntax than the classic callback pyramid of doom.
+
+```js
+const promise = doSomething();
+const promise2 = promise.then(successCallback, failureCallback);
+```
+> `then` will be called after the completion of `doSomething`, and  `promise2` represents the completion of both `doSomething()` and `successCallback` or `failureCallback`. `promise2` is returned from `successCallback` or `failureCallback`.
+
+`successCallback` will be asynchronously called when `doSomething` is fulfilled and `failureCallback` will be called when `doSomething` rejects. 
+
+
+After have a long promise chain, `catch` can be used if promises have the same error handler.
+
+```js
+doSomething()
+  .then(function (result) {
+    return doSomethingElse(result);
+  })
+  .then(function (newResult) {
+    return doThirdThing(newResult);
+  })
+  .then(function (finalResult) {
+    console.log(`Got the final result: ${finalResult}`);
+  })
+  .catch(failureCallback);
+```
+
+!> Always return in `then`. Without `return`, the latter `then` will receive an `undefined`. Worse, latter `then` will be called early, causing race conditions. 
+
+In the following example, the first `then` didn't return a value, therefore, according to [the rule of return value in then](#promisethen), it will return an `undefined` and the `pending` promises after `fetch` will not be queued in front of the second `then` according to the return rule when returning another pending promise. Therefore, we have two independent chains and race condition will happen. 
+```js
+const listOfIngredients = [];
+doSomething()
+  .then((url) => {
+    // # 2
+    // I forgot to return this
+    fetch(url)
+      .then((res) => res.json())
+      .then((data) => {
+        listOfIngredients.push(data);
+      });
+  }
+  .then(() => { 
+    // # 2
+    console.log(listOfIngredients);
+    // Always [], because the fetch request hasn't completed yet.
+  });
+```
+
+Nested promise can restrict `catch` scope, and potentially lead to uncaught error. 
+```js
+Promise.resolve()
+.then(() => {
+    Promise.reject("Hello").catch((msg) => {console.log(`inner catch ${msg}`)}) // internal error can only be caught here. 
+}).catch((msg) => {
+    console.log(msg); // won't catch error.
+})
+
+```
+
+#### [promise.then](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then)
+
+Returns a new Promise immediately. This new promise is always pending when returned, **regardless of the current promise's status.**
+
+`then` **attaches** `successCallback` and `failureCallback` handlers to the **current** (the one returned from the previous call) Promise and they will be called based on the current promise. `then` also returns a **pending** promise **immediately**, whose behavior will be based on the return result of the handlers. Refer to [return value of then](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then#return_value) for more details.
+
+?> For `promise.resolve()`, it returns a `fulfilled` promise, and `promise.reject()` returns a `rejected` promise, and `then` returns a `pending` promise. 
+
+> When returning a non-promise object, `return` in `then` will automatically wrap it into a promise and **fulfill** the promise. It's always good practice to use `catch` to handle failure instead of using the `failureCallback`.
+```js
+Promise.reject()
+  .then(
+    () => 99,
+    () => 42,
+  ) // onRejected returns 42 which is wrapped in a fulfilled Promise
+  .then((solution) => console.log(`Resolved with ${solution}`)); // Fulfilled with 42
+```
+
+#### [promise timing](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises#timing)
+
+Read through [Event Loop](#event-loop) to have solid base first.
+
+In the follow example, when execution:
+0. the main (I imagined) is pushed into the `Stack`. (I'm not sure)
+1. line1 is pushed into the `Stack`. [Promise constructor](#promiseconstructor) is pushed into `Stack` and executed, then `setTimeout` is executed, and the callback is enqueued into the `Task Queue`. 
+> current `Stack` has only the main execution context after finishing line1, and 1 task(`resolve()`) in the `Task Queue`.
+2. line3 is pushed into `Stack` and get executed, handlers in `then()` are associated with the promise.
+> current `Stack` has only the main execution context after finishing line3, and 1 task(`resolve()`) in the `Task Queue`.
+> [rule of thumb of microTask](#event-loop): called only after the function which created it exits, and when the JavaScript execution stack is empty. Therefore, the task in `microTask` is not executed.
+3. line4 is pushed into the `Stack` and executed. 
+4. line5 is pushed into the stack and executed, `then()` returns a new promise and the handler(`console.log2`) is enqueued into the `microTasks` because its current promise is settled.
+5. line6 is pushed into the stack and handlers in `then()` are associated with promise return from line5.
+> current `Stack` has only the main execution context finishing line 4-6, and the `microTask` has 1 task, the `TaskQueue` has 1 task.
+7. line7 is pushed into the stack and prints `1`. 
+> The stack is empty, the `microTask` has 1 task, the `TaskQueue` has 1 task.
+8. `microTask` pops its task, pushes into the `Stack` to execute, prints 2 and resolves. The associated handler(`console.log3`) is enqueued into the `microTasks`, then pops...prints 3. 
+> The `TaskQueue` is not executed because [New tasks in TaskQueue will be executed in the next loop iteration](#event-loop). Because [all tasks in `microTasks` will be executed including the ones added in the interim](#event-loop), thus 2 and 3 are printed sequentially.
+9. Next iteration begins, only the `TaskQueue` has a task, pop it and push into the `Stack` to execute. The promise is resolved and its associated handler is enqueued into the `microTasks`.
+10. .... prints 4.
+
+```js
+1. const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms)); 
+2. 
+3. wait(0).then(() => console.log(4)); 
+4. Promise.resolve() 
+5.  .then(() => console.log(2)) 
+6.  .then(() => console.log(3)); 
+7. console.log(1); // 1, 2, 3, 4
+```
+
+[Another Example](https://javascript.info/microtask-queue):
+
+```js
+let promise1 = Promise.resolve();
+let promise2 = Promise.resolve();
+
+promise1
+.then(() => console.log(1))
+.then(() => console.log(2));
+
+promise2
+.then(() => console.log(3))
+.then(() => console.log(4))
+```
+
+> promise 1 and promise 2 have console.log(1) and console.log(3) event handlers directly attached, so these two goes into the event queue. after the global code is done executing, console.log(1) handler is first brought back to the call stack to be executed. after it is done, it returns a promise whose handler is console.log(2) it goes to the event queue for now. Next the console.log(3) is brought back from the even queue, and it also returns a promise whose handler i.e. the console.log(4) is stored in the event queue. Currently console.log(1) and console.log(3) is printed, and the handlers for these promises are (console.log(2), console.log(4)) is stored inside the event queue. Now as there are no global code remaining these two remaining handlers will be executed so the final order become 1,3,2,4
+
+#### [promise.constructor](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/Promise#parameters)
+
+The Promise constructor is primarily used to wrap functions that do not already support promises.
+
+```js
+const promise1 = new Promise((resolve, reject) => {
+    console.log("hello world");
+    resolve("foo");
+  });
+  
+  promise1.then((value) => { //
+    console.log(value);
+    // expected output: "foo"
+  });
+  
+  console.log(promise1);
+  // expected output: [object Promise]
+```
+```
+expected output:
+hello world
+Promise { <pending> }
+foo
+```
+
+> The executor function is executed immediately by the Promise implementation, passing resolve and reject functions (the executor is called before the Promise constructor even returns the created object) [From the MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/Promise#parameters)
+
+> In the above, `promise1.then()` is still available and return another promise. Because [then()](#promisethen) returns a new Promise immediately. This new promise is always pending when returned, **regardless of the current promise's status.**
+
+## Function
+
+#### [All functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Method_definitions)
+
+#### [Generators](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function*)
+
+#### [getter/setter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get)
+
+`getter` and `setter` can have the same name as the property. However, the property will be accessed is it's public.
+
+getter and setter gains cleaner syntax and can play as they sound in C++ language.
+
+#### Async functions
+
+The purpose of async/await is to simplify the syntax necessary to consume [promise](#promise)-based APIs.
+
+Async functions **always** return a promise. If the return value of an async function is not explicitly a promise, it will be implicitly wrapped in a promise.
+```js
+async function foo() {
+  return 1;
+}
+// Similar but not equivalent.
+function foo() {
+  return Promise.resolve(1);
+}
+```
+
+We can use `await` keyword before a call to a function that **returns a promise**
+
+```js
+function alarm(person, delay) {
+  return new Promise((resolve, reject) => {
+    if (delay < 0) {
+      throw new Error('Alarm delay must not be negative');
+    }
+    setTimeout(() => {
+      resolve(`Wake up, ${person}!`);
+    }, delay);
+  });
+}
+
+button.addEventListener('click', async () => {
+  try {
+    const message = await alarm(name.value, delay.value);
+    output.textContent = message;
+  }
+  catch (error) {
+    output.textContent = `Couldn't set alarm: ${error}`;
+  }
+});
+```
+
+> Also, note that you can only use `await` inside an `async` function, unless your code is in a [JavaScript module](#modules). 
+
+
+
 ## Event 
 
 Event are fired when specific actions is performed, and associated handlers will be called by the standard mechanism. 
@@ -1836,7 +1867,7 @@ Module.default(); // Error
 
 > The scope of the imported module is limited based on where it's declared.
 
-
+The most important effects of this function is that lazy loading is possible. Certain modules can be imported only when certain conditions are met. Reducing the initial bundle size. This is also the essence of how react lazy works. [React code splitting](https://legacy.reactjs.org/docs/code-splitting.html#:~:text=is%20first%20rendered.-,React.,export%20containing%20a%20React%20component.)
 
 
 

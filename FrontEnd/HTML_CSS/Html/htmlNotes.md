@@ -4,7 +4,7 @@
 
 1. always declare `<!DOCTYPE html>`
 
-2. An HTML page will validate without the `<html>` and `<body>` tags, however, in older browsers things will breakdown, and omitting both of them wil crash DOM software.
+2. An HTML page is valid without the `<html>` and `<body>` tags, however, in older browsers things will breakdown, and omitting both of them wil crash DOM software.
 
 3. `<header>` can be omitted, and browser will add a default one before `<body>`
 
@@ -247,15 +247,15 @@ However, `Iframes` can lead to clickjacking. To prevent this:
 1. Backgrounds: There's something we need agree on first.
     1. We know that if we put a static picture onto a smaller screen, in order to maintain how this picture looks, the picture we see will be squashed.<br>
       and the size of this image will be small. The same thing happens to pages.
-    2. viewport width has a default value. such as 900px as lowest and 1920 as highest.    
-    3. `viewport width = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)`
-    4. CSS pixels are different from resolutions. `CSS pixels * CSS pixel ratio = Resolution` [->Ref](https://webspeedtools.com/viewport-vs-screen-resolution-vs-dpr-vs-ppi/)
+    2. CSS pixels are different from resolutions. `CSS pixels * CSS pixel ratio = Resolution` [->Ref](https://webspeedtools.com/viewport-vs-screen-resolution-vs-dpr-vs-ppi/)
 
-    viewport is the window that you see things through. <br>
+    viewport is the window that you see web content <br>
     - **When the screen size is large enough to contain all the elements**, meaning it's larger than the widest element with fixed width, viewport width will vary with the browser size up to a limit such as 1920px. <br>
     - **When the screen size is smaller than the widest element**, viewport will shrink to a point where it's the smallest default value such as 900px, or it's tinny bit larger than the widest element if the width is larger than the default value, so that element is contained without scrollbar.
 
-    The problem here is: When using a smaller device, the browser will render everything based on the viewport size which is larger than the device sceen size. The viewport will be squashed just like rule `#1` into the screen.
+    > In CSS, the unit px is used to mean CSS pixel. Therefore, if you define an image width to be 300px, then that 300 pixels will represent the CSS pixels and cover 300 pixels width in the viewport and not the screen resolution.
+
+    The problem here is: When using a smaller device, the browser will render everything based on the viewport size which is larger than the device screen size. The viewport will be squashed just like rule `#1` into the screen. For video demonstration: [Get your media queries working with the meta viewport HTML tag](https://www.youtube.com/watch?v=SElOdK2qTpI)
     
     ![viewport1](./Assets/viewport1.png)
 
