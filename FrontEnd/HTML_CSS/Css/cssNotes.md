@@ -1,7 +1,33 @@
-## Questions
+## Pinned
 
 1. [What is stack context](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Positioning/Understanding_z_index/The_stacking_context)
 2. [How background-position works](https://stackoverflow.com/questions/51731106/using-percentage-values-with-background-position-on-a-linear-gradient)
+1. All pseudo-classes and pseudo-elements [->Ref](https://www.w3schools.com/css/css_pseudo_elements.asp)
+
+2. [How to center elements?](/FrontEnd/Css/cssNotes.md#center)
+
+3. How to make a responsive table with a scroll bar (scroll bar for table not for the page) [->Ref](/FrontEnd/Css/cssNotes.md#make-a-scroll-bar-for-table)
+
+4. Why paragraph(block) after the div container (block) that contains floating elements would appear by the side of the floating elements? [->Ref](/FrontEnd/Css/cssNotes.md#float-gotcha)
+<iframe src="/FrontEnd/Css/cssSamples/float3.html"></iframe>
+
+5. why `vertical-align` is not working, how to align elements vertically in the center [->Ref](https://stackoverflow.com/questions/79461/how-can-i-vertically-align-elements-in-a-div)
+
+6. Why size of pixel defined in css is different from actual size of pixel of the screen? [->Ref](/FrontEnd/html/htmlNotes?id=viewport)
+
+   - Pixels (px) are relative to the viewing device. For low-dpi devices, 1px is one device pixel (dot) of the display. For printers and high resolution screens 1px implies multiple device pixels.
+
+7. What's the difference between `background-origin` and `background-clip`?
+
+   - The `background-origin` property specifies the origin position of a background image, which means the upper left corner of the image can be positioned at `padding-box`(The upper left corner of the padding edge), `border-box` (the upper left corner of the border edge), `content-box`(...)
+   - The `background-clip` property specifies the **display area**, meaning the background image is still positioned at specified upper left corner, but only certain area is displayed. In this [example](https://www.w3schools.com/css/tryit.asp?filename=trycss3_background-clip), all images are positioned the same, but only the display areas differ.
+   - Related topic can be found [here](/FrontEnd/Css/cssNotes.md#make-a-background-image-for-the-page)
+
+8. How to add same onclick event to all elements in the same class?
+   - You can use for loop to add onclick event to each element of that class.
+   - You can also use Jquery to simplify to code.
+   - [->Ref](https://stackoverflow.com/questions/4588759/how-do-you-set-a-javascript-onclick-event-to-a-class-with-css)
+
 
 ## Index
 1. There are four different techniques to create multi-column layouts.
@@ -37,7 +63,7 @@ The cascading order is calculated based on:
     3. Browser default
 2. [Specificity](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Cascade_and_inheritance#specificity_2)
     - [Selectors](#selector) can be classified into `ID, CLASS, ELEMENT` categories. They can be thought as a 3 digit number in which, `ID` plays as the hundreds place, and `CLASS` as the tens place, and `ELEMENT` as ones place. 
-    > No matter how many `ELEMENT` specificity adds up, it can be more specific than 1 single `CLASS` specificity, same for `CLASS` to `ID`.
+    > No matter how many `ELEMENT` specificity adds up, it can't be more specific than 1 single `CLASS` specificity, same for `CLASS` to `ID`.
 3. Importance: 
 ```css
 p {
@@ -186,7 +212,7 @@ combinations of elements (element `?` element)
 3. attributes with value starts with "a whole word" "a string"/ ends with ... [->Ref](https://www.w3schools.com/css/css_attribute_selectors.asp)
 
 
-## [Pseudo-class and Pseudo-elements](#)
+## Pseudo-class and Pseudo-elements
 
 Check [all Pseudo-classes and Pseudo-elements](https://www.w3schools.com/css/css_pseudo_elements.asp)
 
@@ -258,7 +284,12 @@ For [display: flex;](#flexbox) sets the inner display type, while maintaining th
 
 Margins doesn't count into the Box size. Refer to [Box-sizing](#box-sizing) for details about how standard and alternate box model using `box-sizing: border-box`.
 
+#### [Parts of a box](https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Styling_basics/Box_model#parts_of_a_box)
 
+1. Content box
+2. Padding box
+3. Border box
+4. Margin box
 
 
 
@@ -268,6 +299,19 @@ Margins doesn't count into the Box size. Refer to [Box-sizing](#box-sizing) for 
 Check out [Mastering margin collapsing](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Box_Model/Mastering_margin_collapsing) for more details.
 Check this classic [Example](https://stackoverflow.com/questions/9519841/why-does-this-css-margin-top-style-not-work)
     <iframe src="/Docs/FrontEnd/HTML_CSS/Css/CssSamples/collapse.html"></iframe>
+
+
+#### Block Formatting Context(BFC)
+
+BFC is an INDEPENDENT environment. In a common sense, based on [Box model](#box-model), we believe each element is a box that is self contained, and will not interfere the layout of adjacent elements. However, this is not always the case. It's not rare to see that children elements exceeds the width of parent and affecting the layout of other elements outside of its parent, and [float](#float) elements affecting the layout of other elements as well.
+
+When creating a BFC, it's guaranteed that
+    1. the wrapping element will contain all the wrapped elements, a.k.a [Contain internal floats](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_display/Block_formatting_context#contain_internal_floats)
+    2. It's a self-contained env that will not affect the layout of adjacent elements, a.k.a [Exclude external floats](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_display/Block_formatting_context#exclude_external_floats)
+
+Mainly, creating BFC can be used to fix issues aroused by float elements, as well as [margin collapsing issues](#margin-collapse)
+
+To create a BFC, all need to do is making an element to comply certain css rules. The detail rules can be found at [Block formatting context from MDN](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_display/Block_formatting_context)
 
 #### Box-Sizing
 
@@ -343,6 +387,7 @@ elements' positions are calculated as the offset from its `containing block`, re
 
 
 When more than one positioned elements and they start to overlap, and positioned elements later in the source order win over positioned elements earlier in the source order. Or the one with higher `z-index`
+
 ## float
 
 1. `float: left/right/none/inherit`: The floated element is moved to the left or right and removed from normal flow, and the surrounding content floats around it.
