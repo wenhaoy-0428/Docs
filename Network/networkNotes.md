@@ -1,5 +1,14 @@
 # Network
 
+## DNS
+
+![DNS Look Up routine](./Assets/diagram-export-12-26-2024-2_21_12-PM.png)
+
+When buying a domain from the provider, the domain provider **typically have their own DNS name server**. 
+
+After hosting the website, or service, the server provider (not the domain provider) will provide an IP address of the server, which we can provide to the domain provider. So that the IP address can be linked to the domain using `A` DNS record stored in the domain provider's name server.
+
+However, a some reasonable cases, we may wish not to use the name sever of the domain provider, what we can do is add a `NS` record in the domain provider that points to the authoritative name server that we wish to use and store the A record there.
 
 ## Multicast
 
