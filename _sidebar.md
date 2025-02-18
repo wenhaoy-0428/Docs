@@ -11,6 +11,8 @@
 * [Readings](/Readings/_sidebar.md)
 * [Stats](/Stats/statsNotes.md)
 * [Math](/Math/_sidebar.md)
+* [Graphics](/Graphics/notes.md)
+* [Network](/Network/_sidebar.md)
 - Work
     * [Commands](/Work/commands.md)
     * [ErrCode](/Work/errCode.md)
