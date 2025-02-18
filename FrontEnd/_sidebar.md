@@ -8,6 +8,4 @@
   - [Webpack](/FrontEnd/webpack/webpackNotes.md)
   - [Common Commands](/FrontEnd/cliNotes.md)
   - [Q&A](/FrontEnd/questions.md)
-- IOS
-  - [Swift](/FrontEnd/IOS/swift/swiftNotes.md)
-  - [SwiftUI](/FrontEnd/IOS/swift/swiftUINotes.md)
+- [IOS](/FrontEnd/IOS/_sidebar.md)

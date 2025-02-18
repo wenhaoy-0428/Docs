@@ -14,4 +14,3 @@ Hello, my amazing friend.
 > Inside section, fundamentals of react is included covering JSX. This notes so far, only covers React, not [React Native](https://reactnative.dev/docs/platform-specific-code). However, the fundamentals are the same. 
 
 # [ExpressJS](./BackEnd/Express/expressNotes.md)
-> To be learnt by me.
