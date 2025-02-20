@@ -457,3 +457,14 @@ For hard navigation (refresh/direct visiting), there is not parent parallel page
 
 The main feature of Parallel Routing is particular useful when used in combination with `Intercepting Route` to create a re-visitable modal. Check out the video for better understanding [Learn Next.js Intercepting Routes In 11 Minutes](https://www.youtube.com/watch?v=zDZBKEvU8b0)
 
+
+## [Authentication](https://nextjs.org/docs/app/building-your-application/authentication) 
+
+1. To protect pages, we can use [Middlewares](https://nextjs.org/docs/app/building-your-application/authentication#optimistic-checks-with-middleware-optional)
+
+  > Only protecting pages is not enough, since its very often that certain apis and data requests are also sensitive to leaks.
+  > To help with middleware chaining, follow: 1.[Next.js 13.4.12 multiple middlewares](https://github.com/vercel/next.js/discussions/53997)
+  2. [How to Chain Multiple Middleware Functions in NextJS](https://reacthustle.com/blog/how-to-chain-multiple-middleware-functions-in-nextjs)
+
+1. [Add Data access layer](https://www.youtube.com/watch?v=DG_WT8Gwzho)
+   > This is a really fancy name for something unexpectedly simple. Just a centralized class or function to represent the manipulations of data.
