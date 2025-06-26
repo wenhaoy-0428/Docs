@@ -241,6 +241,8 @@ interface User {
 
 ### [Difference Between Type Alias and interface](https://www.youtube.com/watch?v=QYO-sieqLD4)
 
+> Refer to [Interface vs Type alias in TypeScript 2.7](https://medium.com/@martin_hotell/interface-vs-type-alias-in-typescript-2-7-2a8f1777af4c) for the latest.
+
 `extend` keyword is exclusive to interfaces, however, type alias can use type intersection to achieve the same behavior.
 
 
@@ -256,6 +258,8 @@ type Child = Parent & {
 
 
 > A good practice is to use type alias as much as possible and only use interface when needed.
+
+
 
 
 
