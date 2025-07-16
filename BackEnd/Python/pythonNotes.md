@@ -50,6 +50,58 @@ t.append(10)
 print(s) # [[1, 10]]
 ```
 
+## Type Checking
+
+Type checking in python is **not strict**.
+
+**No enforcement at runtime**: Python ignores type hints during execution
+
+```python
+def add(a: int, b: int) -> int:
+    return a + b
+
+# These will all execute despite type violations
+print(add(1, 2))      # OK - returns 3
+print(add("1", "2"))   # Runs - returns "12"
+print(add([1], [2]))   # Runs - returns [1, 2]
+```
+
+## Modules
+
+Each file can be a module that encapsulates certain logics.
+
+```python
+# calculator.py
+
+def add(a: float, b: float) -> float:
+    return a + b
+
+def subtract(a: float, b: float) -> float:
+    return a - b
+```
+
+And can be used in other files/modules via importing
+
+```python
+# main.py
+import calculator
+
+result = calculator.add(5, 3)
+```
+
+## Packages
+
+A package is a collection of modules organized in a directory hierarchy.
+
+a special file `__init__.py` is required under the package root directory, and will be executed when the package is imported, only run only once.
+
+
+
+
+
+
+
+
 
 ## Manipulate with Files
 
