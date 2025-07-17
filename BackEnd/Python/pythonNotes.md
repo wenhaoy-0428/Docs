@@ -95,13 +95,107 @@ A package is a collection of modules organized in a directory hierarchy.
 
 a special file `__init__.py` is required under the package root directory, and will be executed when the package is imported, only run only once.
 
+`__all__` can also be defined in `__init__.py`, but it only controls what gets imported when a user does `from module import *`. It won't affect explicit importing.
+
+```py
+# - pkg
+#   __init__.py
+#   module1.py
+#   module2.py
+
+# pkg.__init__.py
+__all__ = ["module1"]
+
+# main.py
+from pkg import *
+module1.greet()
+```
+
+we don't have to explicitly import `module1` inside `__init__.py`, but using module name is sufficient. It will run the importing automatically.
+
+```py
+# module1.py
+print('This is a hello from module1')
+
+# pkg.__init__.py
+print("This is a hello from __init__")
+__all__ = ["module1"]
+
+# main.py
+from pkg import *
+
+# Output:
+
+"This is a hello from __init__"
+"This is a hello from module1"
+```
+
+You can always explicit import `module2` even it's not included in `__all__`.
+
+
+### Namespace package
+
+A namespace package (python 3.3+) is a special type of Python package that let you split a package across multiple directories or distribution packages.
+
+```
+path1/
+    my_namespace/
+        module_a.py
+        
+path2/
+    my_namespace/
+        module_b.py
+```
+
+Both directories contribute to `my_namespace` package.
+
+
+```
+project/
+├── plugin_a/
+│   └── my_app/
+│       └── plugins/
+│           └── analytics.py
+│
+└── plugin_b/
+    └── my_app/
+        └── plugins/
+            └── reporting.py
+
+```
+
+```py
+# All these will work after both plugins are installed
+from my_app.plugins import analytics
+from my_app.plugins import reporting
+
+# The namespace 'my_app.plugins' combines both locations
+```
 
 
 
+## Decorators
+
+Decorators are functions that take another function as input and return a modified version of that function. They use the @decorator syntax and are applied right before function/class definitions.
+
+```py
+def my_decorator(func):
+    def wrapper():
+        print("Something is happening before the function is called.")
+        func()
+        print("Something is happening after the function is called.")
+    return wrapper
+
+@my_decorator
+def say_hello():
+    print("Hello!")
+
+say_hello()
+```
 
 
-
-
+* Order matters: Decorators are applied from bottom to top
+* 
 
 ## Manipulate with Files
 
