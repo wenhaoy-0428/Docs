@@ -82,3 +82,7 @@ The major components of a RPC system includes
 ✅ **Performance-critical systems** (trading, IoT)  
 ✅ **Strong typing requirements**  
 ✅ **Stateful interactions** (e.g., real-time games)  
+
+
+### [System Design Global Payment Processing | Paypal](https://www.youtube.com/watch?v=7MXV7RfNtv0&t=1206s)
+
