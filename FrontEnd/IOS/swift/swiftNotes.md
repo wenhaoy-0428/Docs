@@ -125,15 +125,24 @@ someFunctionThatTakesAClosure(closure: {
 
 // Here's how you call this function with a trailing closure instead:
 
-someFunctionThatTakesAClosure() {
+someFunctionThatTakesAClosure {
     // trailing closure's body goes here
+}
+
+someFunctionThatTakesAClosure(argmuent1) {
+    // trailing closure's body goes here
+}
+
+// If closre also needs input parameter
+greet { message in  // 'message' is the parameter
+    print(message)  // Prints "Hello, Swift!"
 }
 ```
 
 Trailing Closure is greatly used in [SwiftUI](#swiftui). For example, creating a horizontal stack using `HStack`
 
 ```swift
-HStack() {
+HStack {
     landmark.image
         .resizable()
         .frame(width: 50, height: 50)
@@ -246,13 +255,18 @@ Using `do, try catch` can simplify the return type into a single type like `Stri
 
 > Do note that, a single do closure can handle multiple try statements, but once one try statement throws an error, the following statements will **not be executed**
 
-## Async
+## [some vs any](https://medium.com/@bakshioye/some-and-any-keyword-in-swift-8efaffaf8228)
+
+`some` only allows homogeneous collection, meaning only similar conforming type are allowed inside the collection. Meanwhile `any` allows heterogeneous collection meaning any conforming type is allowed inside the collection
+
+
+## Concurrency
 
 ### [@escaping closure](https://www.youtube.com/watch?v=7gg8iBH2fg4)
 
 Before Async/Await were introduced, the main approach to write async functions is to use @escaping closure.
 
-As how callback functions work, @escaping closure is marked as the callback. It tells the system that the closure will not return when the function returns.
+As how **callback** functions work, @escaping closure is marked as the callback. It tells the system that the closure will not return when the function returns.
 
 ```swift
 func downloadData(completionHandler: @escaping (_ data: String) -> ()) {
@@ -281,9 +295,130 @@ downloadData { [weak self] returnedData in
 
 The self in the callback function is a must, as when the function is called, it has to add up the number of reference to make sure the class is still alive. An performance improvement of this is to use [weak self](https://www.youtube.com/watch?v=TPHp9kR0Go8), which makes sure if the reference can be eliminated during process.
 
-## [some vs any](https://medium.com/@bakshioye/some-and-any-keyword-in-swift-8efaffaf8228)
+## Tasks
 
-`some` only allows homogeneous collection, meaning only similar conforming type are allowed inside the collection. Meanwhile `any` allows heterogeneous collection meaning any conforming type is allowed inside the collection
+`async / await` is a new syntax for using concurrency in swift.
+
+```swift
+func process() async {
+    let data = await fetchData() 
+    print(data)
+}
+```
+
+1. Async Functions Can Only Be Called in Async Contexts
+2.  Synchronous functions (e.g., viewDidLoad, button handlers, or main) must use **Task** to bridge into an async context.
+
+
+```swift
+// Synchronous function (e.g., UIKit button handler)
+func onButtonTap() {
+    // ✅ Use Task to call async code
+    Task {
+        let data = await fetchData()
+        print(data)
+    }
+}
+
+// ❌ Avoid this (unless the function itself is async)
+func badPractice() {
+    let data = await fetchData() // Error: Can't use 'await' here
+}
+```
+
+A task provides a ew async context for executing code concurrently. Each task run concurrently with respect to other execution context. Meaning nested tasks will still be independent to each other.
+
+```swift
+func fetchUserData() {
+    Task { // Parent Task (unstructured)
+        print("Parent task started")
+        
+        Task { // Child Task (unstructured)
+            print("Child task started")
+            try await Task.sleep(nanoseconds: 1_000_000_000)
+            print("Child task finished")
+        }
+        
+        print("Parent task continues immediately")
+    }
+}
+```
+
+The so called child Task runs independently of the parent.
+
+
+## Structured Concurrency / Unstructured Concurrency
+
+One confusion needs to be resolved is that concurrency is different from asynchronism. 
+
+```swift
+func fetchData() async throws {
+    let a = try await fetchA()  // (1)
+    let b = try await fetchB()  // (2)
+}
+```
+
+The above code is just sequential suspension/resumption, not concurrency.
+
+For concurrency to be structured, it has to be a clear scope like we write in normal sync functions.
+
+**1. Scoped to the current function or block**
+**2. Awaited before exiting the scope**
+
+By achieving this, **a parent-child hierarchy** is needed.
+
+1. Child tasks run independently and parent task only finishes when all child tasks finish (normally / abnormally).
+
+This can be done using 
+
+1. Async let 
+2. Task Group
+
+### Async let
+
+```swift
+func fetchData() async throws {
+    async let a = fetchA()  // Creates a CHILD task
+    async let b = fetchB()  // Creates another CHILD task
+    try await (a, b)        // Awaits both
+}
+```
+
+`async let` makes the binding async by creating a new child task, since tasks are independent and run concurrently, `a` and `b` will start executing immediately and concurrently. Only their result will be awaited when needed.
+
+Check detail from [WWDC21: Explore structured concurrency in Swift | Apple](https://youtu.be/nyuq9qc-2H8?t=352)
+
+However, `async let` can not be used in loops, as its Scope enforcement is done by compile time. Therefore, we can use [TaskGroup](#taskgroup) to dynamically add tasks.
+
+## TaskGroup
+
+
+```swift
+await withTaskGroup(of: Data.self) { group in
+    let photoNames = await listPhotos(inGallery: "Summer Vacation")
+    for name in photoNames {
+        group.addTask {
+            return await downloadPhoto(named: name)
+        }
+    }
+
+
+    for await photo in group {
+        show(photo)
+    }
+}
+```
+
+
+> There’s no guarantee about the order that child tasks complete, so the photos from this gallery can be shown in any order.
+
+
+
+
+
+
+
+
 
 ## Actor
 

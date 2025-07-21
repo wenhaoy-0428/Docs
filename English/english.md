@@ -104,3 +104,25 @@ We will however be avoiding any **superfluous** tooling, with the aim of keeping
 Manual mocks are used to stub out functionality with mock data. For example, instead of accessing a remote resource like a website or a database, you might want to create a manual mock that allows you to use fake data. This ensures your tests will be fast and not **flaky**.
 
 [*Jest-Manual-Mocks*](https://jestjs.io/docs/manual-mocks)
+
+
+it throw me for a loop
+
+> 我懵逼了
+
+I'm drawing a blank
+
+> 我一下子想不起来了
+
+six feet under
+
+> 去世了
+
+I've got a lot on my plate
+
+> 我很忙
+
+
+
+
+

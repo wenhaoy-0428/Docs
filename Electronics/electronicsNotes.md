@@ -118,6 +118,27 @@ Inductance is determined by the same factor of [magnetic flux](#magnetic-flux) a
 
 # Electromagnetism
 
+
+### Magnetic Flux
+
+
+A magnet can create a magnetic filed. A maganetic filed has lines of forces and poles. The lines of forces are known as Menetic flux.
+
+Magnetic fields are always shown visually as lines of force that give a definite pole at each end of the material where the flux lines are more dense and concentrated. **The lines which go to make up a magnetic field showing the direction and intensity are called Lines of Force or more commonly “Magnetic Flux”** and are given the Greek symbol, Phi ( Φ )
+
+
+Magnetic flux density is a measurement of the total magnetic field which passes through a given area. 
+
+For a closed circuit, the following changes can affect the magnetic flux density.
+
+1. increasing current.
+2. increasing the number of turns in a coil.
+3. inserting a magnet into **center** of the coil.
+
+
+
+### Electromagnetism
+
 When a wire has current flowing, a magnetic ring is created around the wire.
 
 ![magnetic_ring](Assets/v2-f028dfbbae85bbc14b84c484fe0073a3_1440w.jpg)
@@ -136,15 +157,13 @@ If we convert the wire into a coil, the rings are next to each other and can be 
 ![coil_magnetic](Assets/Screenshot%202023-12-29%20at%2017.08.58.png)
 
 
-### Magnetic Flux
+Electromagnetism around a Loop
 
-Magnetic flux is a measurement of the total magnetic field which passes through a given area. 
+![elecro](./Assets/electromagnetism-mag11.webp)
 
-For a closed circuit, the following changes can affect the magnetic flux.
+the two magnetic fields therefore help each other by generating a north and a south pole along this line of interaction. This results in the magnetic field being strongest in the middle between the two conductors
 
-1. increasing current.
-2. increasing the number of turns in a coil.
-3. inserting a magnet into **center** of the coil.
+
 
 ### [Faraday's Law and Lenz's Law](https://www.khanacademy.org/science/physics/magnetic-forces-and-magnetic-fields/magnetic-flux-faradays-law/a/what-is-faradays-law)
 
@@ -152,7 +171,7 @@ When the magnetic fields ([magnetic flux](#magnetic-flux)) changes, this will in
 
 > It's the **changes** of magnetic flux cause the EMF, not magnetic flux cause EMF.
 
-> **Also inducted current same as normal current will also create a new magnetic field**
+> **Also induced current same as normal current will also create a new magnetic field**
 
 The magnitude of the EMF is described by **Faraday's law.**
 
@@ -194,5 +213,5 @@ In a LC circuit, the charged Capacitor will discharge and convert the electric e
 ![LC_OSCILLATING_CIRCUIT](./Assets/Screenshot%202024-01-25%20at%2001.31.16.png)
 
 
-
+https://www.electronics-tutorials.ws/
 
