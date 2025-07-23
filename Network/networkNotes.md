@@ -228,3 +228,55 @@ To better understand how macvlan works. Refer to [macvlan for beginners](https:/
 Masquerade is essentially an IP address NAT translation. It enables to translate packets originally from multiple addresses to looks like originally from a single IP address specified. Thus, it enables to hide multiple IP addresses and only expose the one you specific as public. Refer to [Masquerade (hide) NAT from IBM](https://www.ibm.com/docs/en/i/7.2?topic=translation-masquerade-hide-nat) for more details
 
 # iptable
+
+
+## NAT Traversal
+
+One way of connecting devices / services in a private network is use **Port Forwarding** that is enabled in the parent routers. However, this requires the parent router to have a public IP.
+
+When we don't have a public IP address in the root router, we can still use a server that sits between the client and the service in the private network to bridge the connection. This is called NAT Traversal.
+
+### Cloudflare
+
+There're many NAT traversal services out there, but the Zero Trust of Cloudflare is a service to security framework that provides secure remote access to applications and services.
+
+> Zero Trust is a security model that says to trust nobody from inside/outside of the network, wheres, **Zero Trust Network Access(ZTNA)** is such an implementation of the model by Cloudflare.
+
+ZTNA allows us to connect to the internal network in 2 approaches
+
+1. Through domain name to expose a service, like HTTP
+
+![service](./Assets/cloudflare_zero_trust_http.webp)
+
+> This requires a domain name
+
+1. Though private network, this exposes the whole private network just like a vpn.
+
+![private_network](./Assets/cloudflare_zero_trust.webp)
+
+> This requires the client to connect to the cloudflare network using **Warp**
+
+#### Setup
+
+For both approaches, **a cloudflare daemon** is required, to expose the private network/service to the Cloudflare network through **Tunnel**
+
+For a service: 
+
+follow the documentation [Create a tunnel (dashboard)](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/get-started/create-remote-tunnel/) for reference to create a tunnel and setup `cloudflared` on the server device.
+
+For serving the private network
+
+following the documentation [Connect to private network](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/private-net/cloudflared/)
+
+> Warp needs to be installed on the end user's device and [logged in](https://developers.cloudflare.com/cloudflare-one/connections/connect-devices/warp/deployment/manual-deployment/)
+
+Also, the [Split Tunnel needs to be configured](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/private-net/cloudflared/#3-route-private-network-ips-through-warp).
+
+It's also recommended to configure Access Policy to make sure the network is restricted to authenticated users only.
+
+By the end of this setup, the exposed private network like `192.168.*` can be directly visited with **Warp** open, even though the connecting device is not connecting to the private network.
+
+
+### Bonus
+
+In order to ask WSL to enable ssh on windows boot, 
