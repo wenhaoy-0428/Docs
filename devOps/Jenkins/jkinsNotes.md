@@ -152,6 +152,147 @@ pipeline {
 - Enables "Pipeline as Code" approach
 - Version controlled with the application code
 
+[Pipeline syntax can be divided into 2 categories](https://www.jenkins.io/doc/book/pipeline/#pipeline-syntax-overview):
+
+##### **Declarative Pipeline**
+- **Newer, recommended syntax** (introduced in Pipeline 2.5)
+- More structured and opinionated approach
+- Easier to read and write for beginners
+- Built-in validation and error handling
+- Automatically generates stage view in Jenkins UI
+
+**Basic Structure:**
+```groovy
+pipeline {
+    agent any
+    
+    stages {
+        stage('Build') {
+            steps {
+                echo 'Building the application'
+            }
+        }
+        stage('Test') {
+            steps {
+                echo 'Running tests'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                echo 'Deploying application'
+            }
+        }
+    }
+}
+```
+
+**Key Components:**
+- `pipeline {}` - Root block that contains the entire pipeline
+- `agent` - Specifies where the pipeline should run
+- `stages {}` - Contains all the pipeline stages
+- `stage('name') {}` - Individual pipeline stage
+- `steps {}` - Contains the actual commands to execute
+- `post {}` - Actions to run after pipeline completion
+
+##### **Scripted Pipeline**
+- **Original syntax** based on Groovy DSL
+- More flexible and programmatic approach
+- Requires more Groovy/programming knowledge
+- Better for complex conditional logic and dynamic pipelines
+- Uses `node` blocks instead of `pipeline` blocks
+
+**Basic Structure:**
+```groovy
+node {
+    stage('Build') {
+        echo 'Building the application'
+    }
+    
+    stage('Test') {
+        echo 'Running tests'
+    }
+    
+    stage('Deploy') {
+        echo 'Deploying application'
+    }
+}
+```
+
+**Key Differences:**
+| Aspect           | Declarative            | Scripted              |
+| ---------------- | ---------------------- | --------------------- |
+| Learning Curve   | Easier                 | Steeper               |
+| Flexibility      | Limited but sufficient | Highly flexible       |
+| Error Handling   | Built-in               | Manual implementation |
+| Validation       | Automatic              | Manual                |
+| Groovy Knowledge | Minimal                | Extensive             |
+
+##### **Common Pipeline Elements**
+
+**Environment Variables:**
+```groovy
+// Declarative
+pipeline {
+    environment {
+        DEPLOY_ENV = 'staging'
+        API_KEY = credentials('api-key-id')
+    }
+    // stages...
+}
+
+// Scripted
+node {
+    env.DEPLOY_ENV = 'staging'
+    withCredentials([string(credentialsId: 'api-key-id', variable: 'API_KEY')]) {
+        // stages...
+    }
+}
+```
+
+**Conditional Execution:**
+```groovy
+// Declarative
+stage('Deploy to Production') {
+    when {
+        branch 'main'
+    }
+    steps {
+        echo 'Deploying to production'
+    }
+}
+
+// Scripted
+stage('Deploy to Production') {
+    if (env.BRANCH_NAME == 'main') {
+        echo 'Deploying to production'
+    }
+}
+```
+
+**Post Actions:**
+```groovy
+// Declarative
+post {
+    always {
+        cleanWs()
+    }
+    success {
+        emailext subject: 'Pipeline Success', body: 'Build completed successfully'
+    }
+    failure {
+        emailext subject: 'Pipeline Failed', body: 'Build failed'
+    }
+}
+```
+
+##### **Best Practices**
+- **Start with Declarative**: Easier to learn and maintain
+- **Use version control**: Always commit Jenkinsfile to your repository
+- **Keep it simple**: Break complex logic into separate functions or scripts
+- **Use shared libraries**: For reusable pipeline code across projects
+- **Implement proper error handling**: Use try-catch blocks and post actions
+- **Use meaningful stage names**: Makes it easier to track progress in UI
+
 #### 7. **Plugins**
 - Extend Jenkins functionality
 - Over 1,800+ plugins available
