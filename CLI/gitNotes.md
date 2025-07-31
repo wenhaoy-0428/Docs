@@ -157,6 +157,10 @@ git rm --cached <file>
 * `git log A..B` and `git log A...B` show the difference of B from A (basically saying all commits of B since the common ancestor), and the difference between A and B (commits that not both A and B have).
 
 
-
-
 ---
+
+## Git Large File Storage
+
+[Managing Large Files](https://docs.github.com/en/repositories/working-with-files/managing-large-files)
+
+1. [How to remove that was added in an earlier commit](https://docs.github.com/en/repositories/working-with-files/managing-large-files/about-large-files-on-github#removing-a-file-that-was-added-in-an-earlier-commit)
