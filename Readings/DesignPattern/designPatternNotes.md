@@ -242,3 +242,313 @@ Composite Pattern is all about building the a tree structure and share the compo
 
 ![composite_pattern](Assets/Screenshot%202023-09-11%20at%2017.38.49.png)
 
+
+
+## Data Access Patterns
+
+[Data Access Patterns: the Features of the Main Data Access Patterns Applied in Software Industry](https://medium.com/mastering-software-engineering/data-access-patterns-the-features-of-the-main-data-access-patterns-applied-in-software-industry-6eff86906b4e)
+
+1. Table Data Gateway
+2. Row Data Gateway
+3. Active Record
+4. Data Mapper
+5. **Repository**
+6. Data Access Object (DAO)
+
+### Table Data Gateway
+
+TL;DR
+
+An abstraction that encapsulates the access for the database table. Now, the `DataGateWay` class represents the **table**.
+
+One instance per table (e.g., one ChatMessageGateway for all rows).
+
+> It accepts a **Row** and returns a **row**. It only encapsulates away the `SQL`. It's clear the input parameters maps the row **exactly**.
+
+![table_data_gateway](./Assets/table_gateway.webp)
+
+
+```ts
+// Table Gateway Row (raw data matching table schema)
+interface ChatMessageRow {
+  id: number;
+  content: string;
+  role: string;
+  session_id: number; // Matches database column
+}
+
+// Table Gateway Interface and Implementation
+interface ChatMessageGateway {
+  findBySessionId(sessionId: number): Promise<ChatMessageRow[]>;
+  insert(row: ChatMessageRow): Promise<void>;
+}
+
+class SqlChatMessageGateway implements ChatMessageGateway {
+  async findBySessionId(sessionId: number): Promise<ChatMessageRow[]> {
+    // Return raw rows matching table schema
+    const records = await db.query('SELECT * FROM ChatMessages WHERE session_id = ?', [sessionId]);
+    return records.map((record: any) => ({
+      id: record.id,
+      content: record.content,
+      role: record.role,
+      session_id: record.session_id, // Keep database column name
+    }));
+  }
+
+  async insert(row: ChatMessageRow): Promise<void> {
+    await db.query('INSERT INTO ChatMessages (id, content, role, session_id) VALUES (?, ?, ?, ?)', [
+      row.id,
+      row.content,
+      row.role,
+      row.session_id,
+    ]);
+  }
+}
+```
+
+
+### Row Data Gateway
+
+TL;DR
+
+It acts as an in-memory representation of a single database row, providing methods to perform CRUD operations (Create, Read, Update, Delete) directly on that row.
+
+One instance per row (e.g., one ChatMessageGateway per message row).
+
+Typically, a static method called `finder` is used for fetching, and instance methods including `insert`, `delete` and `update`.
+
+> with the Row Data Gateway Pattern, creating a new row typically involves manually mapping your domain object (e.g., ChatMessage) to a Row Data Gateway object (e.g., ChatMessageGateway) and then calling its insert() method to save it to the database. This is because the Row Data Gateway Pattern is a low-level, row-specific pattern that directly represents a single database row, with properties matching the table’s schema and methods to manipulate that row (e.g., insert, update, delete).
+
+```ts
+// Domain Objects
+class ChatMessage {
+  constructor(
+    public id: number,
+    public content: string,
+    public role: "user" | "assistant",
+    public sessionId: number
+  ) {}
+
+  validate(): void {
+    if (!["user", "assistant"].includes(this.role)) {
+      throw new Error("Invalid role: must be 'user' or 'assistant'.");
+    }
+    if (!this.content.trim()) {
+      throw new Error("Message content cannot be empty.");
+    }
+  }
+}
+
+
+// Row Data Gateway
+class ChatMessageGateway {
+  constructor(
+    public id: number,
+    public content: string,
+    public role: string,
+    public session_id: number
+  ) {}
+
+  static async findById(id: number): Promise<ChatMessageGateway | null> {
+    const record = await db.query('SELECT * FROM ChatMessages WHERE id = ?', [id]);
+    return record
+      ? new ChatMessageGateway(record.id, record.content, record.role, record.session_id)
+      : null;
+  }
+
+  async insert(): Promise<void> {
+    await db.query('INSERT INTO ChatMessages (id, content, role, session_id) VALUES (?, ?, ?, ?)', [
+      this.id,
+      this.content,
+      this.role,
+      this.session_id,
+    ]);
+  }
+
+  async update(): Promise<void> {
+    await db.query('UPDATE ChatMessages SET content = ?, role = ?, session_id = ? WHERE id = ?', [
+      this.content,
+      this.role,
+      this.session_id,
+      this.id,
+    ]);
+  }
+
+  async delete(): Promise<void> {
+    await db.query('DELETE FROM ChatMessages WHERE id = ?', [this.id]);
+  }
+}
+
+// manual mapping
+const messageGateway = new ChatMessageGateway(101, "Hello!", "user", 1);
+```
+
+### Active Record
+
+TL;DR
+
+Put everything together, domain, logic, persistence logic.
+
+![active_record](./Assets/active_record.webp)
+
+### Data Mapper
+
+TL;DR
+
+Just an intermediate layer that automatically maps between domain objects (`ChatMessage`) and database data (e.g., rows or DTOs) You don’t manually map; the mapper handles it (e.g., ChatSessionMapper.toPersistence).
+
+> Focuses on mapping data (rows to objects and vice versa). **No domain logic—it just maps data (e.g., joining users and orders tables to populate the User’s orders).**
+
+> It's ok to have one instance of the mapping with more that one corresponding database entity, **One instance represents one domain model**. So the input/output is a domain object.
+
+
+**Structure**
+
+1. **Domain Object**: Represents the business entity with no knowledge of persistence.
+2. **Data Mapper**: A class responsible for mapping between the domain object and the data source (e.g., database tables).
+3. **Data Source**: The underlying storage (e.g., SQL database, NoSQL, or file system).
+
+
+
+Suitable for applications with complex data transformations or when domain objects don’t align directly with database tables.
+
+```ts
+// Domain Object
+class User {
+  constructor(public id: number, public name: string) {}
+}
+
+// Data Mapper
+class UserMapper {
+  async findById(id: number): Promise<User> {
+    // Simulate database query
+    const record = await db.query('SELECT * FROM users WHERE id = ?', [id]);
+    return new User(record.id, record.name);
+  }
+
+  async save(user: User): Promise<void> {
+    // Simulate saving to database
+    await db.query('INSERT INTO users (id, name) VALUES (?, ?)', [user.id, user.name]);
+  }
+}
+
+// Usage
+async function main() {
+  const userMapper = new UserMapper();
+  const user = new User(1, "Alice");
+  await userMapper.save(user);
+  const fetchedUser = await userMapper.findById(1);
+  console.log(fetchedUser); // Output: User { id: 1, name: 'Alice' }
+}
+```
+
+
+### **Repository**
+
+A high-level domain tool that provides a collection-like interface of **aggregate roots** for managing domain objects, enforcing business rules, and coordinating persistence (e.g., transactions, validation).
+
+When testing: 
+
+You’d mock the entire repository interface to test business logic, without worrying about database details.
+
+Whereas, for Data Mapper, you’d mock the database queries or results to test the mapping logic.
+
+> It's common to use [Data Mapper](#data-mapper) with Repository.
+
+In DDD, repositories are created for aggregate roots (ChatSession), not child entities (ChatMessage), **One repository per aggregate root**.
+
+The key of Repository pattern is that it enforces domain logic like, **Validates that the user has a valid name before saving.**, but these logics should be restricted to persistence, instead of heavy business logics.
+
+
+```ts
+// Domain Object
+class User {
+  constructor(public id: number, public name: string) {}
+}
+
+// Data Mapper
+class UserMapper {
+  async findById(id: number): Promise<User> {
+    const record = await db.query('SELECT * FROM users WHERE id = ?', [id]);
+    return new User(record.id, record.name);
+  }
+
+  async save(user: User): Promise<void> {
+    await db.query('INSERT INTO users (id, name) VALUES (?, ?)', [user.id, user.name]);
+  }
+}
+
+// Repository
+interface UserRepository {
+  findById(id: number): Promise<User>;
+  save(user: User): Promise<void>;
+}
+
+class SqlUserRepository implements UserRepository {
+  constructor(private mapper: UserMapper) {}
+
+  async findById(id: number): Promise<User> {
+    return this.mapper.findById(id);
+  }
+
+  async save(user: User): Promise<void> {
+    await this.mapper.save(user);
+  }
+}
+
+// Usage
+// 4. Usage in Business Logic
+class UserService {
+  constructor(private userRepository: UserRepository) {}
+
+  async createUser(id: number, name: string): Promise<void> {
+    const user = new User(id, name);
+    await this.userRepository.save(user);
+  }
+
+  async getUser(id: number): Promise<User> {
+    return this.userRepository.getById(id);
+  }
+}
+```
+
+
+### Data Access Object
+
+TL;DR;
+
+The DAO pattern provides a standardized interface for accessing data from a persistent storage system
+
+**One DAO per entity/table**
+
+Focus: Direct database operations for specific tables (ChatSessions, ChatMessages).
+Data Representation: Works with DTOs (ChatSessionDTO, ChatMessageDTO) that closely mirror the database schema (e.g., user_id, session_id).
+
+Difference between Data Mapper is that, **it accepts/returns DTOs, not domain object**.
+
+```ts
+
+// DTOs for DAO
+interface ChatSessionDTO {
+  id: number;
+  user_id: number;
+}
+
+interface ChatMessageDTO {
+  id: number;
+  content: string;
+  role: "user" | "assistant";
+  sessionId: number;
+}
+
+// DAO Interfaces and Implementations
+interface ChatSessionDAO {
+  findById(id: number): Promise<ChatSessionDTO | null>;
+  save(dto: ChatSessionDTO): Promise<void>;
+}
+
+interface ChatMessageDAO {
+  findBySessionId(sessionId: number): Promise<ChatMessageDTO[]>;
+  save(dto: ChatMessageDTO): Promise<void>;
+}
+```
