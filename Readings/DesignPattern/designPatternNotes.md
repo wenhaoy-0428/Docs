@@ -552,3 +552,13 @@ interface ChatMessageDAO {
   save(dto: ChatMessageDTO): Promise<void>;
 }
 ```
+
+## Domain Driven Design
+
+[To follow DDD patterns, entities must not have public setters in any entity property. Changes in an entity should be driven by explicit methods with explicit ubiquitous language about the change they're performing in the entity.](https://learn.microsoft.com/en-us/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/net-core-microservice-domain-model)
+
+
+You should not create or update OrderItems objects independently or directly; the AggregateRoot class must keep control and consistency of any update operation against its child entities.
+
+ 
+![domain driven design](./Assets/Screenshot%202025-08-22%20at%202.47.54 PM.png)
