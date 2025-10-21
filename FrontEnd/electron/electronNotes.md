@@ -188,9 +188,88 @@ The difference from pattern 1 is that `handle` will have a return value that inv
 ### [Pattern 3: Main to renderer](https://www.electronjs.org/docs/latest/tutorial/ipc#pattern-3-main-to-renderer)
 
 
-When sending a message from the main process to a renderer process, you need to specify which renderer is receiving the message. Messages need to be sent to a renderer process via its WebContents instance
+When sending a message from the main process to a renderer process, you need to specify which renderer is receiving the message. Messages need to be sent to a renderer process via its `WebContents` instance
+
+```js
+click: () => mainWindow.webContents.send('update-counter', -1)
+```
+
+```js
+// main.js
+const { app, BrowserWindow, Menu, ipcMain } = require('electron')
+
+const path = require('node:path')
+
+function createWindow () {
+  const mainWindow = new BrowserWindow({
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js')
+    }
+  })
+
+  const menu = Menu.buildFromTemplate([
+    {
+      label: app.name,
+      submenu: [
+        {
+          click: () => mainWindow.webContents.send('update-counter', 1),
+          label: 'Increment'
+        },
+        {
+          click: () => mainWindow.webContents.send('update-counter', -1),
+          label: 'Decrement'
+        }
+      ]
+    }
+  ])
+  Menu.setApplicationMenu(menu)
+
+  mainWindow.loadFile('index.html')
+}
+// ...
+```
+
+```js
+// preload.js omitted
+```
+
+```js
+// renderer.js
+const counter = document.getElementById('counter')
+
+window.electronAPI.onUpdateCounter((value) => {
+  const oldValue = Number(counter.innerText)
+  const newValue = oldValue + value
+  counter.innerText = newValue.toString()
+})
+```
+
+#### Return value
+
+Unlike `ipcRenderer.invoke` that can have a return value, we can only achive the return value by passing an additional `ipcRenderer.send` within the callback funcion.
 
 
+```js
+// preload.js
+const { contextBridge, ipcRenderer } = require('electron')
+
+contextBridge.exposeInMainWorld('electronAPI', {
+  onUpdateCounter: (callback) => ipcRenderer.on('update-counter', (_event, value) => callback(value)),
+  counterValue: (value) => ipcRenderer.send('counter-value', value)
+})
+```
+
+```js
+// renderer.js
+const counter = document.getElementById('counter')
+
+window.electronAPI.onUpdateCounter((value) => {
+  const oldValue = Number(counter.innerText)
+  const newValue = oldValue + value
+  counter.innerText = newValue.toString()
+  window.electronAPI.counterValue(newValue)
+})
+```
 
 
 
@@ -206,4 +285,140 @@ An Electron app can always **prefer** the UtilityProcess API over Node.js `child
 ## Context Isolation
 
 Context Isolation is a feature that ensures that both your **preload scripts** and Electron's **internal** logic run in a separate context to the website you load in a `webContents` (html).
+
+## Sandbox
+
+### Sandbox-Renderer Process
+
+When renderer processes in Electron are sandboxed, they behave in the same way as a regular Chrome renderer would. **A sandboxed renderer won't have a Node.js environment initialized**.
+
+
+### Sandbox-Preload Scripts
+
+Because the `require` function in **preload scripts** is a polyfill with limited functionality, you will not be able to use `CommonJS modules` to separate your preload script into multiple files. If you need to split your preload code, use a bundler such as `webpack` or `Parcel`.
+
+### Disable sandboxing
+
+In Electron, renderer sandboxing can be disabled on a per-process basis with the `sandbox: false` preference in the BrowserWindow constructor **or** whenever **Node.js integration is enabled** in the renderer.
+
+
+```js
+const win = new BrowserWindow({
+    webPreferences: {
+      sandbox: false
+    }
+  })
+// or
+const win = new BrowserWindow({
+    webPreferences: {
+      nodeIntegration: true
+    }
+  })
+```
+
+
+## Performance
+
+1. [Analyze runtime performance](https://developer.chrome.com/docs/devtools/performance/)
+
+### Analyze module 
+
+``` bash
+node --cpu-prof --heap-prof -e "require('request')"
+```
+
+### Loading and running code too soon
+
+Bad example, where loading `foo-parser` module can be very expensive
+
+```js
+const fs = require('node:fs')
+
+const fooParser = require('foo-parser')
+
+class Parser {
+  constructor () {
+    this.files = fs.readdirSync('.')
+  }
+
+  getParsedFiles () {
+    return fooParser.parse(this.files)
+  }
+}
+
+const parser = new Parser()
+
+module.exports = { parser }
+```
+
+instead, we can defer loading the module only when needed, e.g. when `getParsedFiles` is called
+
+```js
+// "fs" is likely already being loaded, so the `require()` call is cheap
+const fs = require('node:fs')
+
+class Parser {
+  async getFiles () {
+    // Touch the disk as soon as `getFiles` is called, not sooner.
+    // Also, ensure that we're not blocking other operations by using
+    // the asynchronous version.
+    this.files = this.files || await fs.promises.readdir('.')
+
+    return this.files
+  }
+
+  async getParsedFiles () {
+    // Our fictitious foo-parser is a big and expensive module to load, so
+    // defer that work until we actually need to parse files.
+    // Since `require()` comes with a module cache, the `require()` call
+    // will only be expensive once - subsequent calls of `getParsedFiles()`
+    // will be faster.
+    const fooParser = require('foo-parser')
+    const files = await this.getFiles()
+
+    return fooParser.parse(files)
+  }
+}
+
+// This operation is now a lot cheaper than in our previous example
+const parser = new Parser()
+
+module.exports = { parser }
+```
+
+[Reference](https://www.electronjs.org/docs/latest/tutorial/performance#how-1)
+
+
+> Scope of `requrie`
+
+```js
+function processData() {
+    const path = require('path'); // Only available in this function
+    return path.join('folder', 'file.txt');
+}
+
+console.log(path); // ❌ ReferenceError: path is not defined
+```
+
+However, even if you require the same module in different scopes, Node.js returns the cached instance.
+
+```js
+function funcA() {
+    const moment = require('moment');
+    return moment().format();
+}
+
+function funcB() {
+    const moment = require('moment'); // Same cached instance
+    return moment().add(1, 'day');
+}
+```
+
+### Process
+
+Electron's powerful multi-process architecture stands ready to assist you with your long-running tasks. The **main process** handles windows, interactions, and the communication between various components inside your app. It also houses the **UI thread**.
+
+
+
+
 
