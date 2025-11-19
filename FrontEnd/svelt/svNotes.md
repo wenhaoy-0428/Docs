@@ -260,3 +260,106 @@ Since Svetle works like **the component ‘runs’ once, and subsequent updates 
 
 
 ### Binding
+
+In Svelte, binding creates a two-way connection between a variable in your script and an element in your template. When one changes, the other automatically updates.
+
+Take input as an exmaple, where we can define a `state` and use an event handler to update its value. 
+
+```js
+<script>
+	let name = $state('world');
+</script>
+
+<input oninput={(e) => {name = e.target.value}} value={name} />
+
+<h1>Hello {name}!</h1>
+```
+
+We can also use `binding` to reduce the boilerplate code
+
+
+```js
+<script>
+	let name = $state('world');
+</script>
+
+<input bind:value={name} />
+
+<h1>Hello {name}!</h1>
+```
+
+
+### className
+
+There's a shorthand of assigning `className` with the same state.
+
+
+```js
+<script>
+	let flipped = $state(false);
+</script>
+
+<button
+		class="card {flipped ? 'flipped' : ''}"
+		onclick={() => flipped = !flipped}
+	>
+
+
+<button
+	class={["card", { flipped }]}
+	onclick={() => flipped = !flipped}
+>
+```
+
+
+Sometimes, in order to control the style of the child, we can use custom css variable
+
+
+```js
+// box
+<style>
+	.box {
+		width: 5em;
+		height: 5em;
+		border-radius: 0.5em;
+		margin: 0 0 1em 0;
+		background-color: var(--color, #ddd); // here
+	}
+</style>
+
+// parent
+<div class="boxes">
+	<Box --color="red" />
+	<Box --color="green" />
+	<Box --color="blue" />
+</div>
+```
+
+> since css can only be applied to real DOM, while `Box` is not, this feature works by wrapping each component in an element with `display: contents`, where needed, and applying the custom properties to it. If you inspect the elements, you’ll see markup like this:
+
+```js
+<svelte-css-wrapper style="display: contents; --color: red;">
+	<!-- contents -->
+</svelte-css-wrapper>
+```
+
+> Because of display: contents this won’t affect your layout, but the extra element can affect selectors like .parent > .child.
+
+Also, we can define global css to control the children, but this approach is regarded rude and should be used as the last resort.
+
+```js
+// parent
+<style>
+	.boxes :global(.box:nth-child(1)) {
+		background-color: red;
+	}
+
+	.boxes :global(.box:nth-child(2)) {
+		background-color: green;
+	}
+
+	.boxes :global(.box:nth-child(3)) {
+		background-color: blue;
+	}
+</style>
+```
