@@ -195,6 +195,91 @@ As mentioned in the [Persistent Volume](#persistent-volume), PV are resource man
 
 To create a PV, the administrators have to **MANUALLY** create one with provisions. This is certainly undesirable. Therefore, to automate the process, administrators can declare Storage Classes with provisioners (the backend, e.g Google Cloud). So that when requested, PV can be dynamically created. 
 
+### Service
+
+
+In Kubernetes, a **Service** is a method for exposing a network application that is running as one or more Pods in your cluster.
+
+> A single service is bound to one or more pods
+
+
+Each Pod gets its own IP address (Kubernetes expects network plugins to ensure this). For a given Deployment in your cluster, the set of Pods running in one moment in time could be different from the set of Pods running that application a moment later.
+
+This leads to a problem: if some set of Pods (call them "backends") provides functionality to other Pods (call them "frontends") inside your cluster, how do the frontends find out and keep track of which IP address to connect to, so that the frontend can use the backend part of the workload?
+
+To solve this we can define a service `ClusterIP`
+
+Service 的 ClusterIP 就是给它背后那一群 Pod 起了一个『统一入口』，集群内只要访问这个 IP（或更常见的 DNS 名）就能落到其中某一个 Pod 上.
+
+> Choosing `ClusterIP` makes the Service only reachable from within the cluster.
+
+
+
+
+
+### Ingress
+
+
+If your workload speaks HTTP, you might choose to use an Ingress to control how web traffic reaches that workload. Ingress is not a Service type, but it acts as the entry point for your cluster. **An Ingress lets you consolidate your routing rules into a single resource**, so that you can expose multiple components of your workload, running separately in your cluster, behind a single listener.
+
+
+Regard an Ingress as a routing table, it defines with hostname maps to which service.
+
+In order for the ingress to work, we need a ingress controller which is actually a pod doing the job to handle the routing. example controllers are `ingress-nginx`
+
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: demo-ingress
+  namespace: demo
+  annotations:
+    # 下面两行只有用 nginx-ingress 时才需要，可按需删
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  # 指定由哪个 IngressClass 处理；集群里必须已部署同名 Controller
+  ingressClassName: nginx
+  rules:
+  - host: demo.example.com      # 改成本机 hosts 能解析的域名
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: nginx-svc
+            port:
+              number: 80
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: whoami-svc
+            port:
+              number: 80
+  # 如果想强制 HTTPS，可再配 tls: 段落
+```
+
+Here, it defines `demo.example.com` maps to `nginx-svc` service. 
+
+Here, it declares that `demo.example.com` should be routed to the Service named `nginx-svc`; it is simply telling the Ingress Controller, **“Look up the Endpoints behind nginx-svc and give me the list.”**
+
+> The Controller then forwards traffic **straight to those Pod IPs** at their target ports, never touching the ClusterIP.
+
+Thus the Service acts only as a label-based finder plus port spec, not as a hop in the data path.
+
+
+
+### Ingress Controller
+
+
+Ingress Controller 本身就是一个（或一组）Pod；给它再配一个 Service of type NodePort 就等于在运行它的每个节点上都挖了一个 30000–32767 范围内的高端口。任何客户端只要访问 <任意节点IP>:那个NodePort 就能把流量送进 Controller Pod，于是整个 Ingress 通路就通了。
+
+当Ingress Controller被设置为Loadbalancer时，asks the **cloud provider** to create an external cloud load balancer， and
+a) 向外网申请一个真正的 云负载均衡器（AWS ELB/ALB、GCP GLB、阿里云 SLB…）；
+b) 把云 LB 的后端池指向集群里 所有节点 的 NodePort（k8s 会自动创建对应的 NodePort 即使你没显式写）；
+c) 把云 LB 的公网 IP 写回 Service 的 status.loadBalancer.ingress 字段。
 
 
 
@@ -452,6 +537,57 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 kubectl apply -f <add-on.yaml>
 ```
 
+
+### Install Ingress Controller
+
+
+```bash
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo update
+helm -n ingress-nginx install ingress-nginx ingress-nginx/ingress-nginx --create-namespace
+```
+
+### install MetalLB
+
+If we define Ingress Controller to be type of `NodePort`, later when visiting, we have to define
+domain name with port, which is inconnvinent, thus, a better approach is to define a LoadBalancer.
+
+```bash
+helm repo add metallb https://metallb.github.io/metallb
+kubectl create namespace metallb-system
+helm install metallb metallb/metallb
+```
+
+Also apply config for configuring ip address pool
+
+```bash
+cat > metallb-config.yaml << 'EOF'
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: default-pool
+  namespace: metallb-system
+spec:
+  addresses:
+  - 10.21.10.200-10.21.10.210  # 📍 使用你的节点网段
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: default-advertisement
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+  - default-pool
+EOF
+```
+
+> For the addresses, this has to be the same net for your local network, so that others can access.
+
+```bash
+kubectl apply -f metallb-config.yaml
+```
+
 #### Install Longhorn
 
 For Storage, install https://longhorn.io/docs/1.10.1/deploy/install/install-with-helm/
@@ -465,9 +601,81 @@ helm show values <release name>
 
 to use get the confiration file, and update reclaim policy to `Retain`
 
+```bash
+reclaimPolicy: Retain
 ```
 
+###### enable Longhorn UI
+
+Enable xieIngress in `longhorn-values.yaml`
+
+```yaml
+ingress:
+  # -- Setting that allows Longhorn to generate ingress records for the Longhorn UI service.
+  enabled: true
+  ingressClassName: nginx
+  # -- Hostname of the Layer 7 load balancer.
+  host: longhorn.cares-copilot.com
+  ....
+  annotations:
+    # type of authentication
+    nginx.ingress.kubernetes.io/auth-type: basic
+    # prevent the controller from redirecting (308) to HTTPS
+    nginx.ingress.kubernetes.io/ssl-redirect: 'false'
+    # name of the secret that contains the user/password definitions
+    nginx.ingress.kubernetes.io/auth-secret: basic-auth
+    # message to display with an appropriate context why the authentication is required
+    nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required '
+    # custom max body size for file uploading like backing image uploading
+    nginx.ingress.kubernetes.io/proxy-body-size: 10000m
+
 ```
+
+create Auth credential for admin using secret with name `basic-auth`, https://longhorn.io/docs/1.10.1/deploy/accessing-the-ui/longhorn-ingress/
+
+```bash
+$ USER=<USERNAME_HERE>; PASSWORD=<PASSWORD_HERE>; echo "${USER}:$(openssl passwd -stdin -apr1 <<< ${PASSWORD})" >> auth
+
+# USER=longhorn_admin; PASSWORD=ujFkycnf1Awp; echo "${USER}:$(openssl passwd -stdin -apr1 <<< ${PASSWORD})" >> auth
+
+
+kubectl -n longhorn-system create secret generic basic-auth --from-file=auth
+```
+
+#### Backups
+
+connect Aliyun OSS for backup, configure in the `longhorn-values.yaml` the backupTarget to be `s3://<bucket_name>.<region>` according to [Backup Target Setup](https://longhorn.io/docs/1.10.1/snapshots-and-backups/backup-and-restore/set-backup-target/#set-up-aws-s3-backupstore)
+
+```yaml
+defaultBackupStore:
+  # -- Endpoint used to access the default backupstore. (Options: "NFS", "CIFS", "AWS", "GCP", "AZURE")
+  backupTarget: "s3://local-k8s-longhorn-backups.oss-cn-hongkong/"
+  # -- Name of the Kubernetes secret associated with the default backup target.
+  backupTargetCredentialSecret: aliyun-oss-access-credentials
+  # -- Number of seconds that Longhorn waits before checking the default backupstore for new backups. The default value is "300". When the value is "0", polling is disabled.
+  pollInterval: 300
+```
+
+Define `aliyun-oss-access-credentials` secret
+
+```bash
+kubectl create secret generic aliyun-oss-access-credentials   -n longhorn-system   --from-literal=AWS_ACCESS_KEY_ID=****
+--from-literal=AWS_SECRET_ACCESS_KEY=****   
+--from-literal=AWS_ENDPOINTS=https://s3.oss-cn-hongkong.aliyuncs.com  --from-literal=AWS_REGION=oss-cn-hongkong --from-literal=VIRTUAL_HOSTED_STYLE=true
+```
+
+since Aliyun uses virtual-hosted-addresss (the url schema is `s3://<butcket_name>.<region>` instead of `s3://<butcket_name>@<region>`), we also need to specify `VIRTUAL_HOSTED_STYLE=true` in secret.
+
+#### reccurring jobs
+
+Now, we have a backup target, to run the bakcup daily or monthly, we also need to setup a recurring job to perform such backups.
+
+Through [UI](https://longhorn.io/docs/1.10.1/snapshots-and-backups/scheduling-backups-and-snapshots/), add jobs.
+
+> leave `group` to default so that we can have all volumes without group specified to enjoy the recurring jobs.
+
+
+
 
 
 
