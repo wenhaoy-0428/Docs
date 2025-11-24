@@ -363,3 +363,148 @@ Also, we can define global css to control the children, but this approach is reg
 	}
 </style>
 ```
+
+### Actions
+
+
+Actions are functions that let you run custom code when an **element** is added to or removed from the DOM. They are a powerful tool for creating reusable, low-level interactions with HTML elements directly.
+
+`$effect` runes are on component level, while actions are defined bebaviors targeting to DOM element wise.
+
+```js
+<script>
+  let count = 0;
+
+  /** @type {import('svelte/action').Action<HTMLElement, string>} */
+  function myAction(node, someParam) {
+    console.log('Initial parameter:', someParam);
+
+    return {
+      update(someParam) {
+        // This runs whenever the parameter changes
+        console.log('Parameter updated to:', someParam);
+      },
+      destroy() {
+        console.log('Destroyed');
+      }
+    };
+  }
+</script>
+
+<div use:myAction={count}>Count is {count}</div>
+<button on:click={() => count++}>Increment</button>
+```
+
+Modern Svelte 5 Conventions
+
+With the release of Svelte 5, the recommended way to handle side effects and reactive code inside an action has evolved.
+
+Using `$effect` for Setup and Teardown: Instead of relying only on the returned destroy function, you can use Svelte's `$effect` to manage the action's lifecycle in a more integrated way.
+
+```js
+<script>
+  function myAction(node) {
+    $effect(() => {
+      // Setup code here
+      console.log('Effect ran on mount or if dependencies change');
+
+      return () => {
+        // Cleanup code here (runs when the effect re-runs or the element is unmounted)
+        console.log('Effect cleanup');
+      };
+    });
+  }
+</script>
+```
+
+### Transition
+
+We can make more appealing user interfaces by gracefully transitioning elements into and out of the DOM.
+
+```ts
+<script>
+	import { fly } from 'svelte/transition';
+
+	let visible = $state(true);
+</script>
+
+<label>
+	<input type="checkbox" bind:checked={visible} />
+	visible
+</label>
+
+{#if visible}
+	<p transition:fly={{ y: 200, duration: 2000 }}>
+	Flies in and out
+</p>
+{/if}
+```
+
+> Transitions are reversable, so that fly in/out will have a natural transition from the same spot.
+
+while, we can also use `in` `out` directive, but this in case, the transition is not reversable.
+
+
+#### Custom CSS transition
+
+
+```js
+function fade(node, { delay = 0, duration = 400 }) {
+	const o = +getComputedStyle(node).opacity;
+
+	return {
+		delay,
+		duration,
+		css: (t) => `opacity: ${t * o}`
+	};
+}
+```
+
+
+The function takes two arguments — the `node` to which the transition is applied, and any `parameters` that were passed in — and **returns a transition object** which can have the following properties:
+
+`delay` — milliseconds before the transition begins
+`duration` — length of the transition in milliseconds
+`easing` — a `p => t` easing function (see the chapter on tweening)
+`css` — a `(t, u) => css` function, where u === 1 - t
+`tick` — a `(t, u) => {...}` function that has some effect on the node
+
+
+While you should generally use CSS for transitions as much as possible, there are some effects that can’t be achieved without JavaScript, such as a typewriter effect:
+
+
+```js
+<script>
+	let visible = $state(false);
+
+	function typewriter(node, { speed = 1 }) {
+	const valid = node.childNodes.length === 1 && node.childNodes[0].nodeType === Node.TEXT_NODE;
+
+	if (!valid) {
+		throw new Error(`This transition only works on elements with a single text node child`);
+	}
+
+	const text = node.textContent;
+	const duration = text.length / (speed * 0.01);
+
+	return {
+		duration,
+		tick: (t) => {
+			const i = Math.trunc(text.length * t);
+			node.textContent = text.slice(0, i);
+		}
+	};
+}
+</script>
+
+<label>
+	<input type="checkbox" bind:checked={visible} />
+	visible
+</label>
+
+{#if visible}
+	<p transition:typewriter>
+		The quick brown fox jumps over the lazy dog
+	</p>
+{/if}
+```
