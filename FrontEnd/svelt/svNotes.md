@@ -508,3 +508,65 @@ While you should generally use CSS for transitions as much as possible, there ar
 	</p>
 {/if}
 ```
+
+
+### Global Transition
+
+
+In Svelte (including Svelte 5), a global transition is a transition that plays not only when its own block is created or destroyed, but also **when any parent block is created or destroyed**.
+
+By default, transitions in Svelte are **local**, meaning they only trigger when the block they are directly inside is added or removed from the DOM.
+To make a transition global, you add the `|global` modifier to the transition directive.
+
+```js
+{#if x}
+  {#if y}
+    <p transition:fade|global>This fades in/out when **either x or y** changes.</p>
+  {/if}
+{/if}
+```
+
+Without `|global`, the transition would only run when y changes, not when x changes.
+
+
+### Key Block Transition
+
+Key blocks destroy and recreate their contents when the value of an expression changes. This is useful if you want an element to play its transition whenever a value changes instead of only when the element enters or leaves the DOM.
+
+```js
+<script>
+	import { typewriter } from './transition.js';
+	import { messages } from './loading-messages.js';
+
+	let i = $state(-1);
+
+	$effect(() => {
+		const interval = setInterval(() => {
+			i += 1;
+			i %= messages.length;
+		}, 2500);
+
+		return () => {
+			clearInterval(interval);
+		};
+	});
+</script>
+
+<h1>loading...</h1>
+
+{#key i}
+<p in:typewriter={{ speed: 10 }}>
+	{messages[i] || ''}
+</p>
+{/key}
+```
+
+
+## Advanced Topics
+
+
+
+
+
+
+

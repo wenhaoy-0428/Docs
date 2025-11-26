@@ -72,6 +72,16 @@ Jenkins is an open-source automation server that enables developers to build, te
   - **Multi-branch Pipeline**: Automatically creates pipelines for branches
   - **Folder**: Organizes jobs hierarchically
 
+
+For the difference between Pipeline and Freestyle refer to [What Is The Difference Between Freestyle and Pipeline in Jenkins](https://www.youtube.com/watch?v=IOUm1lw7F58)
+
+> In summary, we can achieve the Pipeline by having a single script, or split several steps into different freestyle projects and chain them, this this is so much pain as it's not durable and not easily maintained.
+
+> while standard Jenkins `freestyle` job support simple continuous integration by allowing you to define sequential tasks in an application lifecycle, they do not create a persistent record of execution, enable one script to address all the steps in a complex workflow.
+
+> The Pipeline plugin was built with requirements for a flexible, extensible, and script based CD workflow capability in mind.
+
+
 #### 2. **Build**
 - An execution of a job
 - Each build gets a unique number
@@ -356,6 +366,51 @@ post {
 - **Backup and Maintenance**: Automate routine system tasks
 
 
+## Discovery
+
+
+#### Exclude branches that are also filed as PRs
+
+**Discovers all branches EXCEPT those that have an associated open pull request.**
+
+**Primary Use Case: Avoiding Duplicate Builds**
+The Duplicate Build Problem
+
+```text
+Branch: feature/payment-integration
+    ↓
+PR #123: feature/payment-integration → main
+WITHOUT this option:
+
+Build #1: feature/payment-integration (branch push)
+
+Build #2: PR #123 (pull request)
+```
+
+Two nearly identical builds running simultaneously
+
+
+A branch without a PR will build in these common scenarios: **basic push**
+
+1. Initial Branch Creation/Push
+2. Subsequent Commits to the Branch
+
+```bash
+git checkout feature/login
+# Fix a bug, add more code
+git add .
+git commit -m "Fix login validation"
+git push origin feature/login
+```
+
+Real-World Development Scenarios
+
+```text
+Day 1: Create feature/login → Build #1
+Day 2: Add validation → Build #2  
+Day 3: Fix bug → Build #3
+Day 4: Ready for review → Create PR
+```
 
 
 ### Kubenetes install
