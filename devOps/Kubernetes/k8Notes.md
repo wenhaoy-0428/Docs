@@ -674,10 +674,65 @@ Through [UI](https://longhorn.io/docs/1.10.1/snapshots-and-backups/scheduling-ba
 
 > leave `group` to default so that we can have all volumes without group specified to enjoy the recurring jobs.
 
+> all volumes have to be healthy for the recurring backup job to work.
 
 
 
+### Install gitea
 
+
+```bash
+helm repo add gitea-charts https://dl.gitea.com/charts/
+kubectl create namespace gitea
+
+
+helm install gitea gitea-charts/gitea -f gitea-values.yaml -n gitea
+```
+
+#### Upgrade from SingleNode to MultiNode Cluster
+
+
+By default the `values.yaml` indicates the persistence of `gitea.shared.storage` to use `ReadWriteOnce` which means only a single pod can access the volume. This `RWO` only fits when the cluster has a single workder node. When adding a new node, and update the `replicaCount` in the `values.yaml` from 1 to 2, the second pod will not init correctly due to mounting error.
+
+
+To fix this, either, we define `accessModes: - ReadWriteMany` in advance before initing gitea
+
+```yaml
+persistence:
+  enabled: true
+  create: true
+  mount: true
+  claimName: gitea-shared-storage
+  size: 10Gi
+  accessModes:
+    - ReadWriteMany
+  labels: {}
+  storageClass: "longhorn"
+```
+
+Or for existing volumes using RWO, the access mode can't be changed once created, so we have to remount the volume and restore the data.
+
+1. downgrade the replicaCount of existing gitea to 0
+
+```bash
+helm upgrade gitea gitea-charts/gitea -n gitea \
+  --set replicaCount=0 -f gitea-values.yaml
+```
+
+> This will cause all pods to be deleted, but the volumes and pvcs are still reserved.
+
+2. delete existing pvc
+
+```bash
+kubectl delete pvc gitea-shared-storage -n gitea
+```
+
+3. find the corresponding volume bounded to `gitea-shared-storage` pod in the longhorn web ui, click **restore** 
+  > This will prompt to create a new volume based on the backup, in this case apart from the new volume name, we have to specify the access mode of the new volume to be `ReadWriteMany`
+
+4. for the newly created `RWX` volume, which is supposed to be **detached**  at this moment, click **create PV/PVC**, this will prompt to enter the PVC name and namespace, specify `gitea-shared-storage` and `gitea`.
+
+5. Now, everything should work, increase the `replicaCount` of the `gitea-values.yaml` back to 2 from 0 to restore the whole system.
 
 
 

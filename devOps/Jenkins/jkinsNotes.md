@@ -356,3 +356,71 @@ post {
 - **Backup and Maintenance**: Automate routine system tasks
 
 
+
+
+### Kubenetes install
+
+
+1. use `Helm` to get config values
+
+```bash
+helm repo add jenkins https://charts.jenkins.io
+helm repo update
+
+curl -o jenkins-values.yaml https://raw.githubusercontent.com/jenkinsci/helm-charts/main/charts/jenkins/values.yaml
+
+# create namespace
+kubectl create namespace jenkins
+```
+
+2. config necessary configs
+
+```yaml
+  # If you are using the ingress definitions provided by this chart via the `controller.ingress` block,
+  # the configured hostname will be the ingress hostname starting with `https://`
+  # or `http://` depending on the `tls` configuration.
+  # The Protocol can be overwritten by specifying `controller.jenkinsUrlProtocol`.
+  # -- Set protocol for Jenkins URL; `https` if `controller.ingress.tls`, `http` otherwise
+  jenkinsUrlProtocol: http
+
+  # -- Set Jenkins URL if you are not using the ingress definitions provided by the chart
+  jenkinsUrl: http://jenkins.cares-copilot.com
+
+  ingress:
+    # -- Enables ingress
+    enabled: true
+    ingressClassName: nginx
+
+persistence:
+  # -- Enable the use of a Jenkins PVC
+  enabled: true
+
+  # A manually managed Persistent Volume and Claim
+  # Requires persistence.enabled: true
+  # If defined, PVC must be created manually before volume will be bound
+  # -- Provide the name of a PVC
+  existingClaim:
+
+  # jenkins data Persistent Volume Storage Class
+  # If defined, storageClassName: <storageClass>
+  # If set to "-", storageClassName: "", which disables dynamic provisioning
+  # If undefined (the default) or set to null, no storageClassName spec is
+  #   set, choosing the default provisioner (gp2 on AWS, standard on GKE, AWS & OpenStack)
+  # -- Storage class for the PVC
+  storageClass: longhorn
+  # -- Annotations for the PVC
+  annotations: {}
+  # -- Labels for the PVC
+  labels: {}
+  # -- The PVC access mode
+  accessMode: "ReadWriteOnce"
+```
+
+3. install
+
+```bash
+helm install jenkins jenkins/jenkins -n jenkins -f jenkins-values.yaml
+```
+
+For the ingress configuration and refer to [k8sNotes Ingress Controller]()
+
