@@ -412,8 +412,62 @@ Day 3: Fix bug → Build #3
 Day 4: Ready for review → Create PR
 ```
 
+#### Only branches that are also filed as PRs
 
-### Kubenetes install
+**This is not recommended to use**. It indicates that only branches with PR will be built.
+
+This is useful when you want only builds happen for reviewing. Pushing code will not cause build.
+
+```text
+developers develop new features using `fork`
+ ↓
+create PR
+ ↓
+the main repo serves for reviewing, not for dev/test
+```
+
+In this case, `main` branch will never get builds as `filing as PRs`  means creating a PR from a branch, where that branch has to be the **source**, since you would never have to create a PR from main to other branch, `main` will never be built. Hence we also have `Only branches that are also filed as PRs or main` to counterpart this.
+
+
+### Pull Request Strategy
+
+#### Merging the pull request with the current target branch revision
+
+Build the revision after the PR is merged to the target branch.
+
+This tests the system after if the PR is merged. Therefore, it's useful for integration tests.
+
+Behind the scene, Jenkins
+
+```bash
+# Jenkins 内部执行：
+git checkout develop      # 切换到目标分支
+git merge feature/login   # 合并 PR 分支
+# 然后在这个合并结果上运行构建和测试
+```
+
+Tests merge conflicts
+
+Tests integration
+
+Most common
+
+#### The current pull request revision
+
+Build the current PR revision
+
+Even the tests may pass, the build may still cause merge conflicts.
+
+#### Both the current pull request revision and the pull request merged with the current target branch revision
+
+2 builds will be initiated for each pR.
+
+### Agent
+
+We can use `label` 
+
+
+### Kubernetes install
 
 
 1. use `Helm` to get config values
