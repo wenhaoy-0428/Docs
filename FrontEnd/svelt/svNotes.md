@@ -111,6 +111,25 @@ export const counter = $state({
 ```
 
 
+Avoid shared state on the server, as for SSR is enabled, all data and components are actually run in the same space on the server, so user will be globally available for all users make the requests.
+
+```js
+page.js
+import { user } from '$lib/user';
+import type { PageLoad } from './$types';
+
+export const load: PageLoad = async ({ fetch }) => {
+	const response = await fetch('/api/user');
+
+	// NEVER DO THIS!
+	user.set(await response.json());
+};
+```
+
+Relatively, declaring states in components `page.svelte` is safe, and we can use `Context` to declare global component states. i belive `.svelte.js` to share states should also be fine, as they are in components, so that isolated.
+
+
+
 ### Props
 
 declare `$props` inside the nested component allows parent component to pass props
@@ -147,6 +166,10 @@ Handlers can also be passed just like props in React
 
 <Stepper increment={() => value =+ 1} decrement={() => value -= 1}/>
 ```
+
+### snippet
+
+snippet is a reusable UI snippet, it doesn't contain states, which is the key difference between a component
 
 
 ### Conditional Rendering
