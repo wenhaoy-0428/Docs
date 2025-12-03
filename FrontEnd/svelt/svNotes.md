@@ -585,6 +585,131 @@ Key blocks destroy and recreate their contents when the value of an expression c
 ```
 
 
+### [Snippet Tag](https://svelte.dev/docs/svelte/snippet)
+
+Snippets, and render tags, are a way to create reusable chunks of markup inside your components.
+
+Snippets can be declared anywhere inside your component. They are ‘visible’ to everything in the same lexical scope (i.e. siblings, and children of those siblings):
+
+```js
+<div>
+	{#snippet x()}
+		{#snippet y()}...{/snippet}
+
+		<!-- this is fine -->
+		{@render y()}
+	{/snippet}
+
+	<!-- this will error, as `y` is not in scope -->
+	{@render y()}
+</div>
+
+<!-- this will also error, as `x` is not in scope -->
+{@render x()}
+```
+
+Snippet can even do recursion!!! by rendering itself!
+
+```js
+{#snippet blastoff()}
+	<span>🚀</span>
+{/snippet}
+
+{#snippet countdown(n)}
+	{#if n > 0}
+		<span>{n}...</span>
+		{@render countdown(n - 1)}
+	{:else}
+		{@render blastoff()}
+	{/if}
+{/snippet}
+
+{@render countdown(10)}
+```
+
+### Passing snippets to components
+
+In Svelte 5, **content can be passed to components** in the form of snippets and rendered using render tags.
+
+In legacy mode, content inside component tags is considered *slotted content*, which can be rendered by the component using a [`<slot>`](https://svelte.dev/docs/svelte/legacy-slots) element.
+
+
+We can explicitly pass `snippet` to and render it in the component using `render` we need to makes sure the name of the snippet matches.
+
+```js
+// App.svelte
+<script>
+	import Table from './Table.svelte';
+
+	const fruits = [
+		{ name: 'apples', qty: 5, price: 2 },
+		{ name: 'bananas', qty: 10, price: 1 },
+		{ name: 'cherries', qty: 20, price: 0.5 }
+	];
+</script>
+
+{#snippet header()}
+	<th>fruit</th>
+	<th>qty</th>
+	<th>price</th>
+	<th>total</th>
+{/snippet}
+
+{#snippet row(d)}
+	<td>{d.name}</td>
+	<td>{d.qty}</td>
+	<td>{d.price}</td>
+	<td>{d.qty * d.price}</td>
+{/snippet}
+
+<Table data={fruits} {header} {row} />
+```
+
+```js
+// Table.svelte
+<script>
+	let { data, header, row } = $props();
+</script>
+
+<table>
+	{#if header}
+		<thead>
+			<tr>{@render header()}</tr>
+		</thead>
+	{/if}
+
+	<tbody>
+		{#each data as d}
+			<tr>{@render row(d)}</tr>
+		{/each}
+	</tbody>
+</table>
+```
+
+We can also implicitly declare the snipper props, by nesting it in the children of the targeting component, continuing the previous explicit example.
+
+
+```js
+<!-- this is semantically the same as the above -->
+<Table data={fruits}>
+	{#snippet header()}
+		<th>fruit</th>
+		<th>qty</th>
+		<th>price</th>
+		<th>total</th>
+	{/snippet}
+
+	{#snippet row(d)}
+		<td>{d.name}</td>
+		<td>{d.qty}</td>
+		<td>{d.price}</td>
+		<td>{d.qty * d.price}</td>
+	{/snippet}
+</Table>
+```
+
+
+
 ## Advanced Topics
 
 
