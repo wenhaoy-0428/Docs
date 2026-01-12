@@ -734,7 +734,30 @@ kubectl delete pvc gitea-shared-storage -n gitea
 
 5. Now, everything should work, increase the `replicaCount` of the `gitea-values.yaml` back to 2 from 0 to restore the whole system.
 
+### expose ssh
 
+Since Ingress only works with http, while gitea push and many other operations replies on ssh, in the `values.yaml` we also need to specify  `type: LoadBalancer`.
+
+
+```yaml
+  ssh:
+    type: LoadBalancer
+    port: 22
+    # clusterIP:
+    loadBalancerIP:
+    nodePort:
+    externalTrafficPolicy:
+    externalIPs:
+    ipFamilyPolicy:
+    ipFamilies:
+    hostPort:
+    loadBalancerSourceRanges: []
+    annotations: {}
+    labels: {}
+    loadBalancerClass:
+```
+
+> When specifying `LoadBalancer`, k8s will automatically assign an external ip using the LoadBalancer provider of the cluster if has one, here, since we installed a `Metallb`, it works.
 
 ### Helm
 
@@ -756,6 +779,92 @@ show current configs
 helm get values <release name>
 ```
 
+### Inter Connection
+
+Now, services can be accessed by the external domain name specified by the ingress, however, the provided domain name can not be accessed by the cluster, for example, external users can use `git.cares-copilot.com` to access gitea, but the internal jenkins can't resolve this dns but to use `git-http:3000` which is internally available.
+
+We can resolve this, by having a dns resolver externally that is accessed by the network, or we need to configure the `coredns` that is provided by the cluster.
+
+```bash
+# 1. 查看当前的 CoreDNS 配置
+kubectl get configmap -n kube-system coredns -o yaml
+
+# 2. 编辑 CoreDNS 配置，添加外部域名转发
+kubectl edit configmap -n kube-system coredns
+```
+
+add dns resolution to hosts
+```
+  hosts {
+    10.21.10.5 git.cares-copilot.com
+    10.21.10.5 jenkins.cares-copilot.com
+    10.21.10.5 longhorn.cares-copilot.com
+    # 或者使用通配符（如果 CoreDNS 版本支持）
+    # 10.21.10.5 *.cares-copilot.com
+    fallthrough
+  }
+```
+
+The final config look like
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: coredns
+  namespace: kube-system
+data:
+  Corefile: |
+    .:53 {
+        errors
+        health {
+           lameduck 5s
+        }
+        ready
+        kubernetes cluster.local in-addr.arpa ip6.arpa {
+           pods insecure
+           fallthrough in-addr.arpa ip6.arpa
+           ttl 30
+        }
+        # 添加 hosts 配置
+        hosts {
+          10.21.10.5 git.cares-copilot.com
+          10.21.10.5 jenkins.cares-copilot.com
+          10.21.10.5 longhorn.cares-copilot.com
+          # 或者使用通配符（如果 CoreDNS 版本支持）
+          # 10.21.10.5 *.cares-copilot.com
+          fallthrough
+        }
+        prometheus :9153
+        forward . /etc/resolv.conf
+        cache 30
+        loop
+        reload
+        loadbalance
+    }
+```
+
+To test it out
+
+```bash
+# 启动临时调试 Pod
+kubectl run -it --rm debug --image=alpine --restart=Never -- sh
+
+# 安装工具
+apk add curl
+
+# 测试解析
+nslookup jenkins.cares-copilot.com
+# 应返回 10.21.10.5
+
+# 测试连通性
+curl -I http://jenkins.cares-copilot.com
+# 应返回 HTTP 200 或 403（说明能访问 Jenkins）
+
+# 测试 Gitea Webhook endpoint
+curl -I http://jenkins.cares-copilot.com/gitea-webhook/post
+# 应返回 HTTP 405（说明 endpoint 存在）
+```
 
 
 
