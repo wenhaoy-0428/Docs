@@ -1,2 +1,3 @@
 - [Docker](/devOps/Docker/dockerNotes.md)
+- [Prometheus](/devOps/Prometheus/prometheusNotes.md)
 - [Kubernetes](/devOps/Kubernetes/k8Notes.md)
