@@ -200,3 +200,483 @@ A good choice for logging.
 
 
 [A complete guide to instrumenting Next.JS with OpenTelemetry and Pino Logger](https://harith-sankalpa.medium.com/a-complete-guide-to-instrumenting-next-js-with-opentelemetry-and-pino-logger-54cf5734a40c)
+
+
+下面是一份整理好的文档版，可直接放进项目文档或知识库。
+
+---
+
+# Pino 日志接入 Grafana Stack 的三种方案对比
+
+## 1. 背景
+
+当前项目使用 **Next.js + Pino** 进行应用日志记录，并计划使用 **Grafana Stack** 做日志与链路追踪观测。
+
+Grafana Stack 中常见组件包括：
+
+```text
+Grafana：可视化与查询界面
+Loki：日志存储与查询
+Tempo：Trace 存储与查询
+Alloy：采集、处理、转发 logs / traces / metrics 的 agent
+OpenTelemetry：应用侧生成和传输 telemetry 数据的标准
+```
+
+在日志接入 Loki 这件事上，主要有三种方案：
+
+```text
+方案一：Pino → stdout → Alloy → Loki
+方案二：Pino → OpenTelemetry Transport → OTel Exporter/Collector → Loki
+方案三：Pino → Loki Transport → Loki
+```
+
+三种方案最终都可以把日志送到 Loki，并在 Grafana 中查询，但它们的职责划分、复杂度和生产适用性不同。
+
+---
+
+# 2. 方案一：Pino + stdout + Alloy + Loki
+
+## 2.1 架构链路
+
+```text
+Next.js App
+  ↓
+Pino 输出 JSON 日志到 stdout
+  ↓
+Alloy 采集容器 stdout / Docker logs / Kubernetes logs
+  ↓
+Loki
+  ↓
+Grafana
+```
+
+## 2.2 应用代码示例
+
+```ts
+logger.info({ route: "/api/transcribe" }, "request completed");
+```
+
+Pino 输出一行 JSON 日志：
+
+```json
+{
+  "level": 30,
+  "route": "/api/transcribe",
+  "msg": "request completed"
+}
+```
+
+应用本身不直接知道 Loki，也不负责把日志发到 Loki。它只负责把结构化日志写到 stdout。
+
+## 2.3 职责划分
+
+```text
+应用负责：写结构化日志
+Alloy 负责：采集、处理、加标签、转发日志
+Loki 负责：存储日志
+Grafana 负责：查询和展示日志
+```
+
+## 2.4 优点
+
+这是最推荐的生产方案。
+
+优点包括：
+
+```text
+1. 应用逻辑简单，只负责输出日志。
+2. 符合 Docker / Kubernetes 的标准日志模型。
+3. 即使 Loki 或 Alloy 出问题，仍然可以通过 docker logs / kubectl logs 查看原始日志。
+4. 多服务场景下统一采集，不需要每个服务单独配置 Loki 发送逻辑。
+5. 日志采集、过滤、脱敏、加标签、路由都可以集中在 Alloy 中处理。
+6. 更适合私有化部署和长期维护。
+```
+
+例如多个服务可以统一接入同一个 Alloy：
+
+```text
+nextjs-app
+asr-service
+worker-service
+user-service
+    ↓
+  Alloy
+    ↓
+  Loki
+```
+
+## 2.5 缺点
+
+```text
+1. 需要额外部署 Alloy。
+2. 初期比“应用直接发 Loki”多一个组件。
+3. 需要理解 Alloy 的配置。
+```
+
+但从生产角度看，这个复杂度通常是值得的。
+
+## 2.6 适合场景
+
+```text
+Docker / Kubernetes 部署
+多个服务
+生产环境
+私有化部署
+希望应用和观测系统解耦
+希望日志采集由基础设施统一管理
+```
+
+---
+
+# 3. 方案二：Pino + Transport + OpenTelemetry Exporter + Loki
+
+## 3.1 架构链路
+
+```text
+Next.js App
+  ↓
+Pino Transport
+  ↓
+转换成 OpenTelemetry LogRecord
+  ↓
+OTLP Exporter
+  ↓
+OpenTelemetry Collector / Alloy
+  ↓
+Loki
+  ↓
+Grafana
+```
+
+这个方案是 OpenTelemetry 原生风格。
+
+日志不再只是 stdout 中的一行 JSON，而是会被转换成 OpenTelemetry 的日志模型，也就是 `LogRecord`。
+
+## 3.2 普通日志与 OTel LogRecord 的区别
+
+应用代码仍然可能是：
+
+```ts
+logger.info({ route: "/api/transcribe" }, "request completed");
+```
+
+但它会被转换成类似这样的 OpenTelemetry LogRecord：
+
+```text
+LogRecord:
+  body: "request completed"
+  severity: INFO
+  attributes:
+    route: "/api/transcribe"
+  resource:
+    service.name: "nextjs-app"
+    deployment.environment: "production"
+  trace_id: "..."
+  span_id: "..."
+```
+
+然后通过 OTLP 协议发送到 Collector，再由 Collector 转发到 Loki。
+
+## 3.3 职责划分
+
+```text
+应用负责：写日志、转换为 OpenTelemetry LogRecord、通过 OTLP 发送
+Collector / Alloy 负责：接收、处理、转发
+Loki 负责：存储日志
+Grafana 负责：查询和展示日志
+```
+
+## 3.4 优点
+
+```text
+1. Logs / Traces / Metrics 都可以走 OpenTelemetry 统一协议。
+2. 更符合 OpenTelemetry 原生架构。
+3. 更容易支持多后端转发，例如 Loki + Datadog + Honeycomb。
+4. 应用层 telemetry 更标准化。
+5. 后续如果更换观测后端，理论上更灵活。
+```
+
+整体链路可以统一成：
+
+```text
+App
+  ↓
+OpenTelemetry
+  ↓
+Collector / Alloy
+  ↓
+Loki / Tempo / Grafana Cloud / Datadog
+```
+
+## 3.5 缺点
+
+```text
+1. 应用复杂度更高。
+2. 应用需要关心 OTLP exporter、collector endpoint、发送失败、缓冲、重试等问题。
+3. Node.js / Next.js 生态里，OpenTelemetry Logs 没有 stdout 日志模式那么直观和成熟。
+4. 如果只通过 OTLP 发日志，不输出 stdout，那么 docker logs / kubectl logs 可能看不到完整业务日志。
+5. 排障难度高于 stdout 方案。
+```
+
+如果 OTLP 链路出问题，日志可能丢失，除非同时保留 stdout 输出。
+
+## 3.6 适合场景
+
+```text
+希望 logs / traces / metrics 全部统一走 OpenTelemetry
+有成熟的 OpenTelemetry Collector 管理能力
+需要多后端转发
+不依赖 Docker / Kubernetes stdout 日志采集
+对供应商无关性要求很高
+```
+
+对于当前阶段的 Next.js 项目来说，这个方案偏重，除非明确需要统一 OTLP 管理所有 telemetry。
+
+---
+
+# 4. 方案三：Pino + Transport + Loki
+
+## 4.1 架构链路
+
+```text
+Next.js App
+  ↓
+Pino Loki Transport
+  ↓
+Loki
+  ↓
+Grafana
+```
+
+这个方案最直接：应用自己通过 Pino transport 把日志发送到 Loki。
+
+## 4.2 应用代码示例
+
+业务代码仍然是：
+
+```ts
+logger.info({ route: "/api/transcribe" }, "request completed");
+```
+
+但 Pino transport 会把日志通过 HTTP 推送到 Loki。
+
+## 4.3 职责划分
+
+```text
+应用负责：写日志、配置 Loki、发送日志到 Loki
+Loki 负责：存储日志
+Grafana 负责：查询和展示日志
+```
+
+也就是说，日志投递逻辑进入了应用本身。
+
+## 4.4 优点
+
+```text
+1. 链路最短。
+2. 不需要 Alloy 或 Promtail。
+3. 小项目中接入速度快。
+4. 本地 Demo 或快速验证 Loki 时很方便。
+```
+
+架构很简单：
+
+```text
+App → Loki → Grafana
+```
+
+## 4.5 缺点
+
+```text
+1. 应用和 Loki 强耦合。
+2. 每个应用都需要配置 Loki endpoint、认证、labels 等。
+3. Loki 不可用时，应用侧 transport 可能报错、丢日志、堆积内存或影响性能。
+4. 多服务场景下，每个服务都要重复配置。
+5. 以后从本地 Loki 切换到 Grafana Cloud Loki 或客户私有 Loki 时，需要修改每个应用配置。
+6. 如果只通过 transport 发 Loki，不输出 stdout，则 docker logs / kubectl logs 的排障能力会变弱。
+```
+
+这个方案适合简单，但不太适合长期生产化和多服务架构。
+
+## 4.6 适合场景
+
+```text
+小项目
+Demo
+单体应用
+快速验证 Loki
+不想部署 Alloy
+对长期维护和多服务扩展要求不高
+```
+
+---
+
+# 5. 三种方案总表对比
+
+| 对比项              | 方案一：Pino → stdout → Alloy → Loki | 方案二：Pino → OTel Transport → Collector → Loki | 方案三：Pino → Loki Transport → Loki |
+| ------------------- | ------------------------------------ | ------------------------------------------------ | ------------------------------------ |
+| 日志输出形式        | JSON stdout                          | OpenTelemetry LogRecord                          | 直接发 Loki                          |
+| 谁负责发送日志      | Alloy                                | 应用 + Collector                                 | 应用                                 |
+| 应用是否知道 Loki   | 不知道                               | 不直接知道 Loki，但知道 OTel endpoint            | 知道                                 |
+| 应用复杂度          | 低                                   | 高                                               | 中                                   |
+| 基础设施复杂度      | 中                                   | 中/高                                            | 低                                   |
+| 是否适合多服务      | 很适合                               | 适合，但复杂                                     | 不太适合                             |
+| 是否适合 Docker/K8s | 很适合                               | 可以                                             | 一般                                 |
+| 是否方便本地排障    | 很方便，可用 docker logs             | 取决于是否也输出 stdout                          | 取决于是否也输出 stdout              |
+| 是否容易切换后端    | 容易，改 Alloy 配置                  | 容易，改 Collector 配置                          | 较麻烦，每个应用改配置               |
+| 生产推荐度          | 高                                   | 中                                               | 中/低                                |
+| 私有化部署适配      | 很好                                 | 可以                                             | 一般                                 |
+| 学习/接入成本       | 中                                   | 高                                               | 低                                   |
+
+---
+
+# 6. 和 Trace 的关系
+
+无论使用哪种日志方案，Trace 都可以独立使用 OpenTelemetry：
+
+```text
+Next.js OpenTelemetry
+  ↓
+Collector / Alloy
+  ↓
+Tempo
+  ↓
+Grafana
+```
+
+日志和 Trace 的关联不是靠“日志必须走 OpenTelemetry”，而是靠日志中包含同一个 `trace_id`。
+
+例如日志中包含：
+
+```json
+{
+  "msg": "request failed",
+  "trace_id": "abc123",
+  "span_id": "def456"
+}
+```
+
+Tempo 中也存储了同一个 `trace_id` 的完整链路：
+
+```text
+trace_id = abc123
+
+span 1: Next.js received request
+span 2: Next.js called ASR service
+span 3: ASR service queried database
+```
+
+Grafana 就可以做到：
+
+```text
+Loki 日志
+  ↓ 点击 trace_id
+Tempo Trace
+```
+
+因此，推荐的组合是：
+
+```text
+日志：Pino → stdout → Alloy → Loki
+Trace：OpenTelemetry → Alloy / Collector → Tempo
+```
+
+只要日志中带有 `trace_id`，就可以实现日志与 Trace 关联。
+
+---
+
+# 7. 推荐方案
+
+结合当前情况：
+
+```text
+Next.js 项目
+Pino logger 已经设置
+优先关注日志
+未来可能有多个服务
+可能需要私有化部署
+计划使用 Grafana Stack
+```
+
+推荐选择：
+
+```text
+Pino → stdout → Alloy → Loki
+```
+
+Trace 走：
+
+```text
+OpenTelemetry → Alloy / Collector → Tempo
+```
+
+整体架构为：
+
+```text
+Next.js App
+  ├─ Pino JSON logs → stdout → Alloy → Loki → Grafana
+  └─ OpenTelemetry traces → Alloy / Collector → Tempo → Grafana
+```
+
+这个方案的核心优点是：
+
+```text
+应用只负责生成高质量结构化日志
+基础设施负责采集和转发
+日志和 Trace 通过 trace_id 关联
+未来多个服务可以复用同一套观测栈
+私有化部署也更清晰
+```
+
+---
+
+# 8. 最终结论
+
+## 方案一
+
+```text
+Pino → stdout → Alloy → Loki
+```
+
+最工程化、最生产友好。推荐作为当前默认方案。
+
+## 方案二
+
+```text
+Pino → OpenTelemetry Transport → Collector → Loki
+```
+
+最 OpenTelemetry 原生，但复杂度较高。适合有明确 OTel 全栈标准化需求的团队。
+
+## 方案三
+
+```text
+Pino → Loki Transport → Loki
+```
+
+最直接，适合 Demo、小项目或快速验证，不太适合长期多服务生产架构。
+
+## 当前建议
+
+```text
+优先采用方案一。
+```
+
+也就是：
+
+```text
+Logs:
+Pino JSON stdout → Alloy → Loki
+
+Traces:
+OpenTelemetry → Alloy / Collector → Tempo
+
+Visualization:
+Grafana
+```
+
+一句话总结：
+
+```text
+日志投递应该尽量交给基础设施，而不是让应用直接绑定 Loki。
+```
