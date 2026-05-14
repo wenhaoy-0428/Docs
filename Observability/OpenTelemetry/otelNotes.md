@@ -680,3 +680,489 @@ Grafana
 ```text
 日志投递应该尽量交给基础设施，而不是让应用直接绑定 Loki。
 ```
+
+
+## OpenTelemetry Collector, Grafana Alloy, and OTLP: Relationship Summary
+
+## 1. The core confusion
+
+OpenTelemetry is not one single tool.
+
+It is an ecosystem that defines:
+
+- telemetry concepts: traces, metrics, logs
+- data models
+- semantic conventions
+- protocols, especially OTLP
+- SDKs for applications
+- an official Collector implementation
+
+Grafana Alloy is a separate Grafana Labs tool, but it is compatible with the OpenTelemetry Collector model.
+
+So the relationship is:
+
+```txt
+OpenTelemetry
+├─ Defines the standard model and protocol
+├─ Provides official SDKs
+├─ Provides the official OpenTelemetry Collector
+└─ Provides official Collector components
+
+Grafana Alloy
+└─ Implements a Collector-compatible pipeline and supports many OpenTelemetry Collector components
+```
+
+---
+
+## 2. What is OTLP?
+
+OTLP means **OpenTelemetry Protocol**.
+
+It is only a protocol, not a storage system or dashboard.
+
+It defines how telemetry data is sent over the network.
+
+Common OTLP transports:
+
+```txt
+OTLP over HTTP
+OTLP over gRPC
+```
+
+Example:
+
+```txt
+Next.js app
+  ↓ sends traces via OTLP
+Alloy or OpenTelemetry Collector
+```
+
+Better wording:
+
+```txt
+The app sends traces via OTLP to Alloy.
+```
+
+Not:
+
+```txt
+The app sends traces to OTLP.
+```
+
+OTLP is the language/protocol. Alloy or the OpenTelemetry Collector is the receiver that understands that language.
+
+---
+
+## 3. What is the OpenTelemetry SDK?
+
+The SDK runs inside your application.
+
+For a Next.js / Node.js app, the SDK is responsible for:
+
+- creating traces and spans
+- collecting telemetry from auto-instrumentation
+- attaching context such as trace ID and span ID
+- exporting telemetry to another system
+
+Example:
+
+```txt
+Next.js app
+  ↓
+OpenTelemetry JS SDK
+  ↓
+OTLP exporter
+  ↓
+Alloy / OpenTelemetry Collector / Tempo
+```
+
+Typical Node.js packages:
+
+```bash
+@opentelemetry/api
+@opentelemetry/sdk-node
+@opentelemetry/auto-instrumentations-node
+@opentelemetry/exporter-trace-otlp-http
+```
+
+The SDK is the in-app part.
+
+The Collector or Alloy is the outside-app pipeline/gateway part.
+
+---
+
+## 4. What is the official OpenTelemetry Collector?
+
+The OpenTelemetry Collector is the official vendor-neutral telemetry gateway from the OpenTelemetry project.
+
+It can:
+
+- receive telemetry
+- process telemetry
+- export telemetry to another backend
+
+Its pipeline model is:
+
+```txt
+Receiver → Processor → Exporter
+```
+
+Example Collector config:
+
+```yaml
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+processors:
+  batch:
+
+exporters:
+  otlp:
+    endpoint: tempo:4317
+    tls:
+      insecure: true
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp]
+```
+
+This means:
+
+```txt
+Receive traces via OTLP
+Batch them
+Export them via OTLP to Tempo
+```
+
+---
+
+## 5. What are receivers, processors, exporters, and extensions?
+
+These are component roles inside a Collector-compatible tool.
+
+They are not usually separate tools you install one by one.
+
+### Receiver
+
+A receiver is how telemetry enters the pipeline.
+
+Examples:
+
+```txt
+otlp receiver       accepts OTLP data
+jaeger receiver     accepts Jaeger trace data
+zipkin receiver     accepts Zipkin trace data
+prometheus receiver scrapes Prometheus metrics
+filelog receiver    reads logs from files
+```
+
+### Processor
+
+A processor modifies, filters, batches, or enriches telemetry.
+
+Examples:
+
+```txt
+batch processor
+memory_limiter processor
+attributes processor
+resource processor
+```
+
+### Exporter
+
+An exporter sends telemetry out to another system.
+
+Examples:
+
+```txt
+otlp exporter
+prometheus exporter
+debug exporter
+loki exporter
+jaeger exporter
+zipkin exporter
+```
+
+### Extension
+
+An extension provides helper behavior that is usually not part of the main telemetry data path.
+
+Examples:
+
+```txt
+health check
+authentication helpers
+profiling helpers
+internal diagnostics
+```
+
+For most basic trace setups, you mainly care about:
+
+```txt
+receiver + processor + exporter
+```
+
+---
+
+## 6. Does every receiver use OTLP?
+
+No.
+
+OTLP is only one protocol.
+
+Different receivers accept different protocols or data sources.
+
+Example:
+
+```txt
+App
+  ↓ Jaeger protocol
+OpenTelemetry Collector Jaeger Receiver
+  ↓ internal OpenTelemetry data model
+Batch Processor
+  ↓ OTLP
+Tempo
+```
+
+In this example:
+
+```txt
+Input protocol: Jaeger
+Output protocol: OTLP
+```
+
+The Collector acts as a translator/gateway.
+
+Another example:
+
+```txt
+App
+  ↓ OTLP
+Collector OTLP Receiver
+  ↓ internal OpenTelemetry data model
+Exporter
+  ↓ Jaeger
+Jaeger backend
+```
+
+In this example:
+
+```txt
+Input protocol: OTLP
+Output protocol: Jaeger
+```
+
+So:
+
+```txt
+Receiver = what the Collector can accept
+Exporter = what the Collector can send
+```
+
+---
+
+## 7. What is Grafana Alloy?
+
+Grafana Alloy is Grafana Labs' telemetry collector/gateway.
+
+It can collect, process, and forward:
+
+- logs
+- traces
+- metrics
+- profiles
+
+For OpenTelemetry, Alloy includes many OpenTelemetry Collector-compatible components using the `otelcol.*` namespace.
+
+Example Alloy config:
+
+```hcl
+otelcol.receiver.otlp "default" {
+  grpc {
+    endpoint = "0.0.0.0:4317"
+  }
+
+  http {
+    endpoint = "0.0.0.0:4318"
+  }
+
+  output {
+    traces = [otelcol.processor.batch.default.input]
+  }
+}
+
+otelcol.processor.batch "default" {
+  output {
+    traces = [otelcol.exporter.otlp.tempo.input]
+  }
+}
+
+otelcol.exporter.otlp "tempo" {
+  client {
+    endpoint = "tempo:4317"
+
+    tls {
+      insecure = true
+    }
+  }
+}
+```
+
+This means:
+
+```txt
+Alloy receives OTLP traces
+Alloy batches them
+Alloy exports them via OTLP to Tempo
+```
+
+---
+
+## 8. Alloy vs OpenTelemetry Collector
+
+They are similar in role but not identical.
+
+### OpenTelemetry Collector
+
+```txt
+Official implementation from the OpenTelemetry project
+Vendor-neutral
+Uses YAML config
+Has receivers/processors/exporters/extensions
+Common in many observability stacks
+```
+
+### Grafana Alloy
+
+```txt
+Grafana Labs implementation
+Collector-compatible
+Uses Alloy/HCL-style config
+Integrates well with Grafana, Loki, Tempo, Prometheus, and Mimir
+Can run OpenTelemetry Collector-style components through otelcol.*
+Good fit for Grafana-based observability stacks
+```
+
+Simple comparison:
+
+```txt
+OpenTelemetry Collector = official vendor-neutral collector
+
+Grafana Alloy = Grafana's collector/gateway that supports OpenTelemetry Collector-style pipelines
+```
+
+---
+
+## 9. Why use Alloy if OpenTelemetry already has a Collector?
+
+Because Alloy fits naturally into a Grafana stack.
+
+If your stack is:
+
+```txt
+Pino logs → Docker logs → Alloy → Loki → Grafana
+```
+
+Then adding traces through Alloy keeps one central telemetry gateway:
+
+```txt
+Next.js App
+├─ Logs   → stdout → Alloy → Loki  → Grafana
+└─ Traces → OTLP   → Alloy → Tempo → Grafana
+```
+
+This avoids running two collectors:
+
+```txt
+One for logs
+One for traces
+```
+
+Instead, Alloy can become the central place for telemetry routing.
+
+---
+
+## 10. Recommended mental model
+
+Use this model:
+
+```txt
+OpenTelemetry = standard + SDKs + official Collector
+
+OTLP = protocol used to send telemetry
+
+OpenTelemetry SDK = runs inside the app and creates/exports telemetry
+
+OpenTelemetry Collector = official external telemetry gateway
+
+Grafana Alloy = Grafana's Collector-compatible telemetry gateway
+
+Tempo = trace storage backend
+
+Loki = log storage backend
+
+Grafana = visualization UI
+```
+
+For your current setup:
+
+```txt
+Logs:
+Next.js / Pino
+  ↓ stdout
+Docker logs
+  ↓
+Alloy
+  ↓
+Loki
+  ↓
+Grafana
+
+Traces:
+Next.js / OpenTelemetry SDK
+  ↓ OTLP
+Alloy OTLP receiver
+  ↓
+Alloy batch processor
+  ↓
+Alloy OTLP exporter
+  ↓
+Tempo
+  ↓
+Grafana
+```
+
+---
+
+## 11. Final practical conclusion
+
+You do not need both OpenTelemetry Collector and Alloy for your current setup.
+
+Because you already use Alloy for logs, the recommended path is:
+
+```txt
+Use OpenTelemetry SDK inside the app
+Send traces via OTLP to Alloy
+Use Alloy as the collector/gateway
+Send traces from Alloy to Tempo
+View traces in Grafana
+```
+
+So the key relationship is:
+
+```txt
+OpenTelemetry provides the standard and official implementation.
+
+Alloy is not the official OpenTelemetry Collector,
+but Alloy can perform the Collector role and supports OpenTelemetry Collector-compatible components.
+
+In a Grafana stack, Alloy commonly replaces the need to run the official OpenTelemetry Collector separately.
+```
