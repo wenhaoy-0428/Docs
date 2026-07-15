@@ -600,6 +600,20 @@ useEffect(() => {
 
 > To avoid calling `useEffect` on updates, we can [add dependencies](https://reactjs.org/docs/hooks-effect.html#tip-optimizing-performance-by-skipping-effects) that tells React to perform the side-effect only when certain states changes. **If you want to run an effect and clean it up only once (on mount and unmount), you can pass an empty array ([]) as a second argument.**
 
+
+### [useTransition](https://react.dev/reference/react/useTransition#react-doesnt-treat-my-state-update-after-await-as-a-transition)
+
+A Transition can include multiple Actions, and while a Transition is in progress, your UI stays responsive. For example, if the user clicks a tab but then changes their mind and clicks another tab, the second click will be immediately handled without waiting for the first update to finish.
+
+
+To give the user feedback about in-progress Transitions, the isPending state switches to true at the first call to startTransition, and stays true until all Actions complete and the final state is shown to the user. 
+
+> pending 不是只看 setTab 那一行执行完没有，而是看这个 state update 引发的新 UI 是否完成渲染并提交。 查看example [Exposing action prop from components](https://react.dev/reference/react/useTransition#exposing-action-props-from-components)
+
+
+
+
+
 #### Custom Hooks
 
 A custom Hook is a JavaScript function whose name starts with ”use” and that may call other Hooks. Therefore, Custom Hooks are essentially a wrapper of built-in Hooks and states.

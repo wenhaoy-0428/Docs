@@ -468,3 +468,140 @@ The main feature of Parallel Routing is particular useful when used in combinati
 
 1. [Add Data access layer](https://www.youtube.com/watch?v=DG_WT8Gwzho)
    > This is a really fancy name for something unexpectedly simple. Just a centralized class or function to represent the manipulations of data.
+
+## Instrumentation
+
+这个 Next.js `instrumentation` 文档的核心意思是：
+
+**Next.js 给你一个官方入口，让你在服务启动时初始化监控、日志、Tracing 等工具。**
+
+也就是：
+
+```txt
+Next.js server 启动
+  ↓
+自动执行 instrumentation.ts 里的 register()
+  ↓
+初始化 OpenTelemetry / logger / monitoring SDK
+  ↓
+开始处理请求
+```
+
+官方定义里，instrumentation 是把监控和日志工具集成进应用，用来追踪应用性能、行为，并帮助排查生产问题。Next.js 要求你在项目根目录，或者使用 `src` 时放在 `src` 目录下，创建 `instrumentation.ts` 或 `instrumentation.js`。这个文件需要导出一个 `register` 函数，Next.js 会在新的 server instance 启动时调用一次，而且会在 server ready to handle requests 之前完成。([nextjs.org][1])
+
+---
+
+## 它解决什么问题？
+
+以前你可能会这样初始化 tracing：
+
+```ts
+import "./otel";
+```
+
+然后担心：
+
+```txt
+这个文件到底在哪里 import？
+会不会太晚？
+会不会有些请求已经开始了？
+会不会 dev/prod 行为不一致？
+```
+
+Next.js 的 `instrumentation.ts` 就是给你一个**标准启动入口**。
+
+你可以把这些东西放进去：
+
+```txt
+OpenTelemetry 初始化
+Sentry 初始化
+全局监控 SDK 初始化
+某些启动时 side effect
+runtime-specific 初始化
+```
+
+对于你现在的 Observability 来说，它最重要的用途就是：
+
+```txt
+在 Next.js server 启动时初始化 OpenTelemetry tracing
+```
+
+---
+
+## 最简单例子
+
+官方示例是：
+
+```ts
+import { registerOTel } from '@vercel/otel'
+
+export function register() {
+  registerOTel('next-app')
+}
+```
+
+意思是：Next.js 启动时，调用 `register()`，然后通过 `@vercel/otel` 注册 OpenTelemetry。([nextjs.org][1])
+
+你可以理解成：
+
+```txt
+instrumentation.ts = Next.js 专用的启动 hook
+registerOTel('next-app') = 给这个 Next.js 服务开启 tracing
+```
+
+---
+
+## runtime-specific code 是什么意思？
+
+官方文档里有这个例子：
+
+```ts
+export async function register() {
+  if (process.env.NEXT_RUNTIME === 'nodejs') {
+    await import('./instrumentation-node')
+  }
+
+  if (process.env.NEXT_RUNTIME === 'edge') {
+    await import('./instrumentation-edge')
+  }
+}
+```
+
+意思是：Next.js 可能运行在不同 runtime：
+
+```txt
+nodejs runtime
+edge runtime
+```
+
+有些库只能在 Node.js 里用，比如很多 OpenTelemetry Node SDK、文件系统、某些 native package。
+
+所以你要避免 Edge runtime 加载 Node-only 的代码。
+
+对于你现在 Docker 自部署的 Next.js，大概率主要关心：
+
+```txt
+process.env.NEXT_RUNTIME === 'nodejs'
+```
+
+所以你可以这样写：
+
+```ts
+// instrumentation.ts
+export async function register() {
+  if (process.env.NEXT_RUNTIME === 'nodejs') {
+    await import('./instrumentation-node')
+  }
+}
+```
+
+然后：
+
+```ts
+// instrumentation-node.ts
+import { registerOTel } from '@vercel/otel'
+
+registerOTel('medling-app')
+```
+
+这样更安全。
